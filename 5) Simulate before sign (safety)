@@ -16,3 +16,4 @@ const sim = await fetch('https://api.tenderly.co/api/v1/account/me/project/defau
   })
 });
 const simJson = await sim.json();
+•	Gas suggestions: fetch Blocknative Gas Price API (P50/P95) for the chain and annotate the preview
