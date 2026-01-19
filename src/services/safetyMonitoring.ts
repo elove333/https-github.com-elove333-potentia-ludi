@@ -224,7 +224,7 @@ class SafetyMonitoringService {
   private isKnownUnsafeContract(address: string): boolean {
     // In production, this would check against a database of known unsafe contracts
     // For now, just a placeholder
-    const unsafeContracts = [
+    const unsafeContracts: string[] = [
       // Add known unsafe contract addresses here
     ];
 

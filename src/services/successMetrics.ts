@@ -87,7 +87,6 @@ class SuccessMetricsService {
    */
   private calculateAverageTimeToFirstTx(): number {
     const userTimes: number[] = [];
-    const users = new Set<string>();
 
     // Find first login for each user
     const firstLogins = new Map<string, Date>();

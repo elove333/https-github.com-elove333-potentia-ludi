@@ -126,7 +126,7 @@ class RewardTrackingService {
   /**
    * Claim rewards
    */
-  async claimReward(walletAddress: string, reward: ChainReward): Promise<boolean> {
+  async claimReward(_walletAddress: string, reward: ChainReward): Promise<boolean> {
     // In production, this would execute the claim transaction
     console.log(`Claiming reward:`, reward);
     
