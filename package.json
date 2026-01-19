@@ -8,7 +8,11 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint src --ext ts,tsx",
-    "test": "vitest"
+    "test": "vitest",
+    "db:setup": "psql $DATABASE_URL -f src/backend/database/schema.sql || psql potentia_ludi -f src/backend/database/schema.sql",
+    "db:migrate": "echo 'No migrations yet'",
+    "redis:start": "redis-server --daemonize yes",
+    "redis:stop": "redis-cli shutdown"
   },
   "keywords": [
     "web3",
