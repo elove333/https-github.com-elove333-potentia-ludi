@@ -61,7 +61,7 @@ class GasOptimizationService {
   /**
    * Get gas optimization recommendation
    */
-  async getOptimization(chainId: number, transactionType: string): Promise<GasOptimization> {
+  async getOptimization(chainId: number, _transactionType: string): Promise<GasOptimization> {
     const currentGasPrice = this.gasPriceCache.get(chainId) || BigInt(0);
     
     // Calculate optimal gas price (70% of current for non-urgent transactions)

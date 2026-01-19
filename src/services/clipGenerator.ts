@@ -151,7 +151,7 @@ class ClipGeneratorService {
   /**
    * Generate video with stats overlay
    */
-  private async generateVideo(gameId: string, duration: number): Promise<string> {
+  private async generateVideo(gameId: string, _duration: number): Promise<string> {
     // In production, this would:
     // 1. Process recorded gameplay footage
     // 2. Add stats overlay

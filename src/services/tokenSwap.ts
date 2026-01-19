@@ -13,7 +13,7 @@ class TokenSwapService {
    * Get the best swap route across multiple DEXs
    */
   async getBestRoute(
-    chainId: number,
+    _chainId: number,
     fromToken: string,
     toToken: string,
     amount: string
@@ -78,7 +78,7 @@ class TokenSwapService {
    * Auto-swap tokens based on game requirements
    */
   async autoSwapForGame(
-    gameId: string,
+    _gameId: string,
     userBalance: Record<string, string>,
     requiredToken: string,
     requiredAmount: string

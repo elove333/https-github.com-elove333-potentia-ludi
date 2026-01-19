@@ -1,21 +1,8 @@
 import { ChainReward } from '../types';
 
-interface RewardSource {
-  name: string;
-  chainId: number;
-  contractAddress: string;
-}
-
 class RewardTrackingService {
   private trackedRewards: Map<string, ChainReward[]> = new Map();
   private updateInterval: NodeJS.Timeout | null = null;
-
-  // Common reward sources across different chains
-  private rewardSources: RewardSource[] = [
-    { name: 'Game Rewards', chainId: 1, contractAddress: '0x...' },
-    { name: 'Staking Rewards', chainId: 137, contractAddress: '0x...' },
-    { name: 'Tournament Prizes', chainId: 42161, contractAddress: '0x...' },
-  ];
 
   /**
    * Initialize reward tracking
@@ -57,7 +44,7 @@ class RewardTrackingService {
    * Fetch rewards for a specific chain
    */
   private async fetchRewardsForChain(
-    walletAddress: string,
+    _walletAddress: string,
     chainId: number
   ): Promise<ChainReward[]> {
     // In production, this would query blockchain data
@@ -129,7 +116,7 @@ class RewardTrackingService {
   /**
    * Claim rewards
    */
-  async claimReward(walletAddress: string, reward: ChainReward): Promise<boolean> {
+  async claimReward(_walletAddress: string, reward: ChainReward): Promise<boolean> {
     // In production, this would execute the claim transaction
     console.log(`Claiming reward:`, reward);
     
