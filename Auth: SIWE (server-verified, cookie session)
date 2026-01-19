@@ -1,0 +1,25 @@
+Routes
+	•	GET /api/siwe/nonce — issue nonce, store in Redis
+	•	POST /api/siwe/verify — verify EIP-4361 message + signature, mint httpOnly session cookie
+	•	POST /api/siwe/logout — clear session
+
+Notes & refs: use the EIP-4361 fields (domain, uri, version, nonce, issuedAt) and reject mismatched domain/expired nonces.  ￼
+
+Minimal verify (Next.js route, TS)
+// app/api/siwe/verify/route.ts
+import { NextRequest, NextResponse } from 'next/server';
+import { SiweMessage } from 'siwe'; // from 'siwe' npm
+import { setSessionCookie, redis } from '@/lib/auth';
+
+export async function POST(req: NextRequest) {
+  const { message, signature } = await req.json();
+  const siwe = new SiweMessage(message);
+  const fields = await siwe.validate(signature);
+  const key = `siwe:nonce:${fields.nonce}`;
+  const stored = await redis.get<string>(key);
+  if (!stored || stored !== fields.nonce) return NextResponse.json({ error: 'Bad nonce' }, { status: 400 });
+  await redis.del(key);
+  // Create user record (by address) if missing...
+  await setSessionCookie(fields.address);
+  return NextResponse.json({ ok: true });
+}
