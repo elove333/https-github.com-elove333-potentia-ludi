@@ -1,0 +1,18 @@
+•	Tenderly Simulation API: send from, to, data, value, gas from the 0x v2 quoteResponse.transaction.*. Use the decoded trace to compute human-readable deltas and revert reasons; block execution if negative beyond slippage or if router is unverified.  ￼
+
+Sim call (server)
+const sim = await fetch('https://api.tenderly.co/api/v1/account/me/project/default/simulate', {
+  method: 'POST',
+  headers: { 'X-Access-Key': process.env.TENDERLY_ACCESS_KEY!, 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    save: false,
+    simulation_type: 'quick',
+    network_id: String(chainId),
+    from: intent.takerAddress,
+    to: quote.quoteResponse.transaction.to,
+    input: quote.quoteResponse.transaction.data,
+    gas: quote.quoteResponse.transaction.gas,
+    value: quote.quoteResponse.transaction.value,
+  })
+});
+const simJson = await sim.json();
