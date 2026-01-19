@@ -44,7 +44,9 @@ export async function tradeSwap(params: SwapExecuteParams): Promise<SwapExecuteR
   const { quote, userAddress, deadline, signature } = params;
   
   // Validate quote is still valid (not too old)
-  const quoteAge = Date.now() - (quote as any).timestamp;
+  // Note: In production, quote should include timestamp in type definition
+  const quoteTimestamp = (quote as any).timestamp || 0;
+  const quoteAge = Date.now() - quoteTimestamp;
   if (quoteAge > 60000) { // 60 seconds
     throw new Error('Quote expired. Please get a fresh quote.');
   }

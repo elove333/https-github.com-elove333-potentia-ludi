@@ -21,6 +21,8 @@ import { TrackBalanceParams, TrackBalanceResult, Balance } from './types';
 import { balancesGetWithCache } from './balances.get';
 
 // Store active subscriptions
+// TODO: In production, use a proper subscription management service
+// that persists state and handles cleanup on server restart
 const activeSubscriptions = new Map<string, NodeJS.Timeout>();
 
 /**

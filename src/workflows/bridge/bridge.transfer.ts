@@ -62,7 +62,9 @@ export async function bridgeTransfer(params: BridgeTransferParams): Promise<Brid
   }
   
   // Validate quote is still valid
-  const quoteAge = Date.now() - (quote as any).timestamp;
+  // Note: In production, quote should include timestamp in type definition
+  const quoteTimestamp = (quote as any).timestamp || 0;
+  const quoteAge = Date.now() - quoteTimestamp;
   if (quoteAge > 120000) { // 2 minutes
     throw new Error('Bridge quote expired. Please get a fresh quote.');
   }
