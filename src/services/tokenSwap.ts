@@ -81,7 +81,8 @@ class TokenSwapService {
     _gameId: string,
     userBalance: Record<string, string>,
     requiredToken: string,
-    requiredAmount: string
+    requiredAmount: string,
+    chainId: number = 1
   ): Promise<TokenSwap | null> {
     // Check if user has enough of the required token
     if (userBalance[requiredToken] && parseFloat(userBalance[requiredToken]) >= parseFloat(requiredAmount)) {
@@ -102,7 +103,7 @@ class TokenSwapService {
     // Calculate amount to swap
     const swapAmount = Math.min(parseFloat(balance), parseFloat(requiredAmount) * 1.1).toString();
 
-    return await this.executeSwap(1, fromToken, requiredToken, swapAmount);
+    return await this.executeSwap(chainId, fromToken, requiredToken, swapAmount);
   }
 
   /**

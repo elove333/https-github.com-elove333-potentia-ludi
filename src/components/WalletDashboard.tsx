@@ -22,7 +22,7 @@ const WalletDashboard: React.FC = () => {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       
       setWallet({
-        address: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb',
+        address: '0x1234567890123456789012345678901234567890',
         chainId: 1,
         balance: '1.5',
         isConnected: true,

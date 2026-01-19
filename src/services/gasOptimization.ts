@@ -1,5 +1,16 @@
 import { GasOptimization } from '../types';
 
+interface Transaction {
+  to?: string;
+  from?: string;
+  data?: string;
+  value?: bigint;
+  gasLimit?: bigint;
+  maxFeePerGas?: bigint;
+  maxPriorityFeePerGas?: bigint;
+  type?: string;
+}
+
 class GasOptimizationService {
   private gasPriceCache: Map<number, bigint> = new Map();
   private updateInterval: NodeJS.Timeout | null = null;
@@ -93,8 +104,8 @@ class GasOptimizationService {
    */
   async optimizeTransaction(
     chainId: number,
-    transaction: any
-  ): Promise<any> {
+    transaction: Transaction
+  ): Promise<Transaction> {
     const optimization = await this.getOptimization(chainId, transaction.type || 'default');
     
     return {
