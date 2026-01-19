@@ -131,7 +131,7 @@ class RewardTrackingService {
     console.log(`Claiming reward:`, reward);
     
     // Emit telemetry event for reward claimed
-    const txHash = `0x${Math.random().toString(16).substr(2, 64)}`;
+    const txHash = `0x${Math.random().toString(16).substring(2, 66)}`;
     telemetryService.emitRewardClaimed(
       reward.chainId,
       reward.tokenSymbol,

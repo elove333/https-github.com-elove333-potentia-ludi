@@ -82,6 +82,7 @@ class SafetyMonitoringService {
           failure_rate: failureRate,
           threshold: this.thresholds.maxFailureRate,
           execution_reliability: metrics.executionReliability,
+          violation_subtype: 'high_failure_rate',
         },
       });
     }
@@ -97,6 +98,7 @@ class SafetyMonitoringService {
           simulation_success_rate: simulationSuccessRate,
           threshold: this.thresholds.minSimulationSuccessRate,
           revert_rate: metrics.revertRate,
+          violation_subtype: 'low_simulation_success_rate',
         },
       });
     }
