@@ -1,4 +1,5 @@
 import { ChainReward } from '../types';
+import { telemetryService } from './telemetry';
 
 class RewardTrackingService {
   private trackedRewards: Map<string, ChainReward[]> = new Map();
@@ -60,17 +61,26 @@ class RewardTrackingService {
 
     // Simulate some rewards
     if (Math.random() > 0.5) {
-      return [
-        {
-          chainId,
-          chainName: chainNames[chainId] || `Chain ${chainId}`,
-          tokenAddress: '0x1234567890123456789012345678901234567890',
-          tokenSymbol: 'GAME',
-          amount: (Math.random() * 100).toFixed(2),
-          usdValue: Math.random() * 500,
-          claimable: Math.random() > 0.3,
-        },
-      ];
+      const reward: ChainReward = {
+        chainId,
+        chainName: chainNames[chainId] || `Chain ${chainId}`,
+        tokenAddress: '0x1234567890123456789012345678901234567890',
+        tokenSymbol: 'GAME',
+        amount: (Math.random() * 100).toFixed(2),
+        usdValue: Math.random() * 500,
+        claimable: Math.random() > 0.3,
+      };
+      
+      // Emit telemetry event for reward found
+      telemetryService.emitRewardFound(
+        chainId,
+        reward.tokenSymbol,
+        reward.amount,
+        reward.usdValue,
+        'gameplay'
+      );
+      
+      return [reward];
     }
 
     return [];
@@ -116,9 +126,18 @@ class RewardTrackingService {
   /**
    * Claim rewards
    */
-  async claimReward(_walletAddress: string, reward: ChainReward): Promise<boolean> {
+  async claimReward(walletAddress: string, reward: ChainReward): Promise<boolean> {
     // In production, this would execute the claim transaction
     console.log(`Claiming reward:`, reward);
+    
+    // Emit telemetry event for reward claimed
+    const txHash = `0x${Math.random().toString(16).substr(2, 64)}`;
+    telemetryService.emitRewardClaimed(
+      reward.chainId,
+      reward.tokenSymbol,
+      reward.amount,
+      txHash
+    );
     
     // Simulate claim
     reward.claimable = false;

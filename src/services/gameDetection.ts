@@ -1,4 +1,5 @@
 import { Web3Game } from '../types';
+import { telemetryService } from './telemetry';
 
 // Known Web3 games registry
 const KNOWN_WEB3_GAMES = [
@@ -101,6 +102,9 @@ class GameDetectionService {
     if (!this.detectedGames.has(game.id)) {
       this.detectedGames.set(game.id, game);
       this.notifyObservers(game);
+      
+      // Emit telemetry event for game detection
+      telemetryService.emitGameDetected(game.id, game.name, game.url, game.chainId);
     } else {
       // Update last active time
       const existing = this.detectedGames.get(game.id)!;
