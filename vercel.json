@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "env": {
+    "SESSION_SECRET": "@session-secret",
+    "DATABASE_URL": "@database-url",
+    "REDIS_URL": "@redis-url",
+    "ALCHEMY_API_KEY": "@alchemy-api-key"
+  }
+}

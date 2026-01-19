@@ -1,129 +1,159 @@
-'use client';
-import { useState } from 'react';
-import { 
-  useAccount, 
-  useBalance, 
-  useToken, 
-  usePublicClient 
-} from 'wagmi';
-import { 
-  polygon, 
-  mainnet, 
-  polygonMumbai 
-} from 'wagmi/chains'; // Fixed: Explicit chain imports [web:44]
-import { formatEther, formatUnits, Address } from 'viem'; // Proper types [web:36]
-import { OnchainKitProvider, CoinbaseSmartWalletProvider } from '@coinbase/onchainkit'; // From template [web:31]
-
-const TEST_WALLET: Address = '0x742d35Cc6634C0532925a3b8D7De2665B81b5fE4' as Address; // Test addr w/ Polygon test assets [web:37]
-const GAME_TOKEN = '0x2791Bca1f2aD161e1a43a2250A0fFfA4eD89b55d'; // Example game token (USDC Mumbai) [web:43]
-
 export default function Home() {
-  const [demoMode, setDemoMode] = useState(false);
-  const [selectedChainId, setSelectedChainId] = useState<number>(polygon.id); // Fixed: Numeric ID [web:35]
-
-  const { address } = useAccount();
-  const publicClient = usePublicClient({ chainId: selectedChainId });
-
-  // Type-safe balance hook: specify chainId explicitly [web:42]
-  const {  balanceData } = useBalance({
-    address: demoMode ? TEST_WALLET : address,
-    chainId: selectedChainId,
-    watch: true,
-  });
-
-  // Type-safe ERC20 token data
-  const {  tokenData } = useToken({
-    address: GAME_TOKEN as Address,
-    chainId: selectedChainId,
-  });
-
-  const chains = [polygon, polygonMumbai, mainnet]; // Fixed: Defined chains array for multi-chain [web:44]
-
-  const switchChain = (chainId: number) => {
-    setSelectedChainId(chainId);
-  };
-
   return (
-    <OnchainKitProvider
-      apiKey={process.env.NEXT_PUBLIC_CDP_API_KEY || ''}
-      chains={chains} // Fixed: Pass chains prop [web:38]
-    >
-      <CoinbaseSmartWalletProvider>
-        <main className="min-h-screen bg-gradient-to-br from-purple-900 to-blue-900 p-8">
-          <div className="max-w-4xl mx-auto">
-            <h1 className="text-4xl font-bold text-white mb-8">
-              Potentia_Ludi: Universal Gaming Wallet Hub
-            </h1>
-            
-            {/* Demo Toggle */}
-            <button
-              onClick={() => setDemoMode(!demoMode)}
-              className="mb-6 px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
-            >
-              {demoMode ? 'Use Real Wallet' : `Demo w/ Test Wallet (${TEST_WALLET.slice(0,6)}...`)}
-            </button>
+    <main className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-8">
+      <div className="max-w-6xl mx-auto">
+        <header className="text-center mb-12">
+          <h1 className="text-5xl font-bold text-white mb-4">
+            Potentia Ludi
+          </h1>
+          <p className="text-xl text-gray-300">
+            Conversational Web3 Wallet Hub - Powered by Natural Language Intents
+          </p>
+        </header>
 
-            {/* Chain Selector - Fixed IDs */}
-            <div className="mb-8 flex gap-2">
-              {chains.map((chain) => (
-                <button
-                  key={chain.id}
-                  onClick={() => switchChain(chain.id)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium ${
-                    selectedChainId === chain.id
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-white/10 text-white hover:bg-white/20'
-                  }`}
-                >
-                  {chain.name}
-                </button>
-              ))}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+          {/* SIWE Authentication */}
+          <div className="bg-white/10 backdrop-blur-xl p-6 rounded-2xl border border-white/20">
+            <h3 className="text-2xl font-bold text-white mb-3">🔐 SIWE Auth</h3>
+            <p className="text-gray-300 mb-4">
+              Sign-In with Ethereum authentication with secure session management
+            </p>
+            <ul className="text-sm text-gray-400 space-y-1">
+              <li>✓ /api/siwe/nonce</li>
+              <li>✓ /api/siwe/verify</li>
+              <li>✓ /api/siwe/logout</li>
+            </ul>
+          </div>
+
+          {/* Intent Processing */}
+          <div className="bg-white/10 backdrop-blur-xl p-6 rounded-2xl border border-white/20">
+            <h3 className="text-2xl font-bold text-white mb-3">🎯 Intent Pipeline</h3>
+            <p className="text-gray-300 mb-4">
+              Natural language → Structured JSON intents
+            </p>
+            <ul className="text-sm text-gray-400 space-y-1">
+              <li>✓ balances.get</li>
+              <li>✓ trade.swap</li>
+              <li>✓ bridge.transfer</li>
+              <li>✓ rewards.claim</li>
+            </ul>
+          </div>
+
+          {/* Read Layer */}
+          <div className="bg-white/10 backdrop-blur-xl p-6 rounded-2xl border border-white/20">
+            <h3 className="text-2xl font-bold text-white mb-3">📊 Read Layer</h3>
+            <p className="text-gray-300 mb-4">
+              Portfolio balances, NFTs, and approvals
+            </p>
+            <ul className="text-sm text-gray-400 space-y-1">
+              <li>✓ Alchemy Portfolio API</li>
+              <li>✓ Alchemy NFT API</li>
+              <li>✓ Moralis Fallback</li>
+            </ul>
+          </div>
+
+          {/* DEX Swaps */}
+          <div className="bg-white/10 backdrop-blur-xl p-6 rounded-2xl border border-white/20">
+            <h3 className="text-2xl font-bold text-white mb-3">💱 DEX Swaps</h3>
+            <p className="text-gray-300 mb-4">
+              Token swaps with optimal routing
+            </p>
+            <ul className="text-sm text-gray-400 space-y-1">
+              <li>✓ 0x API Integration</li>
+              <li>✓ Uniswap Fallback</li>
+              <li>✓ Slippage Control</li>
+            </ul>
+          </div>
+
+          {/* Preview & Safety */}
+          <div className="bg-white/10 backdrop-blur-xl p-6 rounded-2xl border border-white/20">
+            <h3 className="text-2xl font-bold text-white mb-3">🛡️ Safety Preview</h3>
+            <p className="text-gray-300 mb-4">
+              Transaction simulation and risk assessment
+            </p>
+            <ul className="text-sm text-gray-400 space-y-1">
+              <li>✓ Tenderly Simulation</li>
+              <li>✓ Decoded Calls</li>
+              <li>✓ Risk Assessment</li>
+            </ul>
+          </div>
+
+          {/* Rewards */}
+          <div className="bg-white/10 backdrop-blur-xl p-6 rounded-2xl border border-white/20">
+            <h3 className="text-2xl font-bold text-white mb-3">🏆 Rewards</h3>
+            <p className="text-gray-300 mb-4">
+              Aggregate gaming rewards and quests
+            </p>
+            <ul className="text-sm text-gray-400 space-y-1">
+              <li>✓ Galxe Integration</li>
+              <li>✓ RabbitHole API</li>
+              <li>✓ Layer3 Support</li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Architecture Overview */}
+        <div className="bg-white/5 backdrop-blur-xl p-8 rounded-3xl border border-white/10 mb-12">
+          <h2 className="text-3xl font-bold text-white mb-6">Architecture</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h4 className="text-lg font-semibold text-white mb-2">Backend Stack</h4>
+              <ul className="text-gray-300 space-y-2">
+                <li>• Next.js 14 with App Router</li>
+                <li>• PostgreSQL (Neon) for data persistence</li>
+                <li>• Redis (Upstash) for caching & sessions</li>
+                <li>• Iron Session for secure cookies</li>
+                <li>• Pino for structured logging</li>
+              </ul>
             </div>
-
-            {/* Wallet Dashboard */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* Native Balance */}
-              <div className="bg-white/10 backdrop-blur-xl p-6 rounded-2xl border border-white/20">
-                <h3 className="text-lg font-semibold text-white mb-2">Native Balance</h3>
-                <p className="text-3xl font-bold text-cyan-400">
-                  {balanceData ? `${Number(formatEther(balanceData.value)).toFixed(4)} ${chains.find(c => c.id === selectedChainId)?.nativeCurrency?.symbol}` : 'Loading...'}
-                </p>
-                <p className="text-sm text-gray-300 mt-1">{demoMode ? TEST_WALLET : address?.slice(0,6)}...</p>
-              </div>
-
-              {/* Game Token Balance */}
-              <div className="bg-white/10 backdrop-blur-xl p-6 rounded-2xl border border-white/20">
-                <h3 className="text-lg font-semibold text-white mb-2">Game Token (USDC)</h3>
-                <p className="text-3xl font-bold text-emerald-400">
-                  {tokenData ? `${Number(formatUnits(tokenData.value || 0n, 6)).toFixed(2)}` : '0.00'}
-                </p>
-                <p className="text-sm text-gray-300">{GAME_TOKEN.slice(0,6)}...</p>
-              </div>
-
-              {/* NFT Count Placeholder */}
-              <div className="bg-white/10 backdrop-blur-xl p-6 rounded-2xl border border-white/20">
-                <h3 className="text-lg font-semibold text-white mb-2">NFTs Owned</h3>
-                <p className="text-3xl font-bold text-purple-400">12</p> {/* Mock; add Alchemy NFT API */}
-                <p className="text-sm text-gray-300">Across games</p>
-              </div>
-            </div>
-
-            {/* Creator Stats Card */}
-            <div className="mt-12 bg-white/5 backdrop-blur-xl p-8 rounded-3xl border border-white/10">
-              <h2 className="text-2xl font-bold text-white mb-4">Creator Dashboard</h2>
-              <p className="text-gray-300 mb-4">Total Earnings: $1,247.50 | Sessions: 42 | Highlights: 15</p>
-              <div className="flex gap-4">
-                <button className="px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-xl hover:from-pink-600">
-                  Export Clips
-                </button>
-                <button className="px-6 py-3 bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-xl hover:from-indigo-600">
-                  Copy Referral
-                </button>
-              </div>
+            <div>
+              <h4 className="text-lg font-semibold text-white mb-2">Security Features</h4>
+              <ul className="text-gray-300 space-y-2">
+                <li>• SIWE authentication</li>
+                <li>• Transaction simulation before execution</li>
+                <li>• Daily spend limits</li>
+                <li>• Approval bounds with Permit2</li>
+                <li>• Prompt injection hardening</li>
+              </ul>
             </div>
           </div>
-        </main>
-      </CoinbaseSmartWalletProvider>
-    </OnchainKitProvider>
+        </div>
+
+        {/* API Endpoints */}
+        <div className="bg-white/5 backdrop-blur-xl p-8 rounded-3xl border border-white/10">
+          <h2 className="text-3xl font-bold text-white mb-6">API Endpoints</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-white/5 p-4 rounded-xl">
+              <code className="text-green-400">GET /api/siwe/nonce</code>
+              <p className="text-sm text-gray-400 mt-1">Generate SIWE nonce</p>
+            </div>
+            <div className="bg-white/5 p-4 rounded-xl">
+              <code className="text-green-400">POST /api/siwe/verify</code>
+              <p className="text-sm text-gray-400 mt-1">Verify signature & create session</p>
+            </div>
+            <div className="bg-white/5 p-4 rounded-xl">
+              <code className="text-green-400">POST /api/siwe/logout</code>
+              <p className="text-sm text-gray-400 mt-1">Destroy session</p>
+            </div>
+            <div className="bg-white/5 p-4 rounded-xl">
+              <code className="text-green-400">GET /api/balances</code>
+              <p className="text-sm text-gray-400 mt-1">Fetch portfolio balances</p>
+            </div>
+            <div className="bg-white/5 p-4 rounded-xl">
+              <code className="text-green-400">POST /api/intents/quote</code>
+              <p className="text-sm text-gray-400 mt-1">Get swap quote</p>
+            </div>
+            <div className="bg-white/5 p-4 rounded-xl">
+              <code className="text-green-400">POST /api/intents/preview</code>
+              <p className="text-sm text-gray-400 mt-1">Preview transaction with risks</p>
+            </div>
+            <div className="bg-white/5 p-4 rounded-xl">
+              <code className="text-green-400">GET /api/rewards</code>
+              <p className="text-sm text-gray-400 mt-1">Aggregate gaming rewards</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
   );
 }
