@@ -1,0 +1,22 @@
+•	wagmi + viem for RPC/signing; RainbowKit for connect modal; WalletConnect v2 connector for mobile/Ledger/Trezor. Keep Base/Arbitrum/Polygon/Ethereum in the chain list.  ￼
+
+Bootstrap (client)
+// app/providers.tsx
+import { WagmiProvider, createConfig, http } from 'wagmi';
+import { mainnet, base, arbitrum, polygon } from 'wagmi/chains';
+import { RainbowKitProvider, getDefaultConfig } from '@rainbow-me/rainbowkit';
+
+const config = getDefaultConfig({
+  appName: 'Potentia_Ludi',
+  projectId: process.env.NEXT_PUBLIC_WC_PROJECT_ID!, // WalletConnect v2
+  chains: [mainnet, base, arbitrum, polygon],
+  transports: { [mainnet.id]: http(), [base.id]: http(), [arbitrum.id]: http(), [polygon.id]: http() },
+});
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  return (
+    <WagmiProvider config={config}>
+      <RainbowKitProvider modalSize="compact">{children}</RainbowKitProvider>
+    </WagmiProvider>
+  );
+}
