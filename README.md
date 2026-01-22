@@ -214,6 +214,10 @@ Contributions are welcome! This project is evolving to include conversational AI
 4. **Test**: Ensure your changes work and don't break existing features
 5. **Submit PR**: Open a pull request with a clear description
 
+For detailed contributing guidelines, see [CONTRIBUTING.md](./CONTRIBUTING.md).
+
+**Need help with Git workflows?** Check out our [Git Workflows Guide](./GIT_WORKFLOWS.md) for practical examples of cherry-picking, resolving conflicts, and safely rewriting history.
+
 ### Areas for Contribution
 
 **Current Features** (Vite + React):
