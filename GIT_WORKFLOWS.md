@@ -165,18 +165,16 @@ git diff --name-only --diff-filter=U  # list conflicted files
 Example conflict markers inside file `request_handler.rb`:
 
 ```ruby
-@@ file: request_handler.rb
- def build_user_agent(req)
--  # old implementation on main
--  agent = req.user_agent || "unknown/0.0"
-+<<<<<<< HEAD
-+  # main branch implementation expects 'req.agent' sometimes
-+  agent = req.agent || "unknown/0.0"
-+=======
-+  # cherry-picked bugfix expects req.user_agent
-+  agent = req.user_agent || "unknown/0.0"
-+>>>>>>> 9a3f7b2... Fix: handle nil user agent
- end
+# file: request_handler.rb
+def build_user_agent(req)
+<<<<<<< HEAD
+  # main branch implementation expects 'req.agent' sometimes
+  agent = req.agent || "unknown/0.0"
+=======
+  # cherry-picked bugfix expects req.user_agent
+  agent = req.user_agent || "unknown/0.0"
+>>>>>>> 9a3f7b2... Fix: handle nil user agent
+end
 ```
 
 ### 3) Resolve the conflict by editing the file to a correct unified implementation
