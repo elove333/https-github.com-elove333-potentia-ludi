@@ -398,7 +398,7 @@ Sign-In with Ethereum flow:
 - Multi-turn conversation refinement
 
 ### Nice-to-Have Features (Phase 3)
-- Mobile app (React Native)
+- Mobile (React Native)
 - Browser extension for in-page assistance
 - Advanced risk scoring with ML
 - Social features (share transactions)
