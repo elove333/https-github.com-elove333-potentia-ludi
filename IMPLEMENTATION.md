@@ -198,7 +198,7 @@ While the current implementation is complete and functional, potential enhanceme
 6. **Achievement System**: Gamification with badges and milestones
 7. **Community Features**: Leaderboards, tournaments, multiplayer stats
 8. **NFT Integration**: Display in-game NFTs and track their value
-9. **Mobile App**: React Native version for mobile gaming
+9. **Mobile**: React Native version for mobile gaming
 10. **AI Features**: Smart recommendations based on playing patterns
 
 ## Conclusion
