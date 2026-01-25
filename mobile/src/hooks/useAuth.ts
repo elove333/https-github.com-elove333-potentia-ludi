@@ -1,5 +1,11 @@
 import { useState, useEffect } from 'react';
 
+interface User {
+  id: string;
+  email: string;
+  name: string;
+}
+
 /**
  * useAuth Hook
  * 
@@ -9,7 +15,7 @@ import { useState, useEffect } from 'react';
  */
 export const useAuth = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
