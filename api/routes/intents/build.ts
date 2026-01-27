@@ -43,7 +43,8 @@ router.post(
       });
 
       if (!preview.success) {
-        handleRouteError(res, new Error(preview.error || 'Failed to build preview'), 'Failed to build preview', 400);
+        const errorMessage = preview.error || 'Failed to build preview';
+        handleRouteError(res, new Error(errorMessage), errorMessage, 400);
         return;
       }
 

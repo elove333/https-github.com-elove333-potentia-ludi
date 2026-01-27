@@ -9,13 +9,37 @@ export abstract class PeriodicMonitor {
    * @param intervalMs - Interval in milliseconds between updates
    */
   protected startMonitoring(intervalMs: number) {
-    // Update at specified interval
+    // Prevent duplicate initialization
+    if (this.updateInterval !== null) {
+      return;
+    }
+
+    // Update at specified interval with error handling
     this.updateInterval = setInterval(() => {
-      this.performUpdate();
+      try {
+        const result = this.performUpdate();
+        // Handle async performUpdate
+        if (result instanceof Promise) {
+          result.catch((error) => {
+            console.error('Error in periodic update:', error);
+          });
+        }
+      } catch (error) {
+        console.error('Error in periodic update:', error);
+      }
     }, intervalMs);
 
-    // Initial update
-    this.performUpdate();
+    // Initial update with error handling
+    try {
+      const result = this.performUpdate();
+      if (result instanceof Promise) {
+        result.catch((error) => {
+          console.error('Error in initial update:', error);
+        });
+      }
+    } catch (error) {
+      console.error('Error in initial update:', error);
+    }
   }
 
   /**
