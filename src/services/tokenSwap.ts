@@ -11,6 +11,14 @@ class TokenSwapService {
   private swapStatusMap: Map<string, TokenSwap> = new Map();
 
   /**
+   * Generate a consistent key for token pair lookups
+   */
+  private getSwapKey(fromToken: string, toToken: string): string {
+    // Use pipe delimiter which is safe for addresses
+    return `${fromToken.toLowerCase()}|${toToken.toLowerCase()}`;
+  }
+
+  /**
    * Get the best swap route across multiple DEXs
    */
   async getBestRoute(
@@ -65,8 +73,8 @@ class TokenSwapService {
     };
 
     this.swapHistory.push(swap);
-    // Add to map for O(1) lookups - use JSON key to avoid collisions
-    const key = JSON.stringify([fromToken, toToken]);
+    // Add to map for O(1) lookups - use consistent key generation
+    const key = this.getSwapKey(fromToken, toToken);
     this.swapStatusMap.set(key, swap);
 
     // In production, this would execute the actual swap
@@ -122,8 +130,8 @@ class TokenSwapService {
    * Get swap status
    */
   getSwapStatus(fromToken: string, toToken: string): TokenSwap | undefined {
-    // Use Map for O(1) lookup instead of array iteration
-    return this.swapStatusMap.get(JSON.stringify([fromToken, toToken]));
+    // Use consistent key generation for O(1) lookup
+    return this.swapStatusMap.get(this.getSwapKey(fromToken, toToken));
   }
 }
 

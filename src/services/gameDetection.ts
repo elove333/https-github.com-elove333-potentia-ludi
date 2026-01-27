@@ -33,6 +33,7 @@ class GameDetectionService {
   private observers: Array<(game: Web3Game) => void> = [];
   private domainSet: Set<string> = new Set();
   private urlCheckDebounceTimer: NodeJS.Timeout | null = null;
+  private pendingNotifications: Map<string, Web3Game> = new Map();
 
   /**
    * Initialize the game detection service
@@ -107,8 +108,9 @@ class GameDetectionService {
   private addDetectedGame(game: Web3Game) {
     if (!this.detectedGames.has(game.id)) {
       this.detectedGames.set(game.id, game);
-      // Debounce notifications to avoid excessive updates
-      this.debounceNotifyObservers(game);
+      // Queue notification for this game
+      this.pendingNotifications.set(game.id, game);
+      this.debounceNotifyObservers();
     } else {
       // Update last active time
       const existing = this.detectedGames.get(game.id)!;
@@ -118,14 +120,19 @@ class GameDetectionService {
   }
 
   /**
-   * Debounced notification to observers
+   * Debounced notification to observers - notifies all pending games after delay
    */
-  private debounceNotifyObservers(game: Web3Game) {
+  private debounceNotifyObservers() {
     if (this.urlCheckDebounceTimer) {
       clearTimeout(this.urlCheckDebounceTimer);
     }
     this.urlCheckDebounceTimer = setTimeout(() => {
-      this.notifyObservers(game);
+      // Notify all pending games
+      this.pendingNotifications.forEach((game) => {
+        this.notifyObservers(game);
+      });
+      // Clear the queue
+      this.pendingNotifications.clear();
     }, 500);
   }
 
@@ -168,6 +175,7 @@ class GameDetectionService {
       clearTimeout(this.urlCheckDebounceTimer);
       this.urlCheckDebounceTimer = null;
     }
+    this.pendingNotifications.clear();
   }
 }
 

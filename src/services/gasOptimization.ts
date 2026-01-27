@@ -136,19 +136,25 @@ class GasOptimizationService {
     // Track that we're preparing a transaction (increment before async operation)
     this.pendingTransactions++;
     
-    const optimization = await this.getOptimization(chainId, transaction.type || 'default');
-    
-    // Note: In production, decrement would happen when transaction is confirmed/failed
-    // For demo purposes, we decrement immediately since we don't track actual sends
-    setTimeout(() => {
+    try {
+      const optimization = await this.getOptimization(chainId, transaction.type || 'default');
+      
+      // Note: In production, decrement would happen when transaction is confirmed/failed
+      // For demo purposes, we decrement after a delay since we don't track actual sends
+      setTimeout(() => {
+        this.pendingTransactions = Math.max(0, this.pendingTransactions - 1);
+      }, 2000);
+      
+      return {
+        ...transaction,
+        maxFeePerGas: optimization.optimizedGasPrice,
+        maxPriorityFeePerGas: optimization.optimizedGasPrice / BigInt(10),
+      };
+    } catch (error) {
+      // Ensure counter is decremented even on error
       this.pendingTransactions = Math.max(0, this.pendingTransactions - 1);
-    }, 2000);
-    
-    return {
-      ...transaction,
-      maxFeePerGas: optimization.optimizedGasPrice,
-      maxPriorityFeePerGas: optimization.optimizedGasPrice / BigInt(10),
-    };
+      throw error;
+    }
   }
 
   /**
