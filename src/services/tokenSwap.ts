@@ -73,13 +73,14 @@ class TokenSwapService {
     };
 
     this.swapHistory.push(swap);
-    // Add to map for O(1) lookups - use consistent key generation
+    // Add to map for O(1) lookups - initial status is 'pending'
     const key = this.getSwapKey(fromToken, toToken);
     this.swapStatusMap.set(key, swap);
 
     // In production, this would execute the actual swap
     // For demo, simulate completion after delay
     setTimeout(() => {
+      // Update status to completed and refresh map entry
       swap.status = 'completed';
       this.swapStatusMap.set(key, swap);
     }, 2000);

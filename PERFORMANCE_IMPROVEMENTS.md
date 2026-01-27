@@ -105,9 +105,13 @@ getSwapStatus(fromToken: string, toToken: string): TokenSwap | undefined {
   );
 }
 
-// After: O(1) Map lookup
+// After: O(1) Map lookup with consistent key generation
+getSwapKey(fromToken: string, toToken: string): string {
+  return `${fromToken.toLowerCase()}|${toToken.toLowerCase()}`;
+}
+
 getSwapStatus(fromToken: string, toToken: string): TokenSwap | undefined {
-  return this.swapStatusMap.get(`${fromToken}-${toToken}`);
+  return this.swapStatusMap.get(this.getSwapKey(fromToken, toToken));
 }
 ```
 

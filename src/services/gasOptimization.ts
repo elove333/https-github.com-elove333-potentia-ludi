@@ -139,8 +139,11 @@ class GasOptimizationService {
     try {
       const optimization = await this.getOptimization(chainId, transaction.type || 'default');
       
-      // Note: In production, decrement would happen when transaction is confirmed/failed
-      // For demo purposes, we decrement after a delay since we don't track actual sends
+      // NOTE: This is demo code. In production:
+      // - Don't use setTimeout for transaction tracking
+      // - Decrement counter when tx is confirmed/failed via event listeners
+      // - Track actual transaction hashes to avoid race conditions
+      // For demo purposes, we simulate a delay to demonstrate conditional monitoring
       setTimeout(() => {
         this.pendingTransactions = Math.max(0, this.pendingTransactions - 1);
       }, 2000);
