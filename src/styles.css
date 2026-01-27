@@ -61,6 +61,10 @@ button:disabled {
   }
 }
 
+.pulse-animation {
+  animation: pulse 2s ease-in-out infinite;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
