@@ -16,7 +16,7 @@ describe('Intent Parser', () => {
     });
 
     it('should parse transfer intent', async () => {
-      const result = await parseIntent('send 50 USDC to 0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb');
+      const result = await parseIntent('send 50 USDC to 0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0');
       
       expect(result).toBeDefined();
       expect(result?.action).toBe('transfer.send');
@@ -175,7 +175,7 @@ describe('Intent Parser', () => {
         entities: {
           amount: '50',
           token: 'USDC',
-          recipient: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb'
+          recipient: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0'
         },
         confidence: 0.8,
         riskLevel: 'HIGH' as const,
@@ -184,7 +184,7 @@ describe('Intent Parser', () => {
 
       const description = getIntentDescription(intent);
       
-      expect(description).toBe('Send 50 USDC to 0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb');
+      expect(description).toBe('Send 50 USDC to 0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0');
     });
 
     it('should describe balance intent', () => {
