@@ -36,8 +36,8 @@ const chains = [
   { id: 8453, name: 'Base' },
 ];
 
-chains.forEach(chain => {
-  console.log(`  • ${chain.name} (Chain ID: ${chain.id})`);
+chains.forEach(supportedChain => {
+  console.log(`  • ${supportedChain.name} (Chain ID: ${supportedChain.id})`);
 });
 
 console.log('\n🎮 Supported Games:');
@@ -49,8 +49,8 @@ const games = [
   'Custom games via manual addition',
 ];
 
-games.forEach(game => {
-  console.log(`  • ${game}`);
+games.forEach(supportedGame => {
+  console.log(`  • ${supportedGame}`);
 });
 
 console.log('\n🚀 To start the application:');

@@ -54,15 +54,15 @@ class ClipGeneratorService {
       return null;
     }
 
-    const gameId = this.recordingState.gameId;
-    const duration = this.recordingState.startTime
+    const currentGameId = this.recordingState.gameId;
+    const recordingDuration = this.recordingState.startTime
       ? (Date.now() - this.recordingState.startTime.getTime()) / 1000
       : 0;
 
     // Get accumulated stats
-    const stats = this.statsBuffer.get(gameId) || {
-      gameId,
-      playTime: duration,
+    const gameStats = this.statsBuffer.get(currentGameId) || {
+      gameId: currentGameId,
+      playTime: recordingDuration,
       transactions: 0,
       gasSpent: '0',
       rewardsEarned: '0',
@@ -71,17 +71,17 @@ class ClipGeneratorService {
     };
 
     // Generate clip metadata
-    const clip: ClipMetadata = {
+    const generatedClip: ClipMetadata = {
       id: `clip-${Date.now()}`,
-      gameId,
+      gameId: currentGameId,
       timestamp: this.recordingState.startTime || new Date(),
-      duration,
-      stats: stats as GameStats,
-      thumbnailUrl: await this.generateThumbnail(gameId),
-      videoUrl: await this.generateVideo(gameId, duration),
+      duration: recordingDuration,
+      stats: gameStats as GameStats,
+      thumbnailUrl: await this.generateThumbnail(currentGameId),
+      videoUrl: await this.generateVideo(currentGameId, recordingDuration),
     };
 
-    this.clips.push(clip);
+    this.clips.push(generatedClip);
 
     // Reset recording state
     this.recordingState = {
@@ -90,7 +90,7 @@ class ClipGeneratorService {
       gameId: null,
     };
 
-    return clip;
+    return generatedClip;
   }
 
   /**
@@ -101,19 +101,19 @@ class ClipGeneratorService {
       return;
     }
 
-    const current = this.statsBuffer.get(gameId) || {};
-    this.statsBuffer.set(gameId, { ...current, ...statsUpdate });
+    const currentStats = this.statsBuffer.get(gameId) || {};
+    this.statsBuffer.set(gameId, { ...currentStats, ...statsUpdate });
   }
 
   /**
    * Record a transaction
    */
   recordTransaction(gameId: string, gasUsed: string) {
-    const stats = this.statsBuffer.get(gameId);
-    if (stats) {
-      stats.transactions = (stats.transactions || 0) + 1;
-      stats.gasSpent = (BigInt(stats.gasSpent || '0') + BigInt(gasUsed)).toString();
-      this.statsBuffer.set(gameId, stats);
+    const currentStats = this.statsBuffer.get(gameId);
+    if (currentStats) {
+      currentStats.transactions = (currentStats.transactions || 0) + 1;
+      currentStats.gasSpent = (BigInt(currentStats.gasSpent || '0') + BigInt(gasUsed)).toString();
+      this.statsBuffer.set(gameId, currentStats);
     }
   }
 
@@ -121,10 +121,10 @@ class ClipGeneratorService {
    * Record a reward earned
    */
   recordReward(gameId: string, amount: string) {
-    const stats = this.statsBuffer.get(gameId);
-    if (stats) {
-      stats.rewardsEarned = (BigInt(stats.rewardsEarned || '0') + BigInt(amount)).toString();
-      this.statsBuffer.set(gameId, stats);
+    const currentStats = this.statsBuffer.get(gameId);
+    if (currentStats) {
+      currentStats.rewardsEarned = (BigInt(currentStats.rewardsEarned || '0') + BigInt(amount)).toString();
+      this.statsBuffer.set(gameId, currentStats);
     }
   }
 
@@ -132,10 +132,10 @@ class ClipGeneratorService {
    * Record an achievement
    */
   recordAchievement(gameId: string, achievement: string) {
-    const stats = this.statsBuffer.get(gameId);
-    if (stats) {
-      stats.achievements = [...(stats.achievements || []), achievement];
-      this.statsBuffer.set(gameId, stats);
+    const currentStats = this.statsBuffer.get(gameId);
+    if (currentStats) {
+      currentStats.achievements = [...(currentStats.achievements || []), achievement];
+      this.statsBuffer.set(gameId, currentStats);
     }
   }
 
@@ -164,15 +164,15 @@ class ClipGeneratorService {
   /**
    * Generate stats overlay image
    */
-  generateStatsOverlay(stats: GameStats): string {
+  generateStatsOverlay(gameStats: GameStats): string {
     // In production, this would generate an image with stats
-    const overlayData = {
-      playTime: `${Math.floor(stats.playTime / 60)}m ${Math.floor(stats.playTime % 60)}s`,
-      transactions: stats.transactions,
-      gasSpent: `${(parseFloat(stats.gasSpent) / 1e18).toFixed(4)} ETH`,
-      rewardsEarned: `${(parseFloat(stats.rewardsEarned) / 1e18).toFixed(2)} tokens`,
-      winRate: `${(stats.winRate * 100).toFixed(1)}%`,
-      achievements: stats.achievements.length,
+    const formattedOverlayData = {
+      playTime: `${Math.floor(gameStats.playTime / 60)}m ${Math.floor(gameStats.playTime % 60)}s`,
+      transactions: gameStats.transactions,
+      gasSpent: `${(parseFloat(gameStats.gasSpent) / 1e18).toFixed(4)} ETH`,
+      rewardsEarned: `${(parseFloat(gameStats.rewardsEarned) / 1e18).toFixed(2)} tokens`,
+      winRate: `${(gameStats.winRate * 100).toFixed(1)}%`,
+      achievements: gameStats.achievements.length,
     };
 
     // Return data URL or image URL
@@ -180,12 +180,12 @@ class ClipGeneratorService {
       <svg width="400" height="200" xmlns="http://www.w3.org/2000/svg">
         <rect width="100%" height="100%" fill="#1a1a2e"/>
         <text x="20" y="40" fill="#ffffff" font-size="20" font-family="Arial">Game Stats</text>
-        <text x="20" y="70" fill="#00d9ff" font-size="14">Play Time: ${overlayData.playTime}</text>
-        <text x="20" y="90" fill="#00d9ff" font-size="14">Transactions: ${overlayData.transactions}</text>
-        <text x="20" y="110" fill="#00d9ff" font-size="14">Gas Spent: ${overlayData.gasSpent}</text>
-        <text x="20" y="130" fill="#00d9ff" font-size="14">Rewards: ${overlayData.rewardsEarned}</text>
-        <text x="20" y="150" fill="#00d9ff" font-size="14">Win Rate: ${overlayData.winRate}</text>
-        <text x="20" y="170" fill="#00d9ff" font-size="14">Achievements: ${overlayData.achievements}</text>
+        <text x="20" y="70" fill="#00d9ff" font-size="14">Play Time: ${formattedOverlayData.playTime}</text>
+        <text x="20" y="90" fill="#00d9ff" font-size="14">Transactions: ${formattedOverlayData.transactions}</text>
+        <text x="20" y="110" fill="#00d9ff" font-size="14">Gas Spent: ${formattedOverlayData.gasSpent}</text>
+        <text x="20" y="130" fill="#00d9ff" font-size="14">Rewards: ${formattedOverlayData.rewardsEarned}</text>
+        <text x="20" y="150" fill="#00d9ff" font-size="14">Win Rate: ${formattedOverlayData.winRate}</text>
+        <text x="20" y="170" fill="#00d9ff" font-size="14">Achievements: ${formattedOverlayData.achievements}</text>
       </svg>
     `)}`;
   }
@@ -201,7 +201,7 @@ class ClipGeneratorService {
    * Get clips for a specific game
    */
   getClipsForGame(gameId: string): ClipMetadata[] {
-    return this.clips.filter((clip) => clip.gameId === gameId);
+    return this.clips.filter((clipMetadata) => clipMetadata.gameId === gameId);
   }
 
   /**

@@ -39,12 +39,12 @@ class GasOptimizationService {
    * Update gas prices for all supported chains
    */
   private async updateGasPrices() {
-    const chains = [1, 137, 56, 42161, 10, 8453]; // ETH, Polygon, BSC, Arbitrum, Optimism, Base
+    const supportedChainIds = [1, 137, 56, 42161, 10, 8453]; // ETH, Polygon, BSC, Arbitrum, Optimism, Base
     
-    for (const chainId of chains) {
+    for (const chainId of supportedChainIds) {
       try {
-        const gasPrice = await this.fetchGasPrice(chainId);
-        this.gasPriceCache.set(chainId, gasPrice);
+        const currentGasPrice = await this.fetchGasPrice(chainId);
+        this.gasPriceCache.set(chainId, currentGasPrice);
       } catch (error) {
         console.error(`Failed to fetch gas price for chain ${chainId}:`, error);
       }
@@ -57,7 +57,7 @@ class GasOptimizationService {
   private async fetchGasPrice(chainId: number): Promise<bigint> {
     // In production, this would call actual RPC endpoints
     // For demo, return mock values based on chain
-    const mockPrices: Record<number, bigint> = {
+    const mockGasPrices: Record<number, bigint> = {
       1: BigInt(30e9), // 30 gwei for Ethereum
       137: BigInt(50e9), // 50 gwei for Polygon
       56: BigInt(5e9), // 5 gwei for BSC
@@ -66,7 +66,7 @@ class GasOptimizationService {
       8453: BigInt(0.001e9), // 0.001 gwei for Base
     };
 
-    return mockPrices[chainId] || BigInt(10e9);
+    return mockGasPrices[chainId] || BigInt(10e9);
   }
 
   /**
@@ -104,14 +104,14 @@ class GasOptimizationService {
    */
   async optimizeTransaction(
     chainId: number,
-    transaction: Transaction
+    transactionParams: Transaction
   ): Promise<Transaction> {
-    const optimization = await this.getOptimization(chainId, transaction.type || 'default');
+    const gasOptimization = await this.getOptimization(chainId, transactionParams.type || 'default');
     
     return {
-      ...transaction,
-      maxFeePerGas: optimization.optimizedGasPrice,
-      maxPriorityFeePerGas: optimization.optimizedGasPrice / BigInt(10),
+      ...transactionParams,
+      maxFeePerGas: gasOptimization.optimizedGasPrice,
+      maxPriorityFeePerGas: gasOptimization.optimizedGasPrice / BigInt(10),
     };
   }
 
