@@ -14,6 +14,8 @@ interface Transaction {
 class GasOptimizationService {
   private gasPriceCache: Map<number, bigint> = new Map();
   private updateInterval: NodeJS.Timeout | null = null;
+  private isMonitoring: boolean = false;
+  private pendingTransactions: number = 0;
 
   /**
    * Initialize gas monitoring
@@ -26,13 +28,35 @@ class GasOptimizationService {
    * Start monitoring gas prices across chains
    */
   private startGasMonitoring() {
-    // Update gas prices every 15 seconds
+    if (this.isMonitoring) return;
+    
+    this.isMonitoring = true;
+    // Update gas prices every 15 seconds when monitoring is active
     this.updateInterval = setInterval(() => {
-      this.updateGasPrices();
+      // Only update if there are pending transactions
+      if (this.pendingTransactions > 0) {
+        this.updateGasPrices();
+      } else if (this.isMonitoring) {
+        // Stop monitoring if no pending transactions
+        this.stopGasMonitoring();
+      }
     }, 15000);
 
     // Initial update
     this.updateGasPrices();
+  }
+
+  /**
+   * Stop monitoring gas prices
+   */
+  private stopGasMonitoring() {
+    if (!this.isMonitoring) return;
+    
+    this.isMonitoring = false;
+    if (this.updateInterval) {
+      clearInterval(this.updateInterval);
+      this.updateInterval = null;
+    }
   }
 
   /**
@@ -109,7 +133,13 @@ class GasOptimizationService {
     chainId: number,
     transaction: Transaction
   ): Promise<Transaction> {
+    // Track pending transaction
+    this.pendingTransactions++;
+    
     const optimization = await this.getOptimization(chainId, transaction.type || 'default');
+    
+    // Transaction is being sent, so it's no longer pending
+    this.pendingTransactions = Math.max(0, this.pendingTransactions - 1);
     
     return {
       ...transaction,

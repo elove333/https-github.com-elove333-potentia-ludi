@@ -159,6 +159,16 @@ class GameDetectionService {
   addCustomGame(game: Web3Game) {
     this.addDetectedGame(game);
   }
+
+  /**
+   * Clean up resources
+   */
+  cleanup() {
+    if (this.urlCheckDebounceTimer) {
+      clearTimeout(this.urlCheckDebounceTimer);
+      this.urlCheckDebounceTimer = null;
+    }
+  }
 }
 
 export const gameDetectionService = new GameDetectionService();
