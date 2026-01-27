@@ -9,6 +9,7 @@
  */
 
 import { Address } from 'viem';
+import { WorkflowValidationResult } from './types';
 
 export interface SwapParams {
   fromToken: Address;
@@ -223,12 +224,7 @@ export async function executeSwap(
  * TODO: Check slippage is within safe limits
  * TODO: Score risk based on amount, tokens, and user history
  */
-export async function validateSwap(params: SwapParams): Promise<{
-  valid: boolean;
-  errors: string[];
-  warnings: string[];
-  riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
-}> {
+export async function validateSwap(params: SwapParams): Promise<WorkflowValidationResult> {
   const errors: string[] = [];
   const warnings: string[] = [];
   let riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL' = 'LOW';
