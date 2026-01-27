@@ -3,13 +3,15 @@ import { Router } from 'express';
 import { requireAuth, AuthenticatedRequest, success, error } from '../../client';
 import { intentQueries } from '../../lib/database';
 import { getIntentStatus } from '../../services/pipelineExecutor';
+import { extractParam } from '../../utils/params';
+import { handleRouteError } from '../../utils/errors';
 
 const router = Router();
 
 // Get intent by ID
 router.get('/:intentId', requireAuth, async (req: AuthenticatedRequest, res) => {
   try {
-    const intentId = Array.isArray(req.params.intentId) ? req.params.intentId[0] : req.params.intentId;
+    const intentId = extractParam(req.params.intentId);
     const userId = req.userId!;
 
     // Get intent
@@ -37,15 +39,14 @@ router.get('/:intentId', requireAuth, async (req: AuthenticatedRequest, res) => 
       executedAt: intent.executed_at
     });
   } catch (err) {
-    console.error('Get intent error:', err);
-    error(res, err instanceof Error ? err.message : 'Failed to get intent', 500);
+    handleRouteError(res, err, 'Get intent error', 500);
   }
 });
 
 // Get intent status
 router.get('/:intentId/status', requireAuth, async (req: AuthenticatedRequest, res) => {
   try {
-    const intentId = Array.isArray(req.params.intentId) ? req.params.intentId[0] : req.params.intentId;
+    const intentId = extractParam(req.params.intentId);
     const userId = req.userId!;
 
     // Get intent to verify ownership
@@ -67,8 +68,7 @@ router.get('/:intentId/status', requireAuth, async (req: AuthenticatedRequest, r
 
     success(res, status);
   } catch (err) {
-    console.error('Get intent status error:', err);
-    error(res, err instanceof Error ? err.message : 'Failed to get intent status', 500);
+    handleRouteError(res, err, 'Get intent status error', 500);
   }
 });
 
@@ -76,7 +76,7 @@ router.get('/:intentId/status', requireAuth, async (req: AuthenticatedRequest, r
 router.get('/', requireAuth, async (req: AuthenticatedRequest, res) => {
   try {
     const userId = req.userId!;
-    const limitParam = Array.isArray(req.query.limit) ? req.query.limit[0] : req.query.limit;
+    const limitParam = extractParam(req.query.limit);
     const limit = parseInt(limitParam as string || '50');
 
     // Get user intents
@@ -94,8 +94,7 @@ router.get('/', requireAuth, async (req: AuthenticatedRequest, res) => {
       }))
     });
   } catch (err) {
-    console.error('List intents error:', err);
-    error(res, err instanceof Error ? err.message : 'Failed to list intents', 500);
+    handleRouteError(res, err, 'List intents error', 500);
   }
 });
 
