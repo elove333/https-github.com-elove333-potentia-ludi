@@ -65,8 +65,8 @@ class TokenSwapService {
     };
 
     this.swapHistory.push(swap);
-    // Add to map for O(1) lookups
-    const key = `${fromToken}-${toToken}`;
+    // Add to map for O(1) lookups - use JSON key to avoid collisions
+    const key = JSON.stringify([fromToken, toToken]);
     this.swapStatusMap.set(key, swap);
 
     // In production, this would execute the actual swap
@@ -123,7 +123,7 @@ class TokenSwapService {
    */
   getSwapStatus(fromToken: string, toToken: string): TokenSwap | undefined {
     // Use Map for O(1) lookup instead of array iteration
-    return this.swapStatusMap.get(`${fromToken}-${toToken}`);
+    return this.swapStatusMap.get(JSON.stringify([fromToken, toToken]));
   }
 }
 

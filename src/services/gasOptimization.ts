@@ -133,13 +133,16 @@ class GasOptimizationService {
     chainId: number,
     transaction: Transaction
   ): Promise<Transaction> {
-    // Track pending transaction
+    // Track that we're preparing a transaction (increment before async operation)
     this.pendingTransactions++;
     
     const optimization = await this.getOptimization(chainId, transaction.type || 'default');
     
-    // Transaction is being sent, so it's no longer pending
-    this.pendingTransactions = Math.max(0, this.pendingTransactions - 1);
+    // Note: In production, decrement would happen when transaction is confirmed/failed
+    // For demo purposes, we decrement immediately since we don't track actual sends
+    setTimeout(() => {
+      this.pendingTransactions = Math.max(0, this.pendingTransactions - 1);
+    }, 2000);
     
     return {
       ...transaction,

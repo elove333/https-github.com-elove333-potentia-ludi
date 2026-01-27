@@ -11,7 +11,8 @@ const RewardsPanel: React.FC = () => {
   useEffect(() => {
     if (!wallet?.address) return;
 
-    // Fetch rewards initially
+    // Fetch rewards initially and periodically
+    // Note: Service also polls, but component needs to stay in sync with store
     const fetchRewards = () => {
       const allRewards = rewardTrackingService.getAllRewards(wallet.address);
       setRewards(allRewards);
@@ -25,8 +26,7 @@ const RewardsPanel: React.FC = () => {
 
     fetchRewards();
     
-    // No need to poll here - the service already polls every 30s
-    // Just subscribe to changes from the service
+    // Poll to keep component in sync with service updates
     const updateInterval = setInterval(fetchRewards, 30000);
 
     return () => clearInterval(updateInterval);
