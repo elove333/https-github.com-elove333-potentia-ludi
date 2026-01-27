@@ -94,6 +94,7 @@ const NetworkStatus: React.FC = () => {
     <div style={styles.container}>
       <div style={styles.indicator}>
         <div
+          className="pulse-animation"
           style={{
             ...styles.dot,
             backgroundColor: getHealthColor(status.health),
@@ -118,6 +119,7 @@ const styles = {
     background: 'rgba(0, 0, 0, 0.3)',
     borderRadius: '6px',
     fontSize: '0.85rem',
+    marginBottom: '1rem',
   },
   indicator: {
     display: 'flex',
@@ -128,7 +130,6 @@ const styles = {
     width: '8px',
     height: '8px',
     borderRadius: '50%',
-    animation: 'pulse 2s ease-in-out infinite',
   },
   label: {
     color: '#ffffff',
