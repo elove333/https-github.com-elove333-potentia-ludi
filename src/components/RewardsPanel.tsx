@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useGamingWalletStore } from '../store/gamingWalletStore';
 import { rewardTrackingService } from '../services/rewardTracking';
 import { ChainReward } from '../types';
@@ -11,7 +11,8 @@ const RewardsPanel: React.FC = () => {
   useEffect(() => {
     if (!wallet?.address) return;
 
-    // Fetch rewards
+    // Fetch rewards initially and periodically
+    // Note: Service also polls, but component needs to stay in sync with store
     const fetchRewards = () => {
       const allRewards = rewardTrackingService.getAllRewards(wallet.address);
       setRewards(allRewards);
@@ -24,12 +25,14 @@ const RewardsPanel: React.FC = () => {
     };
 
     fetchRewards();
-    const interval = setInterval(fetchRewards, 30000);
+    
+    // Poll to keep component in sync with service updates
+    const updateInterval = setInterval(fetchRewards, 30000);
 
-    return () => clearInterval(interval);
+    return () => clearInterval(updateInterval);
   }, [wallet?.address, setRewards]);
 
-  const claimReward = async (reward: ChainReward) => {
+  const claimReward = useCallback(async (reward: ChainReward) => {
     if (!wallet?.address) return;
     
     try {
@@ -40,7 +43,7 @@ const RewardsPanel: React.FC = () => {
     } catch (error) {
       console.error('Failed to claim reward:', error);
     }
-  };
+  }, [wallet?.address, setRewards]);
 
   if (!wallet) {
     return (

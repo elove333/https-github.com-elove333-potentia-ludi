@@ -8,6 +8,15 @@ interface SwapRoute {
 
 class TokenSwapService {
   private swapHistory: TokenSwap[] = [];
+  private swapStatusMap: Map<string, TokenSwap> = new Map();
+
+  /**
+   * Generate a consistent key for token pair lookups
+   */
+  private getSwapKey(fromToken: string, toToken: string): string {
+    // Use pipe delimiter which is safe for addresses
+    return `${fromToken.toLowerCase()}|${toToken.toLowerCase()}`;
+  }
 
   /**
    * Get the best swap route across multiple DEXs
@@ -64,11 +73,16 @@ class TokenSwapService {
     };
 
     this.swapHistory.push(swap);
+    // Add to map for O(1) lookups - initial status is 'pending'
+    const key = this.getSwapKey(fromToken, toToken);
+    this.swapStatusMap.set(key, swap);
 
     // In production, this would execute the actual swap
     // For demo, simulate completion after delay
     setTimeout(() => {
+      // Update status to completed and refresh map entry
       swap.status = 'completed';
+      this.swapStatusMap.set(key, swap);
     }, 2000);
 
     return swap;
@@ -117,9 +131,8 @@ class TokenSwapService {
    * Get swap status
    */
   getSwapStatus(fromToken: string, toToken: string): TokenSwap | undefined {
-    return this.swapHistory.find(
-      (swap) => swap.fromToken === fromToken && swap.toToken === toToken
-    );
+    // Use consistent key generation for O(1) lookup
+    return this.swapStatusMap.get(this.getSwapKey(fromToken, toToken));
   }
 }
 
