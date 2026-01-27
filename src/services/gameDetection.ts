@@ -31,11 +31,18 @@ const KNOWN_WEB3_GAMES = [
 class GameDetectionService {
   private detectedGames: Map<string, Web3Game> = new Map();
   private observers: Array<(game: Web3Game) => void> = [];
+  private domainSet: Set<string> = new Set();
+  private urlCheckDebounceTimer: NodeJS.Timeout | null = null;
 
   /**
    * Initialize the game detection service
    */
   init() {
+    // Build domain set for O(1) lookups
+    KNOWN_WEB3_GAMES.forEach((game) => {
+      game.domains.forEach((domain) => this.domainSet.add(domain));
+    });
+    
     this.startUrlMonitoring();
     this.startContractMonitoring();
   }
@@ -56,8 +63,8 @@ class GameDetectionService {
       checkUrl();
       window.addEventListener('popstate', checkUrl);
       
-      // Check periodically for dynamic apps
-      setInterval(checkUrl, 5000);
+      // Check periodically but less aggressively (30s instead of 5s)
+      setInterval(checkUrl, 30000);
     }
   }
 
@@ -100,13 +107,26 @@ class GameDetectionService {
   private addDetectedGame(game: Web3Game) {
     if (!this.detectedGames.has(game.id)) {
       this.detectedGames.set(game.id, game);
-      this.notifyObservers(game);
+      // Debounce notifications to avoid excessive updates
+      this.debounceNotifyObservers(game);
     } else {
       // Update last active time
       const existing = this.detectedGames.get(game.id)!;
       existing.lastActive = new Date();
       this.detectedGames.set(game.id, existing);
     }
+  }
+
+  /**
+   * Debounced notification to observers
+   */
+  private debounceNotifyObservers(game: Web3Game) {
+    if (this.urlCheckDebounceTimer) {
+      clearTimeout(this.urlCheckDebounceTimer);
+    }
+    this.urlCheckDebounceTimer = setTimeout(() => {
+      this.notifyObservers(game);
+    }, 500);
   }
 
   /**

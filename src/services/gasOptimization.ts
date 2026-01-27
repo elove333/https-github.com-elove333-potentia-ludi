@@ -41,14 +41,17 @@ class GasOptimizationService {
   private async updateGasPrices() {
     const chains = [1, 137, 56, 42161, 10, 8453]; // ETH, Polygon, BSC, Arbitrum, Optimism, Base
     
-    for (const chainId of chains) {
-      try {
-        const gasPrice = await this.fetchGasPrice(chainId);
-        this.gasPriceCache.set(chainId, gasPrice);
-      } catch (error) {
-        console.error(`Failed to fetch gas price for chain ${chainId}:`, error);
-      }
-    }
+    // Fetch gas prices in parallel for better performance
+    await Promise.all(
+      chains.map(async (chainId) => {
+        try {
+          const gasPrice = await this.fetchGasPrice(chainId);
+          this.gasPriceCache.set(chainId, gasPrice);
+        } catch (error) {
+          console.error(`Failed to fetch gas price for chain ${chainId}:`, error);
+        }
+      })
+    );
   }
 
   /**
