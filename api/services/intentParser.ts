@@ -15,110 +15,110 @@ const intentPatterns = [
     pattern: /(?:swap|trade|exchange)\s+(\d+(?:\.\d+)?)\s+(\w+)\s+(?:for|to)\s+(\w+)/i,
     action: 'trade.swap',
     riskLevel: 'MEDIUM' as const,
-    extract: (match: RegExpMatchArray) => ({
-      fromAmount: match[1],
-      fromToken: match[2].toUpperCase(),
-      toToken: match[3].toUpperCase()
+    extractEntities: (regexMatch: RegExpMatchArray) => ({
+      fromAmount: regexMatch[1],
+      fromToken: regexMatch[2].toUpperCase(),
+      toToken: regexMatch[3].toUpperCase()
     })
   },
   {
     pattern: /(?:send|transfer)\s+(\d+(?:\.\d+)?)\s+(\w+)\s+(?:to)\s+(0x[a-fA-F0-9]{40})/i,
     action: 'transfer.send',
     riskLevel: 'HIGH' as const,
-    extract: (match: RegExpMatchArray) => ({
-      amount: match[1],
-      token: match[2].toUpperCase(),
-      recipient: match[3]
+    extractEntities: (regexMatch: RegExpMatchArray) => ({
+      amount: regexMatch[1],
+      token: regexMatch[2].toUpperCase(),
+      recipient: regexMatch[3]
     })
   },
   {
     pattern: /(?:bridge|move)\s+(\d+(?:\.\d+)?)\s+(\w+)\s+(?:from)\s+(\w+)\s+(?:to)\s+(\w+)/i,
     action: 'bridge.transfer',
     riskLevel: 'HIGH' as const,
-    extract: (match: RegExpMatchArray) => ({
-      amount: match[1],
-      token: match[2].toUpperCase(),
-      fromChain: match[3],
-      toChain: match[4]
+    extractEntities: (regexMatch: RegExpMatchArray) => ({
+      amount: regexMatch[1],
+      token: regexMatch[2].toUpperCase(),
+      fromChain: regexMatch[3],
+      toChain: regexMatch[4]
     })
   },
   {
     pattern: /(?:show|get|check)\s+(?:my\s+)?balance(?:s)?/i,
     action: 'balances.get',
     riskLevel: 'LOW' as const,
-    extract: () => ({})
+    extractEntities: () => ({})
   },
   {
     pattern: /(?:show|list|get)\s+(?:my\s+)?(?:nft|nfts)/i,
     action: 'balances.getNFTs',
     riskLevel: 'LOW' as const,
-    extract: () => ({})
+    extractEntities: () => ({})
   },
   {
     pattern: /(?:approve|allow)\s+(\w+)\s+(?:to\s+spend|for)\s+(\d+(?:\.\d+)?)\s+(\w+)/i,
     action: 'approvals.set',
     riskLevel: 'MEDIUM' as const,
-    extract: (match: RegExpMatchArray) => ({
-      spender: match[1],
-      amount: match[2],
-      token: match[3].toUpperCase()
+    extractEntities: (regexMatch: RegExpMatchArray) => ({
+      spender: regexMatch[1],
+      amount: regexMatch[2],
+      token: regexMatch[3].toUpperCase()
     })
   }
 ];
 
 // Calculate confidence score based on pattern match
 function calculateConfidence(
-  input: string,
-  pattern: RegExp,
-  entities: Record<string, any>
+  userInput: string,
+  patternRegex: RegExp,
+  extractedEntities: Record<string, any>
 ): number {
-  let confidence = 0.7; // Base confidence for pattern match
+  let confidenceScore = 0.7; // Base confidence for pattern match
 
   // Increase confidence if input is relatively clean
-  const cleanInput = input.trim().toLowerCase();
+  const cleanInput = userInput.trim().toLowerCase();
   if (cleanInput.length > 0 && cleanInput.length < 200) {
-    confidence += 0.1;
+    confidenceScore += 0.1;
   }
 
   // Increase confidence if we extracted concrete values
-  const hasNumbers = Object.values(entities).some(v => 
-    typeof v === 'string' && /\d/.test(v)
+  const hasNumbers = Object.values(extractedEntities).some(value => 
+    typeof value === 'string' && /\d/.test(value)
   );
   if (hasNumbers) {
-    confidence += 0.1;
+    confidenceScore += 0.1;
   }
 
   // Increase confidence if we have addresses
-  const hasAddress = Object.values(entities).some(v =>
-    typeof v === 'string' && /^0x[a-fA-F0-9]{40}$/.test(v)
+  const hasAddress = Object.values(extractedEntities).some(value =>
+    typeof value === 'string' && /^0x[a-fA-F0-9]{40}$/.test(value)
   );
   if (hasAddress) {
-    confidence += 0.05;
+    confidenceScore += 0.05;
   }
 
   // Cap at 0.95 (never 100% confident in NLP)
-  return Math.min(confidence, 0.95);
+  return Math.min(confidenceScore, 0.95);
 }
 
 // Assess risk level based on action and entities
 function assessRiskLevel(
-  action: string,
-  entities: Record<string, any>,
+  intentAction: string,
+  extractedEntities: Record<string, any>,
   baseRisk: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
 ): 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL' {
   let riskLevel = baseRisk;
 
   // Increase risk for large amounts
-  const amount = parseFloat(entities.amount || entities.fromAmount || '0');
-  if (amount > 10000) {
+  const transactionAmount = parseFloat(extractedEntities.amount || extractedEntities.fromAmount || '0');
+  if (transactionAmount > 10000) {
     riskLevel = 'CRITICAL';
-  } else if (amount > 1000) {
+  } else if (transactionAmount > 1000) {
     if (riskLevel === 'MEDIUM') riskLevel = 'HIGH';
     if (riskLevel === 'LOW') riskLevel = 'MEDIUM';
   }
 
   // Bridge operations are inherently riskier
-  if (action.startsWith('bridge.')) {
+  if (intentAction.startsWith('bridge.')) {
     if (riskLevel === 'MEDIUM') riskLevel = 'HIGH';
   }
 
@@ -126,28 +126,28 @@ function assessRiskLevel(
 }
 
 // Main parser function
-export async function parseIntent(input: string): Promise<ParsedIntent | null> {
-  if (!input || input.trim().length === 0) {
+export async function parseIntent(userInput: string): Promise<ParsedIntent | null> {
+  if (!userInput || userInput.trim().length === 0) {
     return null;
   }
 
-  const cleanInput = input.trim();
+  const sanitizedInput = userInput.trim();
 
   // Try each pattern
-  for (const { pattern, action, riskLevel: baseRisk, extract } of intentPatterns) {
-    const match = cleanInput.match(pattern);
+  for (const { pattern, action, riskLevel: baseRisk, extractEntities } of intentPatterns) {
+    const regexMatch = sanitizedInput.match(pattern);
     
-    if (match) {
-      const entities = extract(match);
-      const confidence = calculateConfidence(cleanInput, pattern, entities);
-      const riskLevel = assessRiskLevel(action, entities, baseRisk);
+    if (regexMatch) {
+      const extractedEntities = extractEntities(regexMatch);
+      const confidenceScore = calculateConfidence(sanitizedInput, pattern, extractedEntities);
+      const assessedRiskLevel = assessRiskLevel(action, extractedEntities, baseRisk);
       
       return {
         action,
-        entities,
-        confidence,
-        riskLevel,
-        requiresConfirmation: riskLevel === 'HIGH' || riskLevel === 'CRITICAL'
+        entities: extractedEntities,
+        confidence: confidenceScore,
+        riskLevel: assessedRiskLevel,
+        requiresConfirmation: assessedRiskLevel === 'HIGH' || assessedRiskLevel === 'CRITICAL'
       };
     }
   }
@@ -157,97 +157,97 @@ export async function parseIntent(input: string): Promise<ParsedIntent | null> {
 }
 
 // Validate parsed intent
-export function validateIntent(intent: ParsedIntent): {
+export function validateIntent(parsedIntent: ParsedIntent): {
   valid: boolean;
   errors: string[];
 } {
-  const errors: string[] = [];
+  const validationErrors: string[] = [];
 
   // Check action is valid
-  if (!intent.action || intent.action.length === 0) {
-    errors.push('Missing action');
+  if (!parsedIntent.action || parsedIntent.action.length === 0) {
+    validationErrors.push('Missing action');
   }
 
   // Check confidence is in valid range
-  if (intent.confidence < 0 || intent.confidence > 1) {
-    errors.push('Invalid confidence score');
+  if (parsedIntent.confidence < 0 || parsedIntent.confidence > 1) {
+    validationErrors.push('Invalid confidence score');
   }
 
   // Validate entities based on action
-  if (intent.action === 'trade.swap') {
-    if (!intent.entities.fromAmount || !intent.entities.fromToken || !intent.entities.toToken) {
-      errors.push('Swap requires fromAmount, fromToken, and toToken');
+  if (parsedIntent.action === 'trade.swap') {
+    if (!parsedIntent.entities.fromAmount || !parsedIntent.entities.fromToken || !parsedIntent.entities.toToken) {
+      validationErrors.push('Swap requires fromAmount, fromToken, and toToken');
     }
     
-    const amount = parseFloat(intent.entities.fromAmount);
-    if (isNaN(amount) || amount <= 0) {
-      errors.push('Invalid swap amount');
+    const swapAmount = parseFloat(parsedIntent.entities.fromAmount);
+    if (isNaN(swapAmount) || swapAmount <= 0) {
+      validationErrors.push('Invalid swap amount');
     }
   }
 
-  if (intent.action === 'transfer.send') {
-    if (!intent.entities.amount || !intent.entities.token || !intent.entities.recipient) {
-      errors.push('Transfer requires amount, token, and recipient');
+  if (parsedIntent.action === 'transfer.send') {
+    if (!parsedIntent.entities.amount || !parsedIntent.entities.token || !parsedIntent.entities.recipient) {
+      validationErrors.push('Transfer requires amount, token, and recipient');
     }
     
-    const amount = parseFloat(intent.entities.amount);
-    if (isNaN(amount) || amount <= 0) {
-      errors.push('Invalid transfer amount');
+    const transferAmount = parseFloat(parsedIntent.entities.amount);
+    if (isNaN(transferAmount) || transferAmount <= 0) {
+      validationErrors.push('Invalid transfer amount');
     }
 
-    if (!/^0x[a-fA-F0-9]{40}$/.test(intent.entities.recipient)) {
-      errors.push('Invalid recipient address');
+    if (!/^0x[a-fA-F0-9]{40}$/.test(parsedIntent.entities.recipient)) {
+      validationErrors.push('Invalid recipient address');
     }
   }
 
-  if (intent.action === 'bridge.transfer') {
-    if (!intent.entities.amount || !intent.entities.token || 
-        !intent.entities.fromChain || !intent.entities.toChain) {
-      errors.push('Bridge requires amount, token, fromChain, and toChain');
+  if (parsedIntent.action === 'bridge.transfer') {
+    if (!parsedIntent.entities.amount || !parsedIntent.entities.token || 
+        !parsedIntent.entities.fromChain || !parsedIntent.entities.toChain) {
+      validationErrors.push('Bridge requires amount, token, fromChain, and toChain');
     }
     
-    const amount = parseFloat(intent.entities.amount);
-    if (isNaN(amount) || amount <= 0) {
-      errors.push('Invalid bridge amount');
+    const bridgeAmount = parseFloat(parsedIntent.entities.amount);
+    if (isNaN(bridgeAmount) || bridgeAmount <= 0) {
+      validationErrors.push('Invalid bridge amount');
     }
   }
 
   return {
-    valid: errors.length === 0,
-    errors
+    valid: validationErrors.length === 0,
+    errors: validationErrors
   };
 }
 
 // Enhanced parsing with AI fallback (placeholder for OpenAI integration)
-export async function parseIntentWithAI(input: string): Promise<ParsedIntent | null> {
+export async function parseIntentWithAI(userInput: string): Promise<ParsedIntent | null> {
   // First try pattern matching
-  const intent = await parseIntent(input);
+  const parsedIntent = await parseIntent(userInput);
   
-  if (intent && intent.confidence >= 0.6) {
-    return intent;
+  if (parsedIntent && parsedIntent.confidence >= 0.6) {
+    return parsedIntent;
   }
 
   // TODO: Implement OpenAI fallback for low confidence or no match
   // This would integrate with lib/ai/openai.ts
   
-  return intent;
+  return parsedIntent;
 }
 
 // Get intent description for user confirmation
-export function getIntentDescription(intent: ParsedIntent): string {
-  switch (intent.action) {
+export function getIntentDescription(parsedIntent: ParsedIntent): string {
+  switch (parsedIntent.action) {
     case 'trade.swap':
-      return `Swap ${intent.entities.fromAmount} ${intent.entities.fromToken} for ${intent.entities.toToken}`;
+      return `Swap ${parsedIntent.entities.fromAmount} ${parsedIntent.entities.fromToken} for ${parsedIntent.entities.toToken}`;
     case 'transfer.send':
-      return `Send ${intent.entities.amount} ${intent.entities.token} to ${intent.entities.recipient}`;
+      return `Send ${parsedIntent.entities.amount} ${parsedIntent.entities.token} to ${parsedIntent.entities.recipient}`;
     case 'bridge.transfer':
-      return `Bridge ${intent.entities.amount} ${intent.entities.token} from ${intent.entities.fromChain} to ${intent.entities.toChain}`;
+      return `Bridge ${parsedIntent.entities.amount} ${parsedIntent.entities.token} from ${parsedIntent.entities.fromChain} to ${parsedIntent.entities.toChain}`;
     case 'balances.get':
       return 'Get your token balances';
     case 'balances.getNFTs':
       return 'Get your NFT collection';
     case 'approvals.set':
-      return `Approve ${intent.entities.spender} to spend ${intent.entities.amount} ${intent.entities.token}`;
+      return `Approve ${parsedIntent.entities.spender} to spend ${parsedIntent.entities.amount} ${parsedIntent.entities.token}`;
     default:
       return 'Unknown action';
   }

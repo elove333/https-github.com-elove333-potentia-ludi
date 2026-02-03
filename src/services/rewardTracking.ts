@@ -28,12 +28,12 @@ class RewardTrackingService {
    * Update rewards from all chains
    */
   private async updateRewards(walletAddress: string) {
-    const chains = [1, 137, 56, 42161, 10, 8453];
+    const supportedChainIds = [1, 137, 56, 42161, 10, 8453];
     
-    for (const chainId of chains) {
+    for (const chainId of supportedChainIds) {
       try {
-        const rewards = await this.fetchRewardsForChain(walletAddress, chainId);
-        this.trackedRewards.set(`${walletAddress}-${chainId}`, rewards);
+        const chainRewards = await this.fetchRewardsForChain(walletAddress, chainId);
+        this.trackedRewards.set(`${walletAddress}-${chainId}`, chainRewards);
       } catch (error) {
         console.error(`Failed to fetch rewards for chain ${chainId}:`, error);
       }
@@ -82,9 +82,9 @@ class RewardTrackingService {
   getAllRewards(walletAddress: string): ChainReward[] {
     const allRewards: ChainReward[] = [];
     
-    this.trackedRewards.forEach((rewards, key) => {
-      if (key.startsWith(walletAddress)) {
-        allRewards.push(...rewards);
+    this.trackedRewards.forEach((chainRewards, rewardKey) => {
+      if (rewardKey.startsWith(walletAddress)) {
+        allRewards.push(...chainRewards);
       }
     });
 
@@ -103,25 +103,25 @@ class RewardTrackingService {
    */
   getTotalRewardValue(walletAddress: string): number {
     const allRewards = this.getAllRewards(walletAddress);
-    return allRewards.reduce((total, reward) => total + reward.usdValue, 0);
+    return allRewards.reduce((totalValue, currentReward) => totalValue + currentReward.usdValue, 0);
   }
 
   /**
    * Get claimable rewards
    */
   getClaimableRewards(walletAddress: string): ChainReward[] {
-    return this.getAllRewards(walletAddress).filter((reward) => reward.claimable);
+    return this.getAllRewards(walletAddress).filter((currentReward) => currentReward.claimable);
   }
 
   /**
    * Claim rewards
    */
-  async claimReward(_walletAddress: string, reward: ChainReward): Promise<boolean> {
+  async claimReward(_walletAddress: string, rewardToClaim: ChainReward): Promise<boolean> {
     // In production, this would execute the claim transaction
-    console.log(`Claiming reward:`, reward);
+    console.log(`Claiming reward:`, rewardToClaim);
     
     // Simulate claim
-    reward.claimable = false;
+    rewardToClaim.claimable = false;
     return true;
   }
 

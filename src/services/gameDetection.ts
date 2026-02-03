@@ -64,21 +64,21 @@ class GameDetectionService {
   /**
    * Check if a URL matches any known Web3 games
    */
-  private checkUrlForGame(url: string) {
+  private checkUrlForGame(currentUrl: string) {
     for (const gameConfig of KNOWN_WEB3_GAMES) {
-      for (const domain of gameConfig.domains) {
-        if (url.includes(domain)) {
-          const game: Web3Game = {
+      for (const gameDomain of gameConfig.domains) {
+        if (currentUrl.includes(gameDomain)) {
+          const detectedGame: Web3Game = {
             id: gameConfig.name.toLowerCase().replace(/\s+/g, '-'),
             name: gameConfig.name,
-            url: url,
+            url: currentUrl,
             chainId: gameConfig.chainId,
             contractAddresses: gameConfig.contractPatterns,
             detected: true,
             lastActive: new Date(),
           };
           
-          this.addDetectedGame(game);
+          this.addDetectedGame(detectedGame);
           return;
         }
       }
@@ -97,33 +97,33 @@ class GameDetectionService {
   /**
    * Add a detected game
    */
-  private addDetectedGame(game: Web3Game) {
-    if (!this.detectedGames.has(game.id)) {
-      this.detectedGames.set(game.id, game);
-      this.notifyObservers(game);
+  private addDetectedGame(detectedGame: Web3Game) {
+    if (!this.detectedGames.has(detectedGame.id)) {
+      this.detectedGames.set(detectedGame.id, detectedGame);
+      this.notifyObservers(detectedGame);
     } else {
       // Update last active time
-      const existing = this.detectedGames.get(game.id)!;
-      existing.lastActive = new Date();
-      this.detectedGames.set(game.id, existing);
+      const existingGame = this.detectedGames.get(detectedGame.id)!;
+      existingGame.lastActive = new Date();
+      this.detectedGames.set(detectedGame.id, existingGame);
     }
   }
 
   /**
    * Subscribe to game detection events
    */
-  subscribe(callback: (game: Web3Game) => void) {
-    this.observers.push(callback);
+  subscribe(observerCallback: (game: Web3Game) => void) {
+    this.observers.push(observerCallback);
     return () => {
-      this.observers = this.observers.filter((obs) => obs !== callback);
+      this.observers = this.observers.filter((obs) => obs !== observerCallback);
     };
   }
 
   /**
    * Notify observers of detected game
    */
-  private notifyObservers(game: Web3Game) {
-    this.observers.forEach((callback) => callback(game));
+  private notifyObservers(detectedGame: Web3Game) {
+    this.observers.forEach((observerCallback) => observerCallback(detectedGame));
   }
 
   /**
@@ -136,8 +136,8 @@ class GameDetectionService {
   /**
    * Manually add a game (for testing or custom games)
    */
-  addCustomGame(game: Web3Game) {
-    this.addDetectedGame(game);
+  addCustomGame(customGame: Web3Game) {
+    this.addDetectedGame(customGame);
   }
 }
 
