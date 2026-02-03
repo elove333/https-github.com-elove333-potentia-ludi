@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { useGamingWalletStore } from '../store/gamingWalletStore';
 import { clipGeneratorService } from '../services/clipGenerator';
 import { ClipMetadata } from '../types';
@@ -9,37 +9,45 @@ const ClipsGallery: React.FC = () => {
   const [selectedClip, setSelectedClip] = useState<ClipMetadata | null>(null);
 
   useEffect(() => {
-    // Fetch clips from service
-    const fetchClips = () => {
-      const allClips = clipGeneratorService.getClips();
-      setLocalClips(allClips);
-    };
-
-    fetchClips();
-    const interval = setInterval(fetchClips, 5000);
+    // Only fetch clips initially and when store updates
+    const allClips = clipGeneratorService.getClips();
+    setLocalClips(allClips);
+    
+    // Reduce polling frequency from 5s to 10s to be less aggressive
+    const interval = setInterval(() => {
+      const updatedClips = clipGeneratorService.getClips();
+      setLocalClips(updatedClips);
+    }, 10000);
 
     return () => clearInterval(interval);
   }, []);
 
-  const allClips = [...clips, ...localClips];
+  // Memoize the combined clips array to prevent unnecessary re-renders
+  const allClips = useMemo(() => [...clips, ...localClips], [clips, localClips]);
 
-  const formatDuration = (seconds: number) => {
+  // Memoize stats overlay to avoid regenerating SVG on every render
+  const statsOverlay = useMemo(
+    () => selectedClip ? clipGeneratorService.generateStatsOverlay(selectedClip.stats) : null,
+    [selectedClip]
+  );
+
+  const formatDuration = useCallback((seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
+  }, []);
 
-  const downloadClip = (clip: ClipMetadata) => {
+  const downloadClip = useCallback((clip: ClipMetadata) => {
     // In production, this would download the actual video
     console.log('Downloading clip:', clip);
     alert(`Downloading clip: ${clip.id}`);
-  };
+  }, []);
 
-  const shareClip = (clip: ClipMetadata) => {
+  const shareClip = useCallback((clip: ClipMetadata) => {
     // In production, this would share to social media
     console.log('Sharing clip:', clip);
     alert(`Sharing clip: ${clip.id}`);
-  };
+  }, []);
 
   return (
     <div style={styles.container}>
@@ -108,7 +116,7 @@ const ClipsGallery: React.FC = () => {
 
             <div style={styles.modalBody}>
               <img
-                src={clipGeneratorService.generateStatsOverlay(selectedClip.stats)}
+                src={statsOverlay || ''}
                 alt="Stats overlay"
                 style={styles.statsOverlay}
               />

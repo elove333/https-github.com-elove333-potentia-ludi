@@ -30,14 +30,17 @@ class RewardTrackingService {
   private async updateRewards(walletAddress: string) {
     const chains = [1, 137, 56, 42161, 10, 8453];
     
-    for (const chainId of chains) {
-      try {
-        const rewards = await this.fetchRewardsForChain(walletAddress, chainId);
-        this.trackedRewards.set(`${walletAddress}-${chainId}`, rewards);
-      } catch (error) {
-        console.error(`Failed to fetch rewards for chain ${chainId}:`, error);
-      }
-    }
+    // Fetch rewards in parallel for better performance
+    await Promise.all(
+      chains.map(async (chainId) => {
+        try {
+          const rewards = await this.fetchRewardsForChain(walletAddress, chainId);
+          this.trackedRewards.set(`${walletAddress}-${chainId}`, rewards);
+        } catch (error) {
+          console.error(`Failed to fetch rewards for chain ${chainId}:`, error);
+        }
+      })
+    );
   }
 
   /**
