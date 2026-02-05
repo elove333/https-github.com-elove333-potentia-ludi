@@ -214,7 +214,7 @@ export async function checkRateLimit(
   // This is a simplified version - in production you'd use Redis
   // For now, we'll just check the database
   try {
-    const result = await telemetryQueries.log(
+    await telemetryQueries.log(
       userId,
       `rate_limit_check_${operation}`,
       { limit, windowMinutes }
