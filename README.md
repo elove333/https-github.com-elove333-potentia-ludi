@@ -4,7 +4,7 @@
 
 A Universal On-Chain Gaming Wallet Hub with natural language capabilities – interact with Web3 through simple conversations. Just say "swap 100 USDC to ETH" or "show my NFT balance" and let AI handle the complexity. The app auto-detects games, optimizes gas, swaps tokens, tracks rewards across chains, and generates creator-ready clips.
 
-### What Makes This Different?
+## What Makes This Different?
 
 Unlike traditional Web3 wallets that require navigating complex UIs and understanding technical jargon:
 - **Natural Language First**: Speak or type commands naturally - "send 0.1 ETH to vitalik.eth"
@@ -15,7 +15,7 @@ Unlike traditional Web3 wallets that require navigating complex UIs and understa
 
 ## Features
 
-### 💬 Conversational Features
+## 💬 Conversational Features
 <!-- CHUNK: Conversational Features - Natural Language Interface (max 800 chars) -->
 **Natural Language Interface (Coming Soon)**
 - Natural language processing for all Web3 operations
@@ -32,7 +32,7 @@ Unlike traditional Web3 wallets that require navigating complex UIs and understa
 - Context memory for natural conversation flow
 <!-- END CHUNK -->
 
-### 🎮 Gaming Features
+## 🎮 Gaming Features
 <!-- CHUNK: Gaming Features - Core Functionality (max 800 chars) -->
 **🔍 Auto Game Detection**
 - Automatically detects Web3 games when you open them
@@ -48,7 +48,7 @@ Unlike traditional Web3 wallets that require navigating complex UIs and understa
 - Social media ready format
 <!-- END CHUNK -->
 
-### ⛓️ Blockchain Features
+## ⛓️ Blockchain Features
 <!-- CHUNK: Blockchain Features - Transaction Management (max 800 chars) -->
 **⛽ Gas Optimization**
 - Real-time gas price monitoring across all major chains
@@ -71,14 +71,14 @@ Unlike traditional Web3 wallets that require navigating complex UIs and understa
 
 ## Technology Stack
 
-### Current Implementation
+## Current Implementation
 - **Frontend**: React 18 + TypeScript
 - **State Management**: Zustand
 - **Web3 Integration**: Ethers.js v6, Wagmi, Viem
 - **Build Tool**: Vite
 - **Styling**: Inline styles with CSS animations
 
-### Conversational Hub Stack (Planned)
+## Conversational Hub Stack (Planned)
 - **Framework**: Next.js 16 (App Router)
 - **Runtime**: Node.js 24 LTS
 - **AI/NLP**: OpenAI Responses API (GPT-4)
@@ -88,12 +88,12 @@ Unlike traditional Web3 wallets that require navigating complex UIs and understa
 
 ## Getting Started
 
-### Prerequisites
+## Prerequisites
 - Node.js 18+ and npm (Node.js 24+ recommended for full conversational features)
 - PostgreSQL 16+ (for conversational features)
 - Redis 7+ (for conversational features)
 
-### Installation
+## Installation
 
 1. Clone the repository:
 ```bash
@@ -133,7 +133,7 @@ The build output will be in the `dist` directory.
 ## Usage
 
 <!-- CHUNK: Usage - Current Features Workflow (max 800 chars) -->
-### Current Features Workflow
+## Current Features Workflow
 1. **Connect Your Wallet**: Click "Connect Wallet" to link your Web3 wallet
 2. **Enable Features**: Toggle gas optimization and auto-swap features as needed
 3. **Play Games**: Open any supported Web3 game, and it will be auto-detected
@@ -143,7 +143,7 @@ The build output will be in the `dist` directory.
 <!-- END CHUNK -->
 
 <!-- CHUNK: Usage - Conversational Interface (max 800 chars) -->
-### Conversational Features Usage (Coming Soon)
+## Conversational Features Usage (Coming Soon)
 **Text Command Examples**:
 - "Show my balance on Polygon" - Query balances on specific chains
 - "Swap 100 USDC for ETH" - Execute token swaps with natural language
@@ -164,7 +164,7 @@ The build output will be in the `dist` directory.
 
 ## Architecture
 
-### Current Architecture
+## Current Architecture
 **Core Services**:
 - **gameDetection.ts**: Monitors URLs and blockchain transactions to detect Web3 games
 - **gasOptimization.ts**: Tracks gas prices and optimizes transaction parameters
@@ -182,7 +182,7 @@ The build output will be in the `dist` directory.
 - **RewardsPanel.tsx**: Displays cross-chain rewards with claim functionality
 - **ClipsGallery.tsx**: Gallery of recorded clips with stats
 
-### 🔧 Workflow Modules Architecture (Planned)
+## 🔧 Workflow Modules Architecture (Planned)
 <!-- CHUNK: Workflow Modules - Intent & Execution System (max 800 chars) -->
 **Workflow Modules** - Modular intent handlers for Web3 operations:
 - `balances.get`: Query token and NFT balances across chains
@@ -233,7 +233,7 @@ src/
 └── index.tsx        # Application entry point
 ```
 
-### Available Scripts
+## Available Scripts
 
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
@@ -244,7 +244,7 @@ src/
 
 Contributions are welcome! This project is evolving to include conversational AI features alongside the existing gaming wallet capabilities.
 
-### How to Contribute
+## How to Contribute
 
 1. **Fork and Clone**: Fork this repository and clone your fork locally
 2. **Create a Branch**: `git checkout -b feature/your-feature-name`
@@ -256,7 +256,7 @@ For detailed contributing guidelines, see [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 **Need help with Git workflows?** Check out our [Git Workflows Guide](./GIT_WORKFLOWS.md) for practical examples of cherry-picking, resolving conflicts, and safely rewriting history.
 
-### Areas for Contribution
+## Areas for Contribution
 
 **Current Features** (Vite + React):
 - Improve game detection algorithms
@@ -271,7 +271,7 @@ For detailed contributing guidelines, see [CONTRIBUTING.md](./CONTRIBUTING.md).
 - Enhance safety validation rules
 - Build UI components for conversational interface
 
-### Extension Points
+## Extension Points
 
 The architecture is designed for modularity. See [ARCHITECTURE.md](./ARCHITECTURE.md) for:
 - **Adding New Workflows**: Guide for implementing custom intent handlers
@@ -279,7 +279,7 @@ The architecture is designed for modularity. See [ARCHITECTURE.md](./ARCHITECTUR
 - **Extending Intent Recognition**: Adding new command types and entities
 - **Custom Safety Rules**: Implementing domain-specific validation
 
-### Development Setup
+## Development Setup
 
 See the detailed contributor guidelines in [ARCHITECTURE.md](./ARCHITECTURE.md#contributor-guidelines) for:
 - Local environment setup
