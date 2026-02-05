@@ -212,7 +212,7 @@ export const intentQueries = {
       query_text = `UPDATE intents 
         SET status = $1, executed_at = $2, parsed_intent = parsed_intent || $3
         WHERE id = $4 RETURNING *`;
-      params = [status, executedAt, preview || null, id];
+      params = [status, executedAt, preview, id];
     } else {
       query_text = `UPDATE intents SET status = $1 WHERE id = $2 RETURNING *`;
       params = [status, id];
