@@ -117,6 +117,12 @@ The build output will be in the `dist` directory.
 
 ## Usage
 
+### Typical Player Workflow
+
+![Potentia Ludi Player Workflow](./assets/player-workflow.png)
+
+The diagram above shows the typical step-by-step process for players interacting with Potentia Ludi, from connecting their wallet to reviewing rewards and continuing gameplay.
+
 ### Current Features
 1. **Connect Your Wallet**: Click "Connect Wallet" to link your Web3 wallet
 2. **Enable Features**: Toggle gas optimization and auto-swap features as needed
@@ -136,6 +142,12 @@ The build output will be in the `dist` directory.
 4. **Context Memory**: Continues conversations naturally - "Now do the same on Optimism"
 
 ## Architecture
+
+### Architecture Overview
+
+![Potentia Ludi Architecture](./assets/architecture-overview.png)
+
+The architecture diagram above illustrates the key components of Potentia Ludi, showing how wallet connection, Web3 game detection, AI intent routing, and transaction execution work together through a unified UI visualization layer.
 
 ### Current Architecture
 **Core Services**:
