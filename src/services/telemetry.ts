@@ -125,11 +125,11 @@ class TelemetryService {
   /**
    * Stop auto-flush and clean up
    */
-  destroy(): void {
+  async destroy(): Promise<void> {
     if (this.intervalId) {
       clearInterval(this.intervalId);
     }
-    this.flush();
+    await this.flush();
   }
 
   // ============= Event Emitters for Common Events =============
