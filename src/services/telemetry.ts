@@ -84,7 +84,17 @@ class TelemetryService {
    * Notify observers of new event
    */
   private notifyObservers(event: TelemetryEvent): void {
-    this.observers.forEach((callback) => callback(event));
+    this.observers.forEach((callback) => {
+      try {
+        callback(event);
+      } catch (error) {
+        console.error('[Telemetry] Observer callback failed:', {
+          error,
+          eventType: event.eventType,
+          eventCategory: event.eventCategory,
+        });
+      }
+    });
   }
 
   /**
