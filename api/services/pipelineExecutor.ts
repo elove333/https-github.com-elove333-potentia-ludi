@@ -76,8 +76,8 @@ export async function executeIntent(
       };
     }
 
-    // Update intent status to executing
-    await intentQueries.updateStatus(context.intentId, 'executing');
+    // Update intent status to executed
+    await intentQueries.updateStatus(context.intentId, 'executed');
 
     // Prepare workflow parameters
     const workflowParams = {
