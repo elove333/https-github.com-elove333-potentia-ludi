@@ -1,9 +1,10 @@
 // Build Intent Preview Route
 import { Router } from 'express';
-import { requireAuth, AuthenticatedRequest, validateRequest, success, error } from '../../client';
-import { parseIntent, validateIntent } from '../../services/intentParser';
+import { requireAuth, AuthenticatedRequest, validateRequest, success } from '../../client';
 import { buildExecutionPreview } from '../../services/pipelineExecutor';
-import { conversationQueries, userQueries } from '../../lib/database';
+import { parseAndValidateIntent } from '../../utils/intent';
+import { getUserAndConversation } from '../../utils/user';
+import { handleRouteError } from '../../utils/errors';
 
 const router = Router();
 
@@ -22,33 +23,15 @@ router.post(
       const { input, chainId } = req.body;
       const userId = req.userId!;
 
-      // Parse intent
-      const parsed = await parseIntent(input);
+      // Parse and validate intent
+      const parsed = await parseAndValidateIntent(input, res);
+      if (!parsed) return;
 
-      if (!parsed) {
-        error(res, 'Could not understand input', 400);
-        return;
-      }
+      // Get user and conversation
+      const userConv = await getUserAndConversation(userId, res);
+      if (!userConv) return;
 
-      // Validate parsed intent
-      const validation = validateIntent(parsed);
-      if (!validation.valid) {
-        error(res, `Invalid intent: ${validation.errors.join(', ')}`, 400);
-        return;
-      }
-
-      // Get or create active conversation
-      let conversation = await conversationQueries.findActive(userId);
-      if (!conversation) {
-        conversation = await conversationQueries.create(userId);
-      }
-
-      // Get user wallet address
-      const user = await userQueries.findByAddress(userId);
-      if (!user) {
-        error(res, 'User not found', 404);
-        return;
-      }
+      const { conversation, user } = userConv;
 
       // Build preview without executing
       const preview = await buildExecutionPreview(parsed, {
@@ -60,7 +43,8 @@ router.post(
       });
 
       if (!preview.success) {
-        error(res, preview.error || 'Failed to build preview', 400);
+        const errorMessage = preview.error || 'Failed to build preview';
+        handleRouteError(res, new Error(errorMessage), errorMessage, 400);
         return;
       }
 
@@ -74,8 +58,7 @@ router.post(
         preview: preview.data
       });
     } catch (err) {
-      console.error('Preview build error:', err);
-      error(res, err instanceof Error ? err.message : 'Failed to build preview', 500);
+      handleRouteError(res, err, 'Preview build error', 500);
     }
   }
 );

@@ -1,4 +1,6 @@
 import { GasOptimization } from '../types';
+import { SUPPORTED_CHAIN_IDS } from '../constants/chains';
+import { PeriodicMonitor } from '../utils/monitoring';
 
 interface Transaction {
   to?: string;
@@ -11,37 +13,28 @@ interface Transaction {
   type?: string;
 }
 
-class GasOptimizationService {
+class GasOptimizationService extends PeriodicMonitor {
   private gasPriceCache: Map<number, bigint> = new Map();
-  private updateInterval: NodeJS.Timeout | null = null;
 
   /**
    * Initialize gas monitoring
    */
   init() {
-    this.startGasMonitoring();
+    this.startMonitoring(15000); // Update every 15 seconds
   }
 
   /**
-   * Start monitoring gas prices across chains
+   * Implementation of periodic update
    */
-  private startGasMonitoring() {
-    // Update gas prices every 15 seconds
-    this.updateInterval = setInterval(() => {
-      this.updateGasPrices();
-    }, 15000);
-
-    // Initial update
-    this.updateGasPrices();
+  protected async performUpdate() {
+    await this.updateGasPrices();
   }
 
   /**
    * Update gas prices for all supported chains
    */
   private async updateGasPrices() {
-    const chains = [1, 137, 56, 42161, 10, 8453]; // ETH, Polygon, BSC, Arbitrum, Optimism, Base
-    
-    for (const chainId of chains) {
+    for (const chainId of SUPPORTED_CHAIN_IDS) {
       try {
         const gasPrice = await this.fetchGasPrice(chainId);
         this.gasPriceCache.set(chainId, gasPrice);
@@ -120,16 +113,6 @@ class GasOptimizationService {
    */
   getCurrentGasPrice(chainId: number): bigint | null {
     return this.gasPriceCache.get(chainId) || null;
-  }
-
-  /**
-   * Clean up resources
-   */
-  cleanup() {
-    if (this.updateInterval) {
-      clearInterval(this.updateInterval);
-      this.updateInterval = null;
-    }
   }
 }
 

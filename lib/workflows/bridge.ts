@@ -9,6 +9,7 @@
  */
 
 import { Address } from 'viem';
+import { WorkflowValidationResult } from './types';
 
 export interface BridgeParams {
   fromChain: number;
@@ -117,12 +118,7 @@ export async function getRoutes(params: BridgeParams): Promise<BridgeRoute[]> {
  * TODO: Validate recipient address format on destination chain
  * TODO: Check minimum/maximum bridge amounts
  */
-export async function validateBridge(params: BridgeParams): Promise<{
-  valid: boolean;
-  errors: string[];
-  warnings: string[];
-  riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
-}> {
+export async function validateBridge(params: BridgeParams): Promise<WorkflowValidationResult> {
   const errors: string[] = [];
   const warnings: string[] = [];
   let riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL' = 'LOW';
