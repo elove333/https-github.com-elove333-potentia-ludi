@@ -4,7 +4,7 @@
  * Tests for bounded memory management and violation tracking
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { SafetyMonitoringService, SafetyViolation } from '../src/services/safetyMonitoring';
 
 describe('SafetyMonitoringService', () => {
