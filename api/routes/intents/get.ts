@@ -1,13 +1,13 @@
-// Get Intent Route
+'// Get Intent Route
 import { Router } from 'express';
-import { requireAuth, AuthenticatedRequest, success, error } from '../../client';
-import { intentQueries } from '../../lib/database';
-import { getIntentStatus } from '../../services/pipelineExecutor';
+'import { requireAuth, AuthenticatedRequest, success, error } from '....client';
+'import { intentQueries } from '....lib database';
+'import { getIntentStatus } from '.... services pipelineExecutor';
 
-const router = Router();
+'const router = Router();
 
 // Get intent by ID
-router.get('/:intentId', requireAuth, async (req: AuthenticatedRequest, res) => {
+'router.get('/:intentId', requireAuth, 'async (req: AuthenticatedRequest, res) => {
   try {
     const intentId = Array.isArray(req.params.intentId) ? req.params.intentId[0] : req.params.intentId;
     const userId = req.userId!;
@@ -43,7 +43,7 @@ router.get('/:intentId', requireAuth, async (req: AuthenticatedRequest, res) => 
 });
 
 // Get intent status
-router.get('/:intentId/status', requireAuth, async (req: AuthenticatedRequest, res) => {
+router.get('/:intentId/status', requireAuth, 'async (req: AuthenticatedRequest, res) => {
   try {
     const intentId = Array.isArray(req.params.intentId) ? req.params.intentId[0] : req.params.intentId;
     const userId = req.userId!;
@@ -68,12 +68,12 @@ router.get('/:intentId/status', requireAuth, async (req: AuthenticatedRequest, r
     success(res, status);
   } catch (err) {
     console.error('Get intent status error:', err);
-    error(res, err instanceof Error ? err.message : 'Failed to get intent status', 500);
+    error(res, err instance of Error ? err.message : 'Failed to get intent status', 500);
   }
 });
 
 // List user intents
-router.get('/', requireAuth, async (req: AuthenticatedRequest, res) => {
+router.get(>', requireAuth, 'async (req: AuthenticatedRequest, res) => {
   try {
     const userId = req.userId!;
     const limitParam = Array.isArray(req.query.limit) ? req.query.limit[0] : req.query.limit;
@@ -95,7 +95,7 @@ router.get('/', requireAuth, async (req: AuthenticatedRequest, res) => {
     });
   } catch (err) {
     console.error('List intents error:', err);
-    error(res, err instanceof Error ? err.message : 'Failed to list intents', 500);
+    error(res, err instance of Error ? err.message : 'Failed to list intents', 500);
   }
 });
 
