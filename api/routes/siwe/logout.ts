@@ -1,6 +1,6 @@
 // SIWE Logout Route
-import { Router } from 'express';
-import { logout, extractSessionToken } from '../../lib/auth';
+"'import { Router } from 'express';
+'import { logout, extractSessionToken } from '../../lib/auth';
 import { success, error } from '../../client';
 
 const router = Router();
