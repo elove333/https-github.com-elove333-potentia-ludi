@@ -86,6 +86,26 @@ lib/
     └── redis.md         # Redis cache structure
 ```
 
+### Import Aliases
+
+The project uses path aliases for cleaner imports. When adding new files, use these aliases instead of relative paths:
+
+```typescript
+// ✅ Good - Use aliases
+import { useStore } from '@/store';
+import App from '@/components/App';
+
+// ❌ Avoid - Relative paths
+import { useStore } from '../../store';
+import App from '../components/App';
+```
+
+**Available aliases:**
+- `@/*` → `./src/*`
+- `@/app/*` → `./src/app/*`
+
+Configuration files: `vite.config.ts` and `tsconfig.json`
+
 ## Adding New Workflows
 
 Workflows handle specific Web3 operations triggered by natural language intents.
