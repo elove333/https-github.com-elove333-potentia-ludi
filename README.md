@@ -82,15 +82,12 @@ Unlike traditional Web3 wallets that require navigating complex UIs and understa
 ## Conversational Hub Stack (Planned)
 - **Framework**: Next.js 16 (App Router)
 - **Runtime**: Node.js 24 LTS
-- **AI/NLP**: OpenAI Responses API (GPT-4)
 - **Database**: PostgreSQL 16+ / Supabase
-- **Cache**: Redis 7+
 - **Authentication**: Sign-In with Ethereum (SIWE) + Supabase Auth
 
 ## Getting Started
 
 ## Prerequisites
-- Node.js 18+ and npm (Node.js 24+ recommended for full conversational features)
 - PostgreSQL 16+ (for conversational features) or Supabase account (free tier works)
 - Redis 7+ (for conversational features)
 - Docker and Docker Compose (optional, for local Supabase testing)
