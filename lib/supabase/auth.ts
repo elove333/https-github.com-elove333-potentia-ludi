@@ -193,10 +193,10 @@ export class AuthManager {
       await this.updateUserMetadata({ wallet_address: walletAddress });
 
       // Get or create player record
-      let player = await supabaseHelpers.getPlayerByWallet(walletAddress);
+      const player = await supabaseHelpers.getPlayerByWallet(walletAddress);
       
       if (!player) {
-        player = await supabaseHelpers.createPlayer(
+        await supabaseHelpers.createPlayer(
           walletAddress,
           user.email,
           user.user_metadata?.username
