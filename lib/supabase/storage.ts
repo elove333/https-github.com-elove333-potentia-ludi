@@ -109,7 +109,7 @@ export class StorageManager {
     tokenId: string,
     metadata: NFTMetadata
   ): Promise<FileUploadResult> {
-    const path = `nft-metadata/${playerId}/${tokenId}.json`;
+    const path = `${playerId}/${tokenId}.json`;
     const blob = new Blob([JSON.stringify(metadata, null, 2)], {
       type: 'application/json',
     });
@@ -131,7 +131,7 @@ export class StorageManager {
   ): Promise<FileUploadResult> {
     const folder = isScreenshot ? 'screenshots' : 'clips';
     const extension = file.name.split('.').pop() || 'mp4';
-    const path = `${folder}/${playerId}/${clipId}.${extension}`;
+    const path = `${playerId}/${folder}/${clipId}.${extension}`;
 
     return this.uploadFile('game-content', path, file, {
       contentType: file.type,
@@ -148,7 +148,7 @@ export class StorageManager {
     snapshotData: WalletSnapshot
   ): Promise<FileUploadResult> {
     const timestamp = new Date().toISOString().replace(/:/g, '-');
-    const path = `wallet-snapshots/${playerId}/${walletId}_${timestamp}.json`;
+    const path = `${playerId}/wallet-snapshots/${walletId}_${timestamp}.json`;
     const blob = new Blob([JSON.stringify(snapshotData, null, 2)], {
       type: 'application/json',
     });

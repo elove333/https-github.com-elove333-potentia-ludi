@@ -185,6 +185,7 @@ CREATE POLICY "Users can insert their own NFTs"
 --   ('wallet-data', 'wallet-data', false);
 
 -- Storage policies for nft-metadata bucket
+-- Paths should be: {player_id}/{token_id}.json
 -- CREATE POLICY "Public read access for NFT metadata"
 --   ON storage.objects FOR SELECT
 --   USING (bucket_id = 'nft-metadata');
@@ -194,6 +195,7 @@ CREATE POLICY "Users can insert their own NFTs"
 --   WITH CHECK (bucket_id = 'nft-metadata' AND auth.role() = 'authenticated');
 
 -- Storage policies for game-content bucket
+-- Paths should be: {player_id}/clips/{clip_id}.ext or {player_id}/screenshots/{clip_id}.ext
 -- CREATE POLICY "Public read access for game content"
 --   ON storage.objects FOR SELECT
 --   USING (bucket_id = 'game-content');
@@ -203,6 +205,8 @@ CREATE POLICY "Users can insert their own NFTs"
 --   WITH CHECK (bucket_id = 'game-content' AND auth.role() = 'authenticated');
 
 -- Storage policies for wallet-data bucket
+-- Paths should be: {auth_user_id}/wallet-snapshots/{wallet_id}_{timestamp}.json
+-- Note: Use auth_user_id (not player_id) as the first path segment to match RLS policy
 -- CREATE POLICY "Users can access their own wallet data"
 --   ON storage.objects FOR SELECT
 --   USING (bucket_id = 'wallet-data' AND (storage.foldername(name))[1] = auth.uid()::text);
