@@ -1,0 +1,59 @@
+# To get started with Dependabot version updates, you'll need to specify which
+# package ecosystems to update and where the package manifests are located.
+# Please see the documentation for all configuration options:
+# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+updates:
+  - package-ecosystem: "" # See documentation for possible values
+    directory: "/" # Location of package manifests
+    schedule:
+      interval: "weekly"
+name: "CodeQL"
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'javascript' ]
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: javascript
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+      3. Automate `npm audit` with GitHub Actions
+
+You can configure npm audit to run automatically during CI checks.
+
+1. Add a GitHub Action for npm audit:
+
+• Add the following to .github/workflows/npm-audit.yml:
+name: npm audit
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+jobs:
+  npm-audit:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run npm audit
+      run: npm audit
