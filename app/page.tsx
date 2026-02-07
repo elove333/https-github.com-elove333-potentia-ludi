@@ -13,8 +13,6 @@
   polygonMumbai 
 } from 'wagmi/chains'; // Fixed: Explicit chain imports [web:44]
 'import { formatEther, formatUnits, Address } from 'viem'; // Proper types [web:36]
-'import { OnchainKitProvider, CoinbaseSmartWalletProvider } from '@coinbase/onchainkit'; // From template [web:31]
-
 'const TEST_WALLET: Address = '0x742d35Cc6634C0532925a3b8D7De2665B81b5fE4' as Address; // Test addr w/ Polygon test assets [web:37]
 const GAME_TOKEN = '0x2791Bca1f2aD161e1a43a2250A0fFfA4eD89b55d'; // Example game token (USDC Mumbai) [web:43]
 
