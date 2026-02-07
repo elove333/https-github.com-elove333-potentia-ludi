@@ -1,7 +1,7 @@
 /**
  * Cross-Chain Transfer Example
  * 
- * Demonstrates safeguard reward transfers across chains using @circle-fin/bridge-kit v1.1.2
+ * Demonstrates safe reward transfers across chains using @circle-fin/bridge-kit v1.1.2
  * and @circle-fin/provider-cctp-v2 v1.0.4
  * 
  * Features:
@@ -24,7 +24,7 @@ async function crossChainFlowExample() {
       8453,     // Base
       'USDC',
       '100.00',
-      '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb'
+      '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0'
     );
 
     console.log(`Transfer ID: ${transfer1.id}`);
@@ -68,7 +68,7 @@ async function crossChainFlowExample() {
         8453,
         'USDC',
         '100.00',
-        '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb'
+        '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0'
       );
     } catch (error) {
       if (error instanceof BridgeError) {
@@ -90,7 +90,7 @@ async function crossChainFlowExample() {
         1399811149, // Solana
         'USDC',
         '100.00',
-        '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb' // EVM address, not Solana
+        '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0' // EVM address format, not Solana
       );
     } catch (error) {
       if (error instanceof BridgeError) {
