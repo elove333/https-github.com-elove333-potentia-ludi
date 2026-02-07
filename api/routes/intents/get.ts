@@ -38,7 +38,7 @@ import { Router } from 'express';
     });
   } catch (err) {
     console.error('Get intent error:', err);
-    error(res, err instanceof Error ? err.message : 'Failed to get intent', 500);
+    error(res, err instance of Error ? err.message : 'Failed to get intent', 500);
   }
 });
 
