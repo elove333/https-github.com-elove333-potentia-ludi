@@ -4,7 +4,7 @@
 
 A Universal On-Chain Gaming Wallet Hub with natural language capabilities – interact with Web3 through simple conversations. Just say "swap 100 USDC to ETH" or "show my NFT balance" and let AI handle the complexity. The app auto-detects games, optimizes gas, swaps tokens, tracks rewards across chains, and generates creator-ready clips.
 
-### What Makes This Different?
+## What Makes This Different?
 
 Unlike traditional Web3 wallets that require navigating complex UIs and understanding technical jargon:
 - **Natural Language First**: Speak or type commands naturally - "send 0.1 ETH to vitalik.eth"
@@ -15,7 +15,9 @@ Unlike traditional Web3 wallets that require navigating complex UIs and understa
 
 ## Features
 
-### 💬 Conversational Interface (Coming Soon)
+## 💬 Conversational Features
+<!-- CHUNK: Conversational Features - Natural Language Interface (max 800 chars) -->
+**Natural Language Interface (Coming Soon)**
 - Natural language processing for all Web3 operations
 - AI-powered intent recognition and entity extraction
 - Multi-turn conversations with context awareness
@@ -23,62 +25,74 @@ Unlike traditional Web3 wallets that require navigating complex UIs and understa
 - Real-time streaming responses
 - Smart clarification questions for ambiguous requests
 
-### 🔍 Auto Game Detection
+**Conversational Commands**
+- Text-based commands like "Show my balance on Polygon"
+- Voice input for hands-free gaming interactions
+- Smart confirmations with AI-powered risk assessment
+- Context memory for natural conversation flow
+<!-- END CHUNK -->
+
+## 🎮 Gaming Features
+<!-- CHUNK: Gaming Features - Core Functionality (max 800 chars) -->
+**🔍 Auto Game Detection**
 - Automatically detects Web3 games when you open them
 - Monitors known gaming platforms across multiple chains
 - Supports Axie Infinity, Gods Unchained, The Sandbox, Decentraland, and more
 - Custom game addition support
 
-### ⛽ Gas Optimization
-- Real-time gas price monitoring across all major chains
-- Automatic transaction optimization to reduce costs
-- Smart scheduling for non-urgent transactions
-- Average savings of 30% on gas fees
-
-### 🔄 Automatic Token Swaps
-- Behind-the-scenes token swapping when games need specific tokens
-- Aggregates best routes from multiple DEX platforms
-- Minimal slippage with optimal routing
-- Supports all major tokens and chains
-
-### 🏆 Multi-Chain Reward Tracking
-- Tracks rewards across Ethereum, Polygon, BSC, Arbitrum, Optimism, and Base
-- Real-time USD value calculation
-- One-click reward claiming
-- Comprehensive reward history
-
-### 🎬 Creator-Ready Clips & Stats
+**🎬 Creator-Ready Clips & Stats**
 - Automatic recording of gaming sessions
 - Real-time stats overlay generation
 - Track transactions, gas spent, rewards earned, and win rates
 - Export clips with professional stats overlays
 - Social media ready format
+<!-- END CHUNK -->
+
+## ⛓️ Blockchain Features
+<!-- CHUNK: Blockchain Features - Transaction Management (max 800 chars) -->
+**⛽ Gas Optimization**
+- Real-time gas price monitoring across all major chains
+- Automatic transaction optimization to reduce costs
+- Smart scheduling for non-urgent transactions
+- Average savings of 30% on gas fees
+
+**🔄 Automatic Token Swaps**
+- Behind-the-scenes token swapping when games need specific tokens
+- Aggregates best routes from multiple DEX platforms
+- Minimal slippage with optimal routing
+- Supports all major tokens and chains
+
+**🏆 Multi-Chain Reward Tracking**
+- Tracks rewards across Ethereum, Polygon, BSC, Arbitrum, Optimism, and Base
+- Real-time USD value calculation
+- One-click reward claiming
+- Comprehensive reward history
+<!-- END CHUNK -->
 
 ## Technology Stack
 
-### Current Implementation
+## Current Implementation
 - **Frontend**: React 18 + TypeScript
 - **State Management**: Zustand
 - **Web3 Integration**: Ethers.js v6, Wagmi, Viem
 - **Build Tool**: Vite
 - **Styling**: Inline styles with CSS animations
+- **Backend**: Supabase (Database, Auth, Storage, Real-time)
 
-### Conversational Hub Stack (Planned)
+## Conversational Hub Stack (Planned)
 - **Framework**: Next.js 16 (App Router)
 - **Runtime**: Node.js 24 LTS
-- **AI/NLP**: OpenAI Responses API (GPT-4)
-- **Database**: PostgreSQL 16+
-- **Cache**: Redis 7+
-- **Authentication**: Sign-In with Ethereum (SIWE)
+- **Database**: PostgreSQL 16+ / Supabase
+- **Authentication**: Sign-In with Ethereum (SIWE) + Supabase Auth
 
 ## Getting Started
 
-### Prerequisites
-- Node.js 18+ and npm (Node.js 24+ recommended for full conversational features)
-- PostgreSQL 16+ (for conversational features)
+## Prerequisites
+- PostgreSQL 16+ (for conversational features) or Supabase account (free tier works)
 - Redis 7+ (for conversational features)
+- Docker and Docker Compose (optional, for local Supabase testing)
 
-### Installation
+## Installation
 
 1. Clone the repository:
 ```bash
@@ -94,11 +108,44 @@ npm install
 3. Set up environment variables (for conversational features):
 ```bash
 cp .env.example .env.local
-# Edit .env.local with your configuration:
-# - OPENAI_API_KEY=your_openai_api_key
-# - DATABASE_URL=postgresql://user:pass@localhost:5432/potentia
-# - REDIS_URL=redis://localhost:6379
+# - SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 ```
+
+### Supabase Setup (Optional but Recommended)
+
+Potentia Ludi integrates with Supabase for centralized data storage, real-time updates, authentication, and file management.
+
+**Option 1: Use Supabase Cloud (Recommended)**
+
+1. Create a free account at [Supabase](https://supabase.com/)
+2. Create a new project
+3. Copy your project URL and API keys from Settings > API
+4. Add them to `.env.local`:
+   ```
+   SUPABASE_URL=https://your-project.supabase.co
+   SUPABASE_ANON_KEY=your-anon-key
+   SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+   ```
+5. Run the database schema from the SQL editor:
+   - Copy contents of `supabase/schema.sql`
+   - Paste in Supabase SQL Editor and execute
+
+**Option 2: Local Development with Docker**
+
+For local testing without cloud Supabase:
+
+```bash
+# Start PostgreSQL, PostgREST, and Redis
+docker-compose up -d
+
+# Check services are running
+docker-compose ps
+
+# Stop services when done
+docker-compose down
+```
+
+See [supabase/README.md](./supabase/README.md) for detailed Supabase integration documentation.
 
 4. Start the development server:
 ```bash
@@ -117,27 +164,39 @@ The build output will be in the `dist` directory.
 
 ## Usage
 
-### Current Features
+<!-- CHUNK: Usage - Current Features Workflow (max 800 chars) -->
+## Current Features Workflow
 1. **Connect Your Wallet**: Click "Connect Wallet" to link your Web3 wallet
 2. **Enable Features**: Toggle gas optimization and auto-swap features as needed
 3. **Play Games**: Open any supported Web3 game, and it will be auto-detected
 4. **Record Sessions**: Click "Record" on any detected game to capture your gameplay
 5. **Track Rewards**: Monitor your cross-chain rewards in real-time
 6. **View Clips**: Access your recorded clips with embedded stats overlays
+<!-- END CHUNK -->
 
-### Conversational Features (Coming Soon)
-1. **Text Commands**: Type natural language commands like:
-   - "Show my balance on Polygon"
-   - "Swap 100 USDC for ETH"
-   - "What are my NFTs worth?"
-   - "Bridge 10 MATIC to Arbitrum"
-2. **Voice Input**: Speak your commands hands-free while gaming
-3. **Smart Confirmations**: AI reviews transactions and asks for confirmation on risky operations
-4. **Context Memory**: Continues conversations naturally - "Now do the same on Optimism"
+<!-- CHUNK: Usage - Conversational Interface (max 800 chars) -->
+## Conversational Features Usage (Coming Soon)
+**Text Command Examples**:
+- "Show my balance on Polygon" - Query balances on specific chains
+- "Swap 100 USDC for ETH" - Execute token swaps with natural language
+- "What are my NFTs worth?" - Get NFT portfolio valuation
+- "Bridge 10 MATIC to Arbitrum" - Cross-chain asset transfers
+
+**Voice Interaction**:
+- Speak commands hands-free while gaming
+- Voice input automatically converted to actions
+- Real-time audio feedback on transaction status
+
+**Smart Safety Features**:
+- AI reviews transactions before execution
+- Risk assessment on potentially dangerous operations
+- Automatic confirmation prompts for high-value transactions
+- Context-aware clarification questions
+<!-- END CHUNK -->
 
 ## Architecture
 
-### Current Architecture
+## Current Architecture
 **Core Services**:
 - **gameDetection.ts**: Monitors URLs and blockchain transactions to detect Web3 games
 - **gasOptimization.ts**: Tracks gas prices and optimizes transaction parameters
@@ -155,14 +214,25 @@ The build output will be in the `dist` directory.
 - **RewardsPanel.tsx**: Displays cross-chain rewards with claim functionality
 - **ClipsGallery.tsx**: Gallery of recorded clips with stats
 
-### Conversational Architecture (Planned)
-See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed specifications of:
-- Natural Language Processing Pipeline (OpenAI Responses API)
-- Intent Resolution Layer (parser, validator, risk scorer)
-- Workflow Modules (`balances.get`, `trade.swap`, `bridge.transfer`)
-- Execution Layer (RPC gateway, transaction builder, simulator)
-- Data Layer (PostgreSQL, Redis, SIWE authentication)
-- Safety Policies and MVP Criteria
+## 🔧 Workflow Modules Architecture (Planned)
+<!-- CHUNK: Workflow Modules - Intent & Execution System (max 800 chars) -->
+**Workflow Modules** - Modular intent handlers for Web3 operations:
+- `balances.get`: Query token and NFT balances across chains
+- `trade.swap`: Execute token swaps with DEX aggregation
+- `bridge.transfer`: Cross-chain asset bridging
+- `nft.transfer`: NFT transfers and marketplace interactions
+- `portfolio.analyze`: Portfolio valuation and analytics
+
+**Processing Pipeline**:
+1. Natural Language Processing (OpenAI Responses API integration)
+2. Intent Resolution Layer (parser, validator, risk scorer)
+3. Workflow Module Routing (intent → action mapping)
+4. Execution Layer (RPC gateway, transaction builder, simulator)
+5. Data Layer (PostgreSQL for state, Redis for caching)
+6. Safety Policies (SIWE authentication, risk assessment)
+
+See [ARCHITECTURE.md](./ARCHITECTURE.md) for complete specifications.
+<!-- END CHUNK -->
 
 ## Supported Chains
 
@@ -195,7 +265,7 @@ src/
 └── index.tsx        # Application entry point
 ```
 
-### Available Scripts
+## Available Scripts
 
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
@@ -206,7 +276,7 @@ src/
 
 Contributions are welcome! This project is evolving to include conversational AI features alongside the existing gaming wallet capabilities.
 
-### How to Contribute
+## How to Contribute
 
 1. **Fork and Clone**: Fork this repository and clone your fork locally
 2. **Create a Branch**: `git checkout -b feature/your-feature-name`
@@ -218,7 +288,7 @@ For detailed contributing guidelines, see [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 **Need help with Git workflows?** Check out our [Git Workflows Guide](./GIT_WORKFLOWS.md) for practical examples of cherry-picking, resolving conflicts, and safely rewriting history.
 
-### Areas for Contribution
+## Areas for Contribution
 
 **Current Features** (Vite + React):
 - Improve game detection algorithms
@@ -233,7 +303,7 @@ For detailed contributing guidelines, see [CONTRIBUTING.md](./CONTRIBUTING.md).
 - Enhance safety validation rules
 - Build UI components for conversational interface
 
-### Extension Points
+## Extension Points
 
 The architecture is designed for modularity. See [ARCHITECTURE.md](./ARCHITECTURE.md) for:
 - **Adding New Workflows**: Guide for implementing custom intent handlers
@@ -241,7 +311,7 @@ The architecture is designed for modularity. See [ARCHITECTURE.md](./ARCHITECTUR
 - **Extending Intent Recognition**: Adding new command types and entities
 - **Custom Safety Rules**: Implementing domain-specific validation
 
-### Development Setup
+## Development Setup
 
 See the detailed contributor guidelines in [ARCHITECTURE.md](./ARCHITECTURE.md#contributor-guidelines) for:
 - Local environment setup

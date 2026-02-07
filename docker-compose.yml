@@ -1,0 +1,77 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: potentia-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: potentia_ludi
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./supabase/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PostgREST - REST API for PostgreSQL
+  postgrest:
+    image: postgrest/postgrest:v11.2.0
+    container_name: potentia-postgrest
+    restart: unless-stopped
+    environment:
+      PGRST_DB_URI: postgres://postgres:postgres@postgres:5432/potentia_ludi
+      PGRST_DB_SCHEMA: public
+      PGRST_DB_ANON_ROLE: postgres
+      PGRST_JWT_SECRET: super-secret-jwt-token-with-at-least-32-characters
+      PGRST_OPENAPI_SERVER_PROXY_URI: http://localhost:3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # Redis for caching and sessions
+  redis:
+    image: redis:7-alpine
+    container_name: potentia-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # Supabase Studio (optional - for database management UI)
+  # Uncomment to enable Supabase Studio
+  # studio:
+  #   image: supabase/studio:latest
+  #   container_name: potentia-studio
+  #   restart: unless-stopped
+  #   environment:
+  #     SUPABASE_URL: http://postgrest:3000
+  #     SUPABASE_REST_URL: http://localhost:3000
+  #     STUDIO_PG_META_URL: http://localhost:8080
+  #   ports:
+  #     - "3001:3000"
+  #   depends_on:
+  #     - postgres
+  #     - postgrest
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  default:
+    name: potentia-network
