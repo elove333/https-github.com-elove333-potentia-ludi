@@ -276,7 +276,7 @@ CREATE TABLE IF NOT EXISTS game_events (
   wallet_address VARCHAR(42) NOT NULL,
   contract_address VARCHAR(42) NOT NULL,
   token_id VARCHAR(255),
-  amount VARCHAR(78),
+  amount VARCHAR(78), -- Stores big integers as strings (max uint256 = 78 decimal digits)
   tx_hash VARCHAR(66) NOT NULL,
   chain_id INTEGER NOT NULL,
   metadata JSONB DEFAULT '{}',

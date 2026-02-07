@@ -73,7 +73,7 @@ router.post('/', async (req: Request, res: Response) => {
         console.log('  📍 Contract:', contractAddress);
 
         // Map network name to chain ID
-        let chainId = 137; // Default to Polygon
+        let chainId = 0; // Default to unknown
         const network = webhookData.event.network.toLowerCase();
         if (network.includes('mainnet') || network.includes('ethereum')) {
           chainId = 1;
@@ -85,6 +85,11 @@ router.post('/', async (req: Request, res: Response) => {
           chainId = 10;
         } else if (network.includes('base')) {
           chainId = 8453;
+        }
+
+        if (chainId === 0) {
+          console.log('  ⚠️ Unknown network, skipping:', webhookData.event.network);
+          continue;
         }
 
         // Check if this contract belongs to a tracked game

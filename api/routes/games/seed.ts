@@ -56,9 +56,14 @@ router.post('/', async (req: Request, res: Response) => {
   try {
     console.log('🌱 Starting game database seeding...');
 
-    // Clear existing games first (optional - comment out if you want to keep existing)
-    await gameQueries.deleteAll();
-    console.log('🗑️ Cleared existing games');
+    // Clear existing games first - ONLY in development/test environments
+    const isProduction = process.env.NODE_ENV === 'production';
+    if (!isProduction) {
+      await gameQueries.deleteAll();
+      console.log('🗑️ Cleared existing games (development mode)');
+    } else {
+      console.log('⚠️ Production mode - skipping delete (games will be added if not exist)');
+    }
 
     const seededGames = [];
 

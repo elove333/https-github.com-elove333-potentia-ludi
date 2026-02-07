@@ -67,14 +67,10 @@ router.post('/', async (req: Request, res: Response) => {
     console.log('🔗 Using webhook URL:', finalWebhookUrl);
     console.log('🔗 Using Alchemy network:', alchemyNetwork);
 
-    // Create webhook via Alchemy API
-    const alchemyUrl = `https://dashboard.alchemy.com/api/create-webhook`;
-    
-    console.log('🔗 Creating webhook via Alchemy...');
-
     // Note: This is a mock implementation since Alchemy webhook creation typically requires
     // using their dashboard API with authentication. In production, you'd use the Alchemy SDK
     // or their dashboard API with proper authentication.
+    // Future: Use alchemyUrl = `https://dashboard.alchemy.com/api/create-webhook` for real implementation
     
     console.log('✅ Webhook setup simulated');
     console.log('💡 In production, use Alchemy Dashboard or SDK to create webhooks');

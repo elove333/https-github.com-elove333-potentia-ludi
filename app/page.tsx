@@ -21,6 +21,11 @@ const GAME_TOKEN = '0x2791Bca1f2aD161e1a43a2250A0fFfA4eD89b55d'; // Example game
 // API base URL
 const API_BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001';
 
+// Warn if using fallback URL
+if (!process.env.NEXT_PUBLIC_APP_URL) {
+  console.warn('⚠️ NEXT_PUBLIC_APP_URL not set, using fallback:', API_BASE_URL);
+}
+
 export default function Home() {
   const [demoMode, setDemoMode] = useState(false);
   const [selectedChainId, setSelectedChainId] = useState<number>(polygon.id); // Fixed: Numeric ID [web:35]
