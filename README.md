@@ -130,6 +130,94 @@ npm run build
 
 The build output will be in the `dist` directory.
 
+## Infrastructure Management with doctl
+
+### Overview
+
+This project uses `doctl` (DigitalOcean CLI) to streamline infrastructure management for hosting the application and backend services. The integration supports deployment, scaling, and resource monitoring for the Potentia Ludi project.
+
+### Installing doctl
+
+#### macOS
+```bash
+brew install doctl
+```
+
+#### Linux
+```bash
+cd ~
+wget https://github.com/digitalocean/doctl/releases/download/v1.104.0/doctl-1.104.0-linux-amd64.tar.gz
+tar xf ~/doctl-1.104.0-linux-amd64.tar.gz
+sudo mv ~/doctl /usr/local/bin
+```
+
+> **Note:** Check for the latest version at [doctl releases](https://github.com/digitalocean/doctl/releases)
+
+#### Windows
+```bash
+# Using Chocolatey
+choco install doctl
+
+# Or download from https://github.com/digitalocean/doctl/releases
+```
+
+### Authentication Setup
+
+1. Create a DigitalOcean API token:
+   - Log in to your DigitalOcean account
+   - Navigate to API → Tokens/Keys
+   - Click "Generate New Token"
+   - Give it a name and select read/write access
+   - Copy the generated token
+
+2. Authenticate doctl:
+```bash
+doctl auth init
+```
+Enter your API token when prompted.
+
+3. Verify authentication:
+```bash
+doctl account get
+```
+
+### Managing Infrastructure
+
+#### List Droplets
+```bash
+doctl compute droplet list
+```
+
+#### Create a Droplet
+```bash
+doctl compute droplet create potentia-ludi-app \
+  --image ubuntu-22-04-x64 \
+  --size s-1vcpu-1gb \
+  --region nyc3 \
+  --ssh-keys YOUR_SSH_KEY_ID
+```
+
+#### Deploy Using Helper Script
+The repository includes a deployment helper script for automated infrastructure setup:
+
+```bash
+# Make the script executable (first time only)
+chmod +x scripts/deploy.sh
+
+# View available options
+./scripts/deploy.sh --help
+
+# Run the deployment script (requires SSH key ID)
+./scripts/deploy.sh --ssh-key-id YOUR_SSH_KEY_ID
+
+# With custom configuration
+./scripts/deploy.sh --droplet-name my-app --region nyc3 --size s-2vcpu-4gb --ssh-key-id YOUR_SSH_KEY_ID
+```
+
+Get your SSH key ID: `doctl compute ssh-key list`
+
+See `scripts/deploy.sh` for detailed usage and configuration options.
+
 ## Usage
 
 <!-- CHUNK: Usage - Current Features Workflow (max 800 chars) -->
