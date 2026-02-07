@@ -8,7 +8,9 @@
  * - "Check my token approvals"
  */
 
-import { Address } from 'viem';
+import { Address, parseAbiItem } from 'viem';
+import { getPublicClient, getChainSymbol, getChainDecimals } from '../utils/chains';
+import { ERC20_ABI } from '../utils/abis';
 
 export interface Balance {
   address: Address;
@@ -55,28 +57,21 @@ export interface BalancesWorkflowParams {
  * @param address - Wallet address to query
  * @param chainId - Chain ID (1 for Ethereum, 137 for Polygon, etc.)
  * @returns Balance information
- * 
- * TODO: Implement RPC call to fetch native balance
- * TODO: Add caching layer (Redis with 30s TTL)
- * TODO: Handle RPC failures with retry logic
  */
 export async function getNativeBalance(
   address: Address,
   chainId: number
 ): Promise<Balance> {
-  // PLACEHOLDER: Implement actual RPC call
-  throw new Error('getNativeBalance not yet implemented');
+  const client = getPublicClient(chainId);
+  const balance = await client.getBalance({ address });
   
-  // Example implementation:
-  // const client = getPublicClient(chainId);
-  // const balance = await client.getBalance({ address });
-  // return {
-  //   address,
-  //   chainId,
-  //   balance,
-  //   symbol: getChainSymbol(chainId),
-  //   decimals: 18,
-  // };
+  return {
+    address,
+    chainId,
+    balance,
+    symbol: getChainSymbol(chainId),
+    decimals: getChainDecimals(chainId),
+  };
 }
 
 /**
@@ -84,40 +79,72 @@ export async function getNativeBalance(
  * 
  * @param address - Wallet address to query
  * @param chainId - Chain ID
- * @param tokens - Optional list of token addresses. If not provided, queries popular tokens.
- * @returns Array of token balances
- * 
- * TODO: Integrate with token list APIs (CoinGecko, 1inch)
- * TODO: Implement multicall for batch balance fetching
- * TODO: Add USD value calculation
- * TODO: Cache results in Redis
+ * @param tokens - Optional list of token addresses. If not provided, returns empty array.
+ * @returns Array of token balances (only non-zero balances)
  */
 export async function getTokenBalances(
   address: Address,
   chainId: number,
   tokens?: Address[]
 ): Promise<TokenBalance[]> {
-  // PLACEHOLDER: Implement actual token balance fetching
-  throw new Error('getTokenBalances not yet implemented');
+  if (!tokens || tokens.length === 0) {
+    return [];
+  }
+
+  const client = getPublicClient(chainId);
   
-  // Example implementation:
-  // const client = getPublicClient(chainId);
-  // const tokenList = tokens || await getPopularTokens(chainId);
-  // 
-  // const balances = await Promise.all(
-  //   tokenList.map(async (tokenAddress) => {
-  //     const balance = await client.readContract({
-  //       address: tokenAddress,
-  //       abi: ERC20_ABI,
-  //       functionName: 'balanceOf',
-  //       args: [address],
-  //     });
-  //     // ... fetch name, symbol, decimals
-  //     return { ... };
-  //   })
-  // );
-  // 
-  // return balances.filter(b => b.balance > 0n);
+  // Fetch balances for all tokens in parallel
+  const balancePromises = tokens.map(async (tokenAddress) => {
+    try {
+      // Read token balance
+      const balance = await client.readContract({
+        address: tokenAddress,
+        abi: ERC20_ABI,
+        functionName: 'balanceOf',
+        args: [address],
+      }) as bigint;
+
+      // Skip if balance is zero
+      if (balance === 0n) {
+        return null;
+      }
+
+      // Fetch token metadata in parallel
+      const [name, symbol, decimals] = await Promise.all([
+        client.readContract({
+          address: tokenAddress,
+          abi: ERC20_ABI,
+          functionName: 'name',
+        }) as Promise<string>,
+        client.readContract({
+          address: tokenAddress,
+          abi: ERC20_ABI,
+          functionName: 'symbol',
+        }) as Promise<string>,
+        client.readContract({
+          address: tokenAddress,
+          abi: ERC20_ABI,
+          functionName: 'decimals',
+        }) as Promise<number>,
+      ]);
+
+      return {
+        address,
+        chainId,
+        balance,
+        symbol,
+        decimals,
+        tokenAddress,
+        name,
+      };
+    } catch (error) {
+      console.error(`Failed to fetch balance for token ${tokenAddress}:`, error);
+      return null;
+    }
+  });
+
+  const results = await Promise.all(balancePromises);
+  return results.filter((result): result is TokenBalance => result !== null);
 }
 
 /**
@@ -157,42 +184,83 @@ export async function getNFTs(
  * 
  * @param address - Wallet address to query
  * @param chainId - Chain ID
- * @returns Array of active approvals
+ * @returns Array of active approvals (with non-zero allowances)
  * 
- * TODO: Scan Transfer events to find approval transactions
- * TODO: Query current allowance for each approval
- * TODO: Identify risky approvals (unlimited, unknown spenders)
+ * Note: This is a placeholder implementation that scans recent approval events.
+ * For production use, consider using specialized APIs like Etherscan or Alchemy
+ * to get comprehensive approval history, as scanning all historical events
+ * can be resource-intensive and may hit RPC limits.
  */
 export async function getApprovals(
   address: Address,
   chainId: number
 ): Promise<Approval[]> {
-  // PLACEHOLDER: Implement actual approval scanning
-  throw new Error('getApprovals not yet implemented');
+  const client = getPublicClient(chainId);
   
-  // Example implementation:
-  // const client = getPublicClient(chainId);
-  // const logs = await client.getLogs({
-  //   event: parseAbiItem('event Approval(address indexed owner, address indexed spender, uint256 value)'),
-  //   args: { owner: address },
-  //   fromBlock: 'earliest',
-  //   toBlock: 'latest',
-  // });
-  // 
-  // // For each approval, check current allowance
-  // const approvals = await Promise.all(
-  //   logs.map(async (log) => {
-  //     const allowance = await client.readContract({
-  //       address: log.address,
-  //       abi: ERC20_ABI,
-  //       functionName: 'allowance',
-  //       args: [address, log.args.spender],
-  //     });
-  //     return { ... };
-  //   })
-  // );
-  // 
-  // return approvals.filter(a => a.amount > 0n);
+  try {
+    // Get current block to limit the scan range
+    const currentBlock = await client.getBlockNumber();
+    // Scan last 10000 blocks (roughly 1-2 days on most chains)
+    const fromBlock = currentBlock - 10000n;
+    
+    // Scan for Approval events where this address is the owner
+    const logs = await client.getLogs({
+      event: parseAbiItem('event Approval(address indexed owner, address indexed spender, uint256 value)'),
+      args: {
+        owner: address,
+      },
+      fromBlock,
+      toBlock: 'latest',
+    });
+
+    // For each unique token-spender pair, check current allowance
+    const approvalMap = new Map<string, { token: Address; spender: Address }>();
+    
+    for (const log of logs) {
+      if (log.args.owner && log.args.spender) {
+        const key = `${log.address}-${log.args.spender}`;
+        approvalMap.set(key, {
+          token: log.address,
+          spender: log.args.spender,
+        });
+      }
+    }
+
+    // Check current allowances for all approval pairs
+    const approvalPromises = Array.from(approvalMap.values()).map(async ({ token, spender }) => {
+      try {
+        const allowance = await client.readContract({
+          address: token,
+          abi: ERC20_ABI,
+          functionName: 'allowance',
+          args: [address, spender],
+        }) as bigint;
+
+        // Only return approvals with non-zero allowance
+        if (allowance === 0n) {
+          return null;
+        }
+
+        return {
+          token,
+          spender,
+          amount: allowance,
+          chainId,
+          timestamp: Date.now(), // Use current time as we don't track historical timestamp
+        };
+      } catch (error) {
+        console.error(`Failed to check allowance for ${token} to ${spender}:`, error);
+        return null;
+      }
+    });
+
+    const results = await Promise.all(approvalPromises);
+    return results.filter((result): result is Approval => result !== null);
+  } catch (error) {
+    console.error('Failed to scan approval events:', error);
+    // Return empty array if scanning fails (e.g., RPC limits)
+    return [];
+  }
 }
 
 /**
