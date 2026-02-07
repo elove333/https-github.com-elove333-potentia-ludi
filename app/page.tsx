@@ -17,11 +17,11 @@
 const GAME_TOKEN = '0x2791Bca1f2aD161e1a43a2250A0fFfA4eD89b55d'; // Example game token (USDC Mumbai) [web:43]
 
 // API base URL
-'const API_BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001';
+const API_BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001';
 
 // Warn if using fallback URL
-'if (!process.env.NEXT_PUBLIC_APP_URL) {
-  console.warn('⚠️ NEXT_PUBLIC_APP_URL not 'set, using fallback:', API_BASE_URL);
+if (!process.env.NEXT_PUBLIC_APP_URL) {
+  console.warn('⚠️ NEXT_PUBLIC_APP_URL not set, using fallback:', API_BASE_URL);
 }
 
 'export default function Home() {
