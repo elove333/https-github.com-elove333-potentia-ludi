@@ -32,17 +32,16 @@ if (!process.env.NEXT_PUBLIC_APP_URL) {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const { address } = useAccount();
-  const publicClient = usePublicClient({ chainId: selectedChainId });
 
   // Type-safe balance hook: specify chainId explicitly [web:42]
-  const {  balanceData } = useBalance({
+  const { data: balanceData } = useBalance({
     address: demoMode ? TEST_WALLET : address,
     chainId: selectedChainId,
     watch: true,
   });
 
   // Type-safe ERC20 token data
-  const {  tokenData } = useToken({
+  const { data: tokenData } = useToken({
     address: GAME_TOKEN as Address,
     chainId: selectedChainId,
   });
@@ -62,7 +61,7 @@ if (!process.env.NEXT_PUBLIC_APP_URL) {
       setError(null);
       setSuccessMessage(null);
 
-      'const response = await axios.post(`${API_BASE_URL}/api/games/seed`);
+      const response = await axios.post(`${API_BASE_URL}/api/games/seed`);
       
       console.log('✅ Games seeded successfully:', response.data);
       setSuccessMessage(`Successfully seeded ${response.data.count} games!`);
@@ -81,7 +80,7 @@ if (!process.env.NEXT_PUBLIC_APP_URL) {
       if (!walletAddress) {
         console.log('❌ No wallet address available');
         setError('Please connect wallet first');
-        'return;
+        return;
       }
 
       console.log('💰 Get Token Balances button clicked');
@@ -92,7 +91,7 @@ if (!process.env.NEXT_PUBLIC_APP_URL) {
       setError(null);
       setSuccessMessage(null);
 
-      'const response = await axios.post(`${API_BASE_URL}/api/alchemy/get-token-balances`, {
+      const response = await axios.post(`${API_BASE_URL}/api/alchemy/get-token-balances`, {
         address: walletAddress,
         chainId: selectedChainId
       });
@@ -116,19 +115,19 @@ if (!process.env.NEXT_PUBLIC_APP_URL) {
       setSuccessMessage(null);
 
       // Use some example game contracts
-      'const contractAddresses = [
+      const contractAddresses = [
         '0x3845badade8e6dff049820680d1f14bd3903a5d0', // The Sandbox
         '0xccC8cb5229B0ac8069C51fd58367Fd1e622aFD97'  // Gods Unchained
       ];
 
-      'const response = await axios.post(`${API_BASE_URL}/api/alchemy/setup-webhook`, {
+      const response = await axios.post(`${API_BASE_URL}/api/alchemy/setup-webhook`, {
         contractAddresses,
         chainId: selectedChainId
       });
       
       console.log('✅ Webhook setup response:', response.data);
       setSuccessMessage('Webhook configuration prepared! Check console for instructions.');
-    } 'catch (err) {
+    } catch (err) {
       console.error('❌ Error setting up webhook:', err);
       setError(err instanceof Error ? err.message : 'Failed to setup webhook');
     } finally {
@@ -137,13 +136,13 @@ if (!process.env.NEXT_PUBLIC_APP_URL) {
   };
 
   // Handler for Test Webhook button
-  'const handleTestWebhook = async () => {
+  const handleTestWebhook = async () => {
     try {
       const walletAddress = demoMode ? TEST_WALLET : address;
       if (!walletAddress) {
         console.log('❌ No wallet address available');
         setError('Please connect wallet first');
-        'return;
+        return;
       }
 
       console.log('🧪 Test Webhook button clicked');
@@ -153,14 +152,14 @@ if (!process.env.NEXT_PUBLIC_APP_URL) {
       setError(null);
       setSuccessMessage(null);
 
-      'const response = await axios.post(`${API_BASE_URL}/api/webhooks/test`, {
+      const response = await axios.post(`${API_BASE_URL}/api/webhooks/test`, {
         walletAddress,
         contractAddress: '0x3845badade8e6dff049820680d1f14bd3903a5d0', // The Sandbox
         chainId: 1
       });
       
       console.log('✅ Test webhook complete:', response.data);
-      setSuccessMessage('Test webhook sent successfully) Check console per details.');
+      setSuccessMessage('Test webhook sent successfully! Check console for details.');
     } catch (err) {
       console.error('❌ Error testing webhook:', err);
       setError(err instanceof Error ? err.message : 'Failed to test webhook');
@@ -177,7 +176,7 @@ if (!process.env.NEXT_PUBLIC_APP_URL) {
       setError(null);
       setSuccessMessage(null);
 
-      'const response = await axios.get(`${API_BASE_URL}/api/config`);
+      const response = await axios.get(`${API_BASE_URL}/api/config`);
       
       console.log('✅ Config checked:', response.data);
       setSuccessMessage(`Config OK! Webhook URL: ${response.data.webhookURL}`);
@@ -239,7 +238,7 @@ if (!process.env.NEXT_PUBLIC_APP_URL) {
                   onClick={() => switchChain(chain.id)}
                   className={`px-4 py-2 rounded-lg text-sm font-medium ${
                     selectedChainId === chain.id
-                      '? 'bg-blue-500 text-white'
+                      ? 'bg-blue-500 text-white'
                       : 'bg-white/10 text-white hover:bg-white/20'
                   }`}
                 >
@@ -300,7 +299,7 @@ if (!process.env.NEXT_PUBLIC_APP_URL) {
               <div className="bg-white/10 backdrop-blur-xl p-6 rounded-2xl border border-white/20">
                 <h3 className="text-lg font-semibold text-white mb-2">Native Balance</h3>
                 <p className="text-3xl font-bold text-cyan-400">
-                  {balanceData ? `${Number(formatEther(balanceData.value)).toFixed(4)} ${chains.find(c '=> c.id === selectedChainId)?.nativeCurrency?.symbol}` : 'Loading...'}
+                  {balanceData ? `${Number(formatEther(balanceData.value)).toFixed(4)} ${chains.find(c => c.id === selectedChainId)?.nativeCurrency?.symbol}` : 'Loading...'}
                 </p>
                 <p className="text-sm text-gray-300 mt-1">{demoMode ? TEST_WALLET : address?.slice(0,6)}...</p>
               </div>

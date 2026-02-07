@@ -75,16 +75,19 @@ router.post('/', async (req: Request, res: Response) => {
         // Map network name to chain ID
         let chainId = 0; // Default to unknown
         const network = webhookData.event.network.toLowerCase();
-        if (network.includes('mainnet') || network.includes('ethereum')) {
-          chainId = 1;
-        } else if (network.includes('polygon')) {
+        // Check specific chains first before generic mainnet fallback
+        if (network.includes('polygon') || network.includes('matic')) {
           chainId = 137;
-        } else if (network.includes('arbitrum')) {
+        } else if (network.includes('arbitrum') || network.includes('arb')) {
           chainId = 42161;
-        } else if (network.includes('optimism')) {
+        } else if (network.includes('optimism') || network.includes('opt')) {
           chainId = 10;
         } else if (network.includes('base')) {
           chainId = 8453;
+        } else if (network.includes('ronin')) {
+          chainId = 2020;
+        } else if (network.includes('mainnet') || network.includes('ethereum')) {
+          chainId = 1;
         }
 
         if (chainId === 0) {
