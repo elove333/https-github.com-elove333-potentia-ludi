@@ -77,21 +77,23 @@ Unlike traditional Web3 wallets that require navigating complex UIs and understa
 - **Web3 Integration**: Ethers.js v6, Wagmi, Viem
 - **Build Tool**: Vite
 - **Styling**: Inline styles with CSS animations
+- **Backend**: Supabase (Database, Auth, Storage, Real-time)
 
 ## Conversational Hub Stack (Planned)
 - **Framework**: Next.js 16 (App Router)
 - **Runtime**: Node.js 24 LTS
 - **AI/NLP**: OpenAI Responses API (GPT-4)
-- **Database**: PostgreSQL 16+
+- **Database**: PostgreSQL 16+ / Supabase
 - **Cache**: Redis 7+
-- **Authentication**: Sign-In with Ethereum (SIWE)
+- **Authentication**: Sign-In with Ethereum (SIWE) + Supabase Auth
 
 ## Getting Started
 
 ## Prerequisites
 - Node.js 18+ and npm (Node.js 24+ recommended for full conversational features)
-- PostgreSQL 16+ (for conversational features)
+- PostgreSQL 16+ (for conversational features) or Supabase account (free tier works)
 - Redis 7+ (for conversational features)
+- Docker and Docker Compose (optional, for local Supabase testing)
 
 ## Installation
 
@@ -113,7 +115,46 @@ cp .env.example .env.local
 # - OPENAI_API_KEY=your_openai_api_key
 # - DATABASE_URL=postgresql://user:pass@localhost:5432/potentia
 # - REDIS_URL=redis://localhost:6379
+# - SUPABASE_URL=https://your-project.supabase.co
+# - SUPABASE_ANON_KEY=your-anon-key
+# - SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 ```
+
+### Supabase Setup (Optional but Recommended)
+
+Potentia Ludi integrates with Supabase for centralized data storage, real-time updates, authentication, and file management.
+
+**Option 1: Use Supabase Cloud (Recommended)**
+
+1. Create a free account at [Supabase](https://supabase.com/)
+2. Create a new project
+3. Copy your project URL and API keys from Settings > API
+4. Add them to `.env.local`:
+   ```
+   SUPABASE_URL=https://your-project.supabase.co
+   SUPABASE_ANON_KEY=your-anon-key
+   SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+   ```
+5. Run the database schema from the SQL editor:
+   - Copy contents of `supabase/schema.sql`
+   - Paste in Supabase SQL Editor and execute
+
+**Option 2: Local Development with Docker**
+
+For local testing without cloud Supabase:
+
+```bash
+# Start PostgreSQL, PostgREST, and Redis
+docker-compose up -d
+
+# Check services are running
+docker-compose ps
+
+# Stop services when done
+docker-compose down
+```
+
+See [supabase/README.md](./supabase/README.md) for detailed Supabase integration documentation.
 
 4. Start the development server:
 ```bash
