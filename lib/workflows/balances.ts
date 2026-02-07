@@ -246,7 +246,7 @@ export async function getApprovals(
           spender,
           amount: allowance,
           chainId,
-          timestamp: Date.now(), // Use current time as we don't track historical timestamp
+          timestamp: Date.now(), // Approximation: using current time since we don't fetch block timestamps
         };
       } catch (error) {
         console.error(`Failed to check allowance for ${token} to ${spender}:`, error);

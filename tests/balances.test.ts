@@ -9,7 +9,7 @@ import {
 import type { Address } from 'viem';
 
 // Test addresses
-const TEST_ADDRESS: Address = '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb' as Address;
+const TEST_ADDRESS: Address = '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0' as Address;
 const USDC_POLYGON: Address = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174' as Address;
 
 describe('Balances Workflow', () => {
