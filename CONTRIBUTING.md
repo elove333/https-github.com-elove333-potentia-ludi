@@ -1,621 +1,417 @@
-# Contributing Guide
+# Contributing to Potentia Ludi
 
-Thank you for your interest in contributing to the Conversational Web3 Wallet Hub! This guide will help you understand how to extend the pipeline and integrate with APIs.
+Thank you for your interest in contributing to the Conversational Web3 Wallet Hub! This document provides guidelines and instructions for contributing to the project.
 
 ## Table of Contents
 
-1. [Getting Started](#getting-started)
-2. [Git Workflows & Best Practices](#git-workflows--best-practices)
-3. [Code Organization](#code-organization)
-4. [Adding New Workflows](#adding-new-workflows)
-5. [Integrating New APIs](#integrating-new-apis)
-6. [Extending Intent Recognition](#extending-intent-recognition)
-7. [Adding Safety Rules](#adding-safety-rules)
-8. [Testing Guidelines](#testing-guidelines)
-9. [Pull Request Process](#pull-request-process)
+- [Code of Conduct](#code-of-conduct)
+- [Getting Started](#getting-started)
+- [Development Process](#development-process)
+- [Contributing Guidelines](#contributing-guidelines)
+- [Extension Points](#extension-points)
+- [Pull Request Process](#pull-request-process)
+- [Coding Standards](#coding-standards)
+
+## Code of Conduct
+
+We are committed to providing a welcoming and inclusive environment for all contributors. Please be respectful and constructive in all interactions.
 
 ## Getting Started
 
-1. **Fork and Clone**
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/https-github.com-elove333-potentia-ludi.git
-   cd https-github.com-elove333-potentia-ludi
-   ```
+### Prerequisites
 
-2. **Install Dependencies**
-   ```bash
-   npm install
-   ```
+1. Read the [SETUP.md](./SETUP.md) guide to set up your development environment
+2. Review the [ARCHITECTURE.md](./ARCHITECTURE.md) to understand the system design
+3. Familiarize yourself with the codebase structure
 
-3. **Set Up Environment**
-   ```bash
-   cp .env.example .env.local
-   # Edit .env.local with your API keys
-   ```
+### First Time Contributors
 
-4. **Read Documentation**
-   - [ARCHITECTURE.md](./ARCHITECTURE.md) - System design
-   - [SETUP.md](./SETUP.md) - Local setup guide
-   - [README.md](./README.md) - Feature overview
-   - [GIT_WORKFLOWS.md](./GIT_WORKFLOWS.md) - Git workflows and conflict resolution
+Good first issues for new contributors:
 
-5. **Create a Branch**
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
+- 🟢 **Documentation improvements**: Fix typos, add examples, clarify instructions
+- 🟢 **Type definitions**: Add or improve TypeScript types
+- 🟡 **UI enhancements**: Improve component styling or add new UI elements
+- 🟡 **Test coverage**: Add tests for existing functionality
+- 🔴 **New features**: Implement new workflows or integrations
 
-## Git Workflows & Best Practices
+Issues are labeled by difficulty:
+- `good-first-issue`: Perfect for newcomers
+- `help-wanted`: We need community help on these
+- `enhancement`: New feature requests
+- `bug`: Something isn't working
 
-When contributing to this project, you may need to work with common Git operations like cherry-picking commits, resolving conflicts, or safely rewriting commit history. We've created a comprehensive guide to help you:
+## Development Process
 
-**📖 [Git Workflows Guide](./GIT_WORKFLOWS.md)** - Complete reference with practical examples
+### 1. Fork and Clone
 
-This guide covers:
-- **Cherry-picking commits** from one branch to another (e.g., hotfixes from feature to main)
-- **Safely rewriting history** with `git reset --soft` and `--force-with-lease`
-- **Resolving merge conflicts** during cherry-pick operations
-- **Handling stash conflicts** when applying stashed changes
-- **Safety tips and recovery strategies** using `git reflog`
+```bash
+# Fork the repository on GitHub, then:
+git clone https://github.com/YOUR_USERNAME/https-github.com-elove333-potentia-ludi.git
+cd https-github.com-elove333-potentia-ludi
 
-### Quick Git Tips for Contributors
-
-- **Always create a backup branch** before any destructive operations
-- **Use `--force-with-lease`** instead of `--force` when pushing rewrites
-- **Cherry-pick with `-x`** to maintain traceability of commits
-- **Check `git status` and `git diff`** immediately when conflicts occur
-- **Use `git reflog`** to recover from mistakes
-
-See the [Git Workflows Guide](./GIT_WORKFLOWS.md) for detailed step-by-step instructions and conflict resolution examples.
-
-## Code Organization
-
-```
-lib/
-├── ai/                    # AI/NLP integration
-│   └── openai.ts         # OpenAI API client and intent parsing
-├── workflows/            # Intent workflow implementations
-│   ├── balances.ts       # Balance queries
-│   ├── swap.ts           # Token swaps
-│   ├── bridge.ts         # Cross-chain transfers
-│   └── index.ts          # Workflow registry
-├── validation/           # Input validation and sanitization
-├── execution/            # Transaction execution layer
-├── safety/              # Risk scoring and safety checks
-└── db/                  # Database schemas and migrations
-    ├── schema.sql       # PostgreSQL schema
-    └── redis.md         # Redis cache structure
+# Add upstream remote
+git remote add upstream https://github.com/elove333/https-github.com-elove333-potentia-ludi.git
 ```
 
-## Adding New Workflows
+### 2. Create a Branch
 
-Workflows handle specific Web3 operations triggered by natural language intents.
+```bash
+# Update your fork
+git checkout main
+git pull upstream main
 
-### Step 1: Create Workflow File
+# Create feature branch
+git checkout -b feature/your-feature-name
 
-Create a new file in `lib/workflows/`:
+# Branch naming conventions:
+# - feature/add-nft-support
+# - fix/balance-cache-bug
+# - docs/update-setup-guide
+# - refactor/simplify-intent-parser
+```
+
+### 3. Make Changes
+
+Follow the [Coding Standards](#coding-standards) section below.
+
+### 4. Test Your Changes
+
+```bash
+# Run linter
+npm run lint
+
+# Run tests
+npm test
+
+# Test manually
+npm run dev
+# Open http://localhost:3000
+```
+
+### 5. Commit Changes
+
+```bash
+# Stage changes
+git add .
+
+# Commit with clear message
+git commit -m "Add feature: description of what you added"
+
+# Commit message format:
+# - "Add feature: [description]"
+# - "Fix: [bug description]"
+# - "Docs: [documentation changes]"
+# - "Refactor: [what was refactored]"
+# - "Test: [test additions/changes]"
+```
+
+### 6. Push and Create PR
+
+```bash
+# Push to your fork
+git push origin feature/your-feature-name
+
+# Go to GitHub and create a Pull Request
+```
+
+## Contributing Guidelines
+
+### Areas for Contribution
+
+#### 1. Conversational AI Pipeline
+
+**Adding New Intents**
+
+To add support for a new intent (e.g., `staking.deposit`):
+
+1. Create type definitions in `src/workflows/staking/types.ts`:
 
 ```typescript
-// lib/workflows/nft-transfer.ts
-
-import { Address } from 'viem';
-
-export interface NFTTransferParams {
-  contract: Address;
-  tokenId: string;
-  recipient: Address;
+export interface StakingDepositParams {
   chainId: number;
+  amount: bigint;
+  validator?: string;
 }
+```
 
-export interface NFTTransferResult {
-  txHash: `0x${string}`;
-  status: 'pending' | 'confirmed';
+2. Implement the workflow in `src/workflows/staking/staking.deposit.ts`:
+
+```typescript
+export async function stakingDeposit(params: StakingDepositParams): Promise<StakingResult> {
+  // Implementation
 }
+```
 
-/**
- * Execute NFT transfer
- * 
- * @param params - Transfer parameters
- * @returns Transaction result
- */
-export async function executeNFTTransfer(
-  params: NFTTransferParams
-): Promise<NFTTransferResult> {
-  // 1. Validate parameters
-  // 2. Check ownership
-  // 3. Build transaction
-  // 4. Simulate transaction
-  // 5. Execute transfer
-  // 6. Return result
-  
-  throw new Error('Not implemented');
-}
+3. Update the OpenAI system prompt in `src/ai/openai-client.ts` to recognize the new intent
 
-/**
- * Validate NFT transfer parameters
- */
-export async function validateNFTTransfer(
-  params: NFTTransferParams
-): Promise<{
-  valid: boolean;
-  errors: string[];
-  warnings: string[];
-  riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
-}> {
-  const errors: string[] = [];
-  const warnings: string[] = [];
-  
-  // Add validation logic
-  
-  return {
-    valid: errors.length === 0,
-    errors,
-    warnings,
-    riskLevel: 'MEDIUM',
-  };
-}
+4. Add tests for the new intent
 
-/**
- * Main workflow entry point
- */
-export async function executeNFTTransferWorkflow(
-  params: NFTTransferParams
-): Promise<{
-  validation: Awaited<ReturnType<typeof validateNFTTransfer>>;
-  execution?: NFTTransferResult;
-}> {
-  const validation = await validateNFTTransfer(params);
-  
-  if (!validation.valid) {
-    throw new Error(`Validation failed: ${validation.errors.join(', ')}`);
-  }
-  
-  const execution = await executeNFTTransfer(params);
-  
-  return { validation, execution };
-}
+#### 2. Workflow Extensions
 
-// Export metadata for workflow registry
-export const nftTransferWorkflowMetadata = {
-  name: 'nft.transfer',
-  description: 'Transfer NFTs to another address',
-  examples: [
-    'Send my Bored Ape #1234 to alice.eth',
-    'Transfer NFT to 0x123...',
-  ],
-  intents: ['nft_transfer', 'send_nft'],
+**Integrating a New Chain**
+
+1. Add chain configuration to workflow files:
+
+```typescript
+const CHAIN_CONFIG = {
+  // ... existing chains
+  324: zkSync, // Add new chain
 };
 ```
 
-### Step 2: Register Workflow
+2. Update RPC configuration in `.env.example`:
 
-Add to `lib/workflows/index.ts`:
-
-```typescript
-import { 
-  nftTransferWorkflowMetadata,
-  executeNFTTransferWorkflow,
-} from './nft-transfer';
-
-export const WORKFLOW_REGISTRY = {
-  // ... existing workflows
-  'nft.transfer': {
-    metadata: nftTransferWorkflowMetadata,
-    execute: executeNFTTransferWorkflow,
-  },
-} as const;
+```env
+RPC_URL_ZKSYNC=https://mainnet.era.zksync.io
 ```
 
-### Step 3: Update Intent Parser
+3. Test all workflows on the new chain
 
-Add to `lib/ai/openai.ts`:
+**Adding a DEX Integration**
 
-```typescript
-const INTENT_FUNCTIONS = [
-  // ... existing functions
-  {
-    name: 'parse_nft_transfer',
-    description: 'Parse a request to transfer an NFT',
-    parameters: {
-      type: 'object',
-      required: ['contract', 'tokenId', 'recipient'],
-      properties: {
-        contract: {
-          type: 'string',
-          description: 'NFT contract address',
-        },
-        tokenId: {
-          type: 'string',
-          description: 'Token ID of the NFT',
-        },
-        recipient: {
-          type: 'string',
-          description: 'Recipient address or ENS name',
-        },
-        chainId: {
-          type: 'number',
-          description: 'Chain ID',
-        },
-      },
-    },
-  },
-];
-```
-
-### Step 4: Add Tests
-
-Create `lib/workflows/__tests__/nft-transfer.test.ts`:
+1. Create DEX adapter in `src/workflows/trade/adapters/`:
 
 ```typescript
-import { describe, it, expect } from 'vitest';
-import { validateNFTTransfer } from '../nft-transfer';
-
-describe('NFT Transfer Workflow', () => {
-  it('should validate correct parameters', async () => {
-    const result = await validateNFTTransfer({
-      contract: '0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D' as any,
-      tokenId: '1234',
-      recipient: '0x742d35Cc6634C0532925a3b8D7De2665B81b5fE4' as any,
-      chainId: 1,
-    });
-    
-    expect(result.valid).toBe(true);
-  });
-  
-  it('should reject invalid recipient', async () => {
-    const result = await validateNFTTransfer({
-      contract: '0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D' as any,
-      tokenId: '1234',
-      recipient: 'invalid' as any,
-      chainId: 1,
-    });
-    
-    expect(result.valid).toBe(false);
-    expect(result.errors.length).toBeGreaterThan(0);
-  });
-});
-```
-
-## Integrating New APIs
-
-### Example: Adding CoinGecko Price API
-
-1. **Create API Client**
-
-```typescript
-// lib/apis/coingecko.ts
-
-export class CoinGeckoClient {
-  private apiKey: string;
-  private baseUrl = 'https://api.coingecko.com/api/v3';
-  
-  constructor(apiKey: string) {
-    this.apiKey = apiKey;
-  }
-  
-  async getTokenPrice(
-    tokenAddress: string,
-    chainId: number
-  ): Promise<number> {
-    const platform = this.getPlatformId(chainId);
-    const url = `${this.baseUrl}/simple/token_price/${platform}`;
-    
-    const response = await fetch(url, {
-      headers: {
-        'x-cg-pro-api-key': this.apiKey,
-      },
-      params: {
-        contract_addresses: tokenAddress,
-        vs_currencies: 'usd',
-      },
-    });
-    
-    const data = await response.json();
-    return data[tokenAddress.toLowerCase()]?.usd || 0;
-  }
-  
-  private getPlatformId(chainId: number): string {
-    const platforms = {
-      1: 'ethereum',
-      137: 'polygon-pos',
-      56: 'binance-smart-chain',
-      42161: 'arbitrum-one',
-      10: 'optimistic-ethereum',
-      8453: 'base',
-    };
-    return platforms[chainId] || 'ethereum';
+export class UniswapV2Adapter implements DEXAdapter {
+  async getQuote(params: QuoteParams): Promise<Quote> {
+    // Implementation
   }
 }
+```
 
-// Export singleton instance
-export const coingecko = new CoinGeckoClient(
-  process.env.COINGECKO_API_KEY || ''
+2. Register adapter in `src/workflows/trade/trade.quote.ts`
+
+3. Add configuration to environment variables
+
+#### 3. Backend Infrastructure
+
+**Database Schema Changes**
+
+1. Create migration file in `src/backend/database/migrations/`:
+
+```sql
+-- 001_add_staking_table.sql
+CREATE TABLE staking_positions (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_address VARCHAR(42) NOT NULL,
+  -- ... other fields
 );
 ```
 
-2. **Add Caching**
+2. Update `client.ts` with new query methods
+
+**Redis Cache Strategies**
+
+1. Add new cache key in `src/backend/cache/redis-client.ts`:
 
 ```typescript
-import { redis } from '../db/redis';
-
-export async function getTokenPriceWithCache(
-  tokenAddress: string,
-  chainId: number
-): Promise<number> {
-  const cacheKey = `price:${chainId}:${tokenAddress}:usd`;
-  
-  // Try cache first
-  const cached = await redis.get(cacheKey);
-  if (cached) {
-    return parseFloat(cached);
-  }
-  
-  // Fetch from API
-  const price = await coingecko.getTokenPrice(tokenAddress, chainId);
-  
-  // Cache for 5 minutes
-  await redis.set(cacheKey, price.toString(), 'EX', 300);
-  
-  return price;
-}
-```
-
-3. **Use in Workflows**
-
-```typescript
-// In lib/workflows/balances.ts
-import { getTokenPriceWithCache } from '../apis/coingecko';
-
-export async function getTokenBalances(
-  address: Address,
-  chainId: number
-): Promise<TokenBalance[]> {
-  // ... fetch balances
-  
-  // Add USD values
-  const balancesWithUSD = await Promise.all(
-    balances.map(async (balance) => ({
-      ...balance,
-      usdValue: await getTokenPriceWithCache(
-        balance.tokenAddress,
-        chainId
-      ) * Number(balance.balance) / 10 ** balance.decimals,
-    }))
-  );
-  
-  return balancesWithUSD;
-}
-```
-
-## Extending Intent Recognition
-
-### Adding New Intent Categories
-
-1. **Define Intent Type**
-
-```typescript
-// lib/ai/openai.ts
-
-export type IntentAction = 
-  | 'balances.get'
-  | 'trade.swap'
-  | 'bridge.transfer'
-  | 'nft.transfer'     // New
-  | 'portfolio.analyze' // New
-  | 'unknown';
-```
-
-2. **Add Function Definition**
-
-```typescript
-const INTENT_FUNCTIONS = [
-  // ...
-  {
-    name: 'parse_portfolio_analysis',
-    description: 'Parse a request to analyze portfolio',
-    parameters: {
-      type: 'object',
-      properties: {
-        timeframe: {
-          type: 'string',
-          enum: ['24h', '7d', '30d', 'all'],
-          description: 'Analysis timeframe',
-        },
-        includeNFTs: {
-          type: 'boolean',
-          description: 'Include NFT valuations',
-        },
-      },
-    },
-  },
-];
-```
-
-3. **Update System Prompt**
-
-```typescript
-const SYSTEM_PROMPT = `You are a helpful Web3 wallet assistant...
-
-Your capabilities include:
-1. Querying wallet balances, NFTs, and token approvals (balances.get)
-2. Executing token swaps via DEX aggregators (trade.swap)
-3. Bridging assets across chains (bridge.transfer)
-4. Transferring NFTs (nft.transfer)              // New
-5. Analyzing portfolios (portfolio.analyze)       // New
-...`;
-```
-
-## Adding Safety Rules
-
-Create custom validation rules for specific scenarios:
-
-```typescript
-// lib/safety/validators.ts
-
-export interface SafetyRule {
-  name: string;
-  check: (params: any, context: any) => Promise<SafetyResult>;
-  priority: number; // Higher = checked first
-}
-
-export interface SafetyResult {
-  passed: boolean;
-  level: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
-  message?: string;
-  recommendation?: string;
-}
-
-// Example: Large transaction warning
-export const largeTransactionRule: SafetyRule = {
-  name: 'large_transaction_check',
-  priority: 100,
-  check: async (params, context) => {
-    const amountUSD = await convertToUSD(params.amount, params.token);
-    
-    if (amountUSD > 10000) {
-      return {
-        passed: false,
-        level: 'HIGH',
-        message: `Large transaction detected: $${amountUSD.toFixed(2)}`,
-        recommendation: 'Consider splitting into smaller transactions',
-      };
-    }
-    
-    return { passed: true, level: 'LOW' };
-  },
+export const CacheKeys = {
+  // ... existing keys
+  staking: (address: string, chainId: number) =>
+    `staking:${chainId}:${address}`,
 };
-
-// Register rule
-export const SAFETY_RULES: SafetyRule[] = [
-  largeTransactionRule,
-  // ... more rules
-];
 ```
 
-Use in workflows:
+2. Implement cache logic with appropriate TTL
+
+#### 4. Safety and Validation
+
+**Adding Custom Safety Rules**
+
+1. Add validation in `src/workflows/shared/validation.ts`:
 
 ```typescript
-export async function validateSwap(params: SwapParams) {
-  // ... existing validation
-  
-  // Apply safety rules
-  for (const rule of SAFETY_RULES) {
-    const result = await rule.check(params, context);
-    if (!result.passed && result.level === 'CRITICAL') {
-      errors.push(result.message);
-    } else if (!result.passed) {
-      warnings.push(result.message);
-    }
+export function validateStakingAmount(amount: bigint, minimum: bigint): void {
+  if (amount < minimum) {
+    throw new Error(`Amount below minimum stake of ${minimum}`);
   }
-  
-  return { valid, errors, warnings, riskLevel };
 }
 ```
 
-## Testing Guidelines
+2. Integrate into workflow execution
 
-### Unit Tests
-```bash
-npm run test              # Run all tests
-npm run test:watch        # Watch mode
-npm run test:coverage     # With coverage
-```
+3. Add tests for edge cases
 
-### Test Structure
+#### 5. UI/UX Improvements
+
+**Adding New Components**
+
+1. Create component in `src/components/`:
+
 ```typescript
-describe('Workflow Name', () => {
-  describe('validation', () => {
-    it('should accept valid parameters', async () => {
-      // Test happy path
-    });
-    
-    it('should reject invalid parameters', async () => {
-      // Test error cases
-    });
-  });
-  
-  describe('execution', () => {
-    it('should execute successfully', async () => {
-      // Test execution
-    });
-    
-    it('should handle errors gracefully', async () => {
-      // Test error handling
-    });
-  });
-});
+export function ChatInterface({ onMessage }: ChatInterfaceProps) {
+  // Implementation
+}
 ```
 
-### Integration Tests
-```typescript
-// Test full workflow with mocked APIs
-it('should complete swap workflow', async () => {
-  // Mock external APIs
-  const mockGetQuote = vi.fn().mockResolvedValue(mockQuote);
-  
-  // Execute workflow
-  const result = await executeSwapWorkflow(params);
-  
-  // Verify results
-  expect(result.success).toBe(true);
-  expect(mockGetQuote).toHaveBeenCalled();
-});
-```
+2. Add component to main app
+
+3. Style consistently with existing components
+
+## Extension Points
+
+The architecture is designed to be extensible. See [ARCHITECTURE.md - Extension Points](./ARCHITECTURE.md#extension-points) for detailed guides on:
+
+- Adding new intents
+- Integrating new chains
+- Custom DEX integration
+- Custom safety rules
 
 ## Pull Request Process
 
-1. **Ensure Quality**
-   - All tests pass: `npm run test`
-   - Linter passes: `npm run lint`
-   - Types check: `npm run type-check`
-   - Build succeeds: `npm run build`
+### Before Submitting
 
-2. **Update Documentation**
-   - Add JSDoc comments to functions
-   - Update README.md if adding features
-   - Update ARCHITECTURE.md for significant changes
+- ✅ Code follows the style guidelines
+- ✅ All tests pass
+- ✅ Linter passes with no errors
+- ✅ Documentation is updated
+- ✅ Commit messages are clear
+- ✅ Branch is up to date with main
 
-3. **Write Clear Commits**
-   ```
-   feat: Add NFT transfer workflow
-   
-   - Implement NFT transfer validation
-   - Add ownership checks
-   - Integrate with OpenSea API
-   - Add tests for edge cases
-   
-   Closes #123
-   ```
+### PR Template
 
-4. **Create Pull Request**
-   - Clear title and description
-   - Link related issues
-   - Add screenshots for UI changes
-   - Request review from maintainers
+When creating a PR, include:
 
-5. **Address Feedback**
-   - Respond to all comments
-   - Make requested changes
-   - Re-request review
+```markdown
+## Description
+Brief description of what this PR does
 
-## Code Style
+## Type of Change
+- [ ] Bug fix
+- [ ] New feature
+- [ ] Documentation update
+- [ ] Refactoring
+- [ ] Other (specify)
 
-- **TypeScript**: Strict mode enabled
-- **Formatting**: Use Prettier (automatic)
-- **Naming**:
-  - Functions: `camelCase`
-  - Types/Interfaces: `PascalCase`
-  - Constants: `UPPER_SNAKE_CASE`
-  - Files: `kebab-case.ts`
-- **Comments**: JSDoc for public APIs
-- **Error Handling**: Always use try-catch for async operations
+## Testing
+How to test these changes:
+1. Step 1
+2. Step 2
+3. Expected result
 
-## Getting Help
+## Checklist
+- [ ] Code follows style guidelines
+- [ ] Tests pass
+- [ ] Documentation updated
+- [ ] No breaking changes (or breaking changes documented)
 
-- **Documentation**: Read ARCHITECTURE.md and SETUP.md
-- **Issues**: Search existing issues first
-- **Discussions**: Use GitHub Discussions for questions
-- **Discord**: Join our community server (link in README)
+## Screenshots (if applicable)
+Add screenshots for UI changes
+```
+
+### Review Process
+
+1. **Automated Checks**: CI will run linting and tests
+2. **Code Review**: Maintainers will review your code
+3. **Discussion**: Address feedback and make requested changes
+4. **Approval**: Once approved, your PR will be merged
+
+### After Merge
+
+Your contribution will be:
+- Merged into the main branch
+- Included in the next release
+- Credited in release notes
+
+## Coding Standards
+
+### TypeScript
+
+```typescript
+// ✅ Good: Clear types and JSDoc comments
+/**
+ * Get balance for a wallet address
+ * @param address - Wallet address to check
+ * @param chainId - Chain ID to query
+ * @returns Balance information
+ */
+export async function getBalance(
+  address: Address,
+  chainId: number
+): Promise<Balance> {
+  // Implementation
+}
+
+// ❌ Bad: No types or documentation
+export async function getBalance(address, chainId) {
+  // Implementation
+}
+```
+
+### Code Organization
+
+```typescript
+// ✅ Good: Organized imports
+import { Address } from 'viem';
+import { Balance } from './types';
+import { validateAddress } from '../shared/validation';
+
+// ❌ Bad: Messy imports
+import { validateAddress } from '../shared/validation';
+import { Address } from 'viem';
+import { Balance } from './types';
+```
+
+### Error Handling
+
+```typescript
+// ✅ Good: Specific error messages
+if (!address) {
+  throw new Error('Address is required');
+}
+
+// ❌ Bad: Generic error
+if (!address) {
+  throw new Error('Invalid input');
+}
+```
+
+### Comments
+
+```typescript
+// ✅ Good: Explain why, not what
+// Cache balance for 30 seconds to reduce RPC calls
+await redis.set(key, balance, 30);
+
+// ❌ Bad: Obvious comment
+// Set balance in cache
+await redis.set(key, balance, 30);
+```
+
+### Naming Conventions
+
+- **Files**: `kebab-case.ts` (e.g., `balance-tracker.ts`)
+- **Functions**: `camelCase` (e.g., `getBalance`)
+- **Classes**: `PascalCase` (e.g., `IntentParser`)
+- **Constants**: `SCREAMING_SNAKE_CASE` (e.g., `MAX_RETRIES`)
+- **Types/Interfaces**: `PascalCase` (e.g., `BalanceParams`)
+
+### File Structure
+
+```
+src/
+├── workflows/           # Business logic
+│   ├── balances/
+│   │   ├── types.ts    # Types first
+│   │   ├── *.get.ts    # Main implementations
+│   │   └── *.track.ts
+│   └── shared/         # Shared utilities
+├── ai/                 # AI/NLP components
+├── backend/            # Backend services
+└── components/         # React components
+```
+
+## Questions?
+
+- Open an issue with the `question` label
+- Check existing issues for answers
+- Review [ARCHITECTURE.md](./ARCHITECTURE.md) for design details
+- See [SETUP.md](./SETUP.md) for environment setup
 
 ## License
 
-By contributing, you agree that your contributions will be licensed under the MIT License.
+By contributing, you agree that your contributions will be licensed under the same MIT License that covers this project.
+
+---
+
+Thank you for contributing to Potentia Ludi! 🚀

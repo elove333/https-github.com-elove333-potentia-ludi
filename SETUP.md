@@ -6,424 +6,423 @@ This guide will help you set up the Conversational Web3 Wallet Hub for local dev
 
 Before you begin, ensure you have the following installed:
 
-- **Node.js 24+ LTS** (recommended) or Node.js 18+
+- **Node.js**: Version 20+ (Node.js 24+ recommended)
   - Check version: `node --version`
-  - Download from: https://nodejs.org/
-  
-- **npm 10+** or **pnpm 8+**
-  - Check version: `npm --version`
-  - Install pnpm: `npm install -g pnpm`
-  
-- **Docker** (for PostgreSQL and Redis)
-  - Check version: `docker --version`
-  - Download from: https://www.docker.com/products/docker-desktop
+  - Download: https://nodejs.org/
 
-- **Git**
+- **npm**: Version 8+ (usually comes with Node.js)
+  - Check version: `npm --version`
+
+- **PostgreSQL**: Version 15+
+  - Check version: `psql --version`
+  - Download: https://www.postgresql.org/download/
+
+- **Redis**: Version 7+
+  - Check version: `redis-server --version`
+  - Download: https://redis.io/download/
+
+- **Git**: For version control
   - Check version: `git --version`
 
-## Step 1: Clone the Repository
+## Step-by-Step Setup
+
+### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/elove333/https-github.com-elove333-potentia-ludi.git
 cd https-github.com-elove333-potentia-ludi
 ```
 
-## Step 2: Install Dependencies
+### 2. Install Dependencies
 
-Using npm:
 ```bash
 npm install
 ```
 
-Or using pnpm (recommended for faster installs):
+This will install all required packages including:
+- React 18 & TypeScript
+- Ethers.js, Wagmi, Viem for Web3
+- Zustand for state management
+- Vite for building
+
+### 3. Setup PostgreSQL Database
+
+#### Create Database
+
 ```bash
-pnpm install
+# Start PostgreSQL (if not running)
+# macOS/Linux:
+sudo service postgresql start
+# or
+brew services start postgresql
+
+# Windows:
+# Start PostgreSQL service from Services
+
+# Create database
+createdb potentia_ludi
 ```
 
-## Step 3: Set Up Database Services
+#### Run Schema
 
-### Option A: Using Docker Compose (Recommended)
-
-Create a `docker-compose.yml` file in the project root:
-
-```yaml
-version: '3.8'
-
-services:
-  postgres:
-    image: postgres:16-alpine
-    container_name: potentia-postgres
-    environment:
-      POSTGRES_DB: potentia_ludi
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./lib/db/schema.sql:/docker-entrypoint-initdb.d/schema.sql
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  redis:
-    image: redis:7-alpine
-    container_name: potentia-redis
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-    command: redis-server --appendonly yes
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 3s
-      retries: 5
-
-volumes:
-  postgres_data:
-  redis_data:
-```
-
-Start the services:
 ```bash
-docker-compose up -d
+# Initialize database schema
+psql potentia_ludi -f src/backend/database/schema.sql
 ```
 
-Check status:
+#### Verify Database
+
 ```bash
-docker-compose ps
+# Connect to database
+psql potentia_ludi
+
+# List tables
+\dt
+
+# You should see tables like:
+# - intents
+# - transaction_cache
+# - user_preferences
+# - price_cache
+# - balance_cache
+# etc.
+
+# Exit psql
+\q
 ```
 
-View logs:
+### 4. Setup Redis
+
+#### Start Redis Server
+
 ```bash
-docker-compose logs -f
+# Start Redis
+redis-server
+
+# Or start as background service
+# macOS/Linux:
+redis-server --daemonize yes
+
+# Windows:
+# Install Redis using WSL or Docker
 ```
 
-### Option B: Manual Installation
+#### Verify Redis
 
-#### PostgreSQL
-1. Download and install PostgreSQL 16 from https://www.postgresql.org/download/
-2. Create database:
-   ```bash
-   createdb potentia_ludi
-   ```
-3. Run schema:
-   ```bash
-   psql potentia_ludi < lib/db/schema.sql
-   ```
-
-#### Redis
-1. Download and install Redis from https://redis.io/download
-2. Start Redis server:
-   ```bash
-   redis-server
-   ```
-
-## Step 4: Configure Environment Variables
-
-Copy the example environment file:
 ```bash
-cp .env.example .env.local
+# Test Redis connection
+redis-cli ping
+# Should return: PONG
+
+# Check Redis is running
+redis-cli info server
 ```
 
-Edit `.env.local` with your configuration:
+### 5. Configure Environment Variables
 
-### Minimum Required Variables
+#### Create .env file
+
+```bash
+# Copy example environment file
+cp .env.example .env
+```
+
+#### Edit .env file
+
+Open `.env` in your editor and configure:
+
+**Required:**
 ```env
-# OpenAI (Required for conversational features)
-OPENAI_API_KEY=sk-proj-your-key-here
+# OpenAI API Key (get from https://platform.openai.com/)
+OPENAI_API_KEY=sk-your-key-here
 
 # Database
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/potentia_ludi
+DATABASE_URL=postgresql://localhost:5432/potentia_ludi
 
 # Redis
 REDIS_URL=redis://localhost:6379
-
-# Session Security
-SESSION_SECRET=generate-a-random-32-char-string-here
-JWT_SECRET=generate-another-random-32-char-string-here
 ```
 
-### Optional but Recommended
+**Optional but Recommended:**
 ```env
-# Alchemy for reliable RPC access
-ALCHEMY_API_KEY_MAINNET=your-key-here
-ALCHEMY_API_KEY_POLYGON=your-key-here
+# RPC endpoints (get free from Alchemy, Infura, or QuickNode)
+RPC_URL_ETHEREUM=https://eth-mainnet.g.alchemy.com/v2/your-key
+RPC_URL_POLYGON=https://polygon-mainnet.g.alchemy.com/v2/your-key
 
-# 0x API for DEX aggregation
-ZEROX_API_KEY=your-key-here
+# Coinbase integration
+NEXT_PUBLIC_CDP_API_KEY=your-coinbase-key
 
-# Tenderly for transaction simulation
-TENDERLY_API_KEY=your-key-here
+# Price feeds
+COINGECKO_API_KEY=your-coingecko-key
 ```
 
-**Generate secure secrets:**
-```bash
-# On Linux/Mac
-openssl rand -base64 32
+### 6. Install Additional Dependencies (Optional)
 
-# On Windows (PowerShell)
-[Convert]::ToBase64String((1..32 | ForEach-Object { Get-Random -Minimum 0 -Maximum 256 }))
+For full conversational AI functionality, install:
+
+```bash
+# OpenAI SDK
+npm install openai
+
+# PostgreSQL client
+npm install pg @types/pg
+
+# Redis client
+npm install redis
+
+# Additional utilities
+npm install dotenv
 ```
 
-## Step 5: Verify Setup
+### 7. Run Database Migrations (if any)
 
-### Check Database Connection
 ```bash
-npm run db:check
+# Currently no migrations needed as schema.sql creates everything
+# Future migrations will be in src/backend/database/migrations/
 ```
 
-If you don't have this script yet, test manually:
+### 8. Start Development Server
+
 ```bash
-psql postgresql://postgres:postgres@localhost:5432/potentia_ludi -c "SELECT version();"
-```
-
-### Check Redis Connection
-```bash
-redis-cli ping
-```
-Should return: `PONG`
-
-### Check Node.js Version
-```bash
-node --version
-```
-Should be v18+ (v24+ recommended)
-
-## Step 6: Run Database Migrations
-
-If using an ORM like Prisma:
-```bash
-npm run prisma:generate
-npm run prisma:migrate
-```
-
-Or manually apply schema:
-```bash
-psql $DATABASE_URL < lib/db/schema.sql
-```
-
-## Step 7: Start Development Server
-
-### Current Vite Setup
-```bash
+# Start the development server
 npm run dev
 ```
 
-The app will be available at: http://localhost:5173
+The application will be available at: http://localhost:3000
 
-### Future Next.js Setup
-Once Next.js is integrated:
-```bash
-npm run dev
-```
+### 9. Verify Setup
 
-The app will be available at: http://localhost:3000
+Open http://localhost:3000 in your browser and check:
 
-## Step 8: Verify Installation
+✅ Page loads without errors
+✅ Wallet connection works
+✅ UI components render correctly
 
-Open your browser and navigate to the development URL. You should see:
-- Current: The gaming wallet interface
-- Future: The conversational interface with text input
-
-## Troubleshooting
-
-### Port Already in Use
-
-If port 5173 (Vite) or 3000 (Next.js) is already in use:
-```bash
-# Find process using the port (Mac/Linux)
-lsof -i :5173
-
-# Kill the process
-kill -9 <PID>
-
-# Or use a different port
-npm run dev -- --port 3001
-```
-
-### Database Connection Failed
-
-1. Check if PostgreSQL is running:
-   ```bash
-   docker-compose ps postgres
-   # or
-   pg_isready -h localhost -p 5432
-   ```
-
-2. Verify DATABASE_URL in `.env.local`
-3. Check PostgreSQL logs:
-   ```bash
-   docker-compose logs postgres
-   ```
-
-### Redis Connection Failed
-
-1. Check if Redis is running:
-   ```bash
-   docker-compose ps redis
-   # or
-   redis-cli ping
-   ```
-
-2. Verify REDIS_URL in `.env.local`
-
-### OpenAI API Errors
-
-1. Verify your API key is correct
-2. Check your OpenAI account has credits
-3. Ensure you have access to the GPT-4 API (may require upgraded account)
-
-### TypeScript Errors
-
-```bash
-# Rebuild TypeScript
-npm run build
-
-# Or check for errors
-npx tsc --noEmit
-```
-
-### Dependency Issues
-
-```bash
-# Clear cache and reinstall
-rm -rf node_modules package-lock.json
-npm install
-
-# Or with pnpm
-rm -rf node_modules pnpm-lock.yaml
-pnpm install
-```
+Check console for any errors related to:
+- Database connection
+- Redis connection
+- OpenAI API
 
 ## Development Workflow
 
-### Common Commands
+### Running the Application
 
 ```bash
-# Start development server
+# Development mode with hot reload
 npm run dev
 
 # Build for production
 npm run build
 
+# Preview production build
+npm run preview
+```
+
+### Code Quality
+
+```bash
 # Run linter
 npm run lint
 
 # Run tests (when available)
-npm run test
-
-# Check types
-npm run type-check
+npm test
 ```
 
 ### Database Management
 
 ```bash
 # Connect to database
-psql $DATABASE_URL
+psql potentia_ludi
 
-# Backup database
-pg_dump $DATABASE_URL > backup.sql
+# Common queries
+SELECT * FROM intents ORDER BY created_at DESC LIMIT 10;
+SELECT * FROM user_preferences;
 
-# Restore database
-psql $DATABASE_URL < backup.sql
-
-# Reset database
-psql $DATABASE_URL -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
-psql $DATABASE_URL < lib/db/schema.sql
+# Clear cache tables (development only)
+DELETE FROM balance_cache;
+DELETE FROM price_cache;
 ```
 
 ### Redis Management
 
 ```bash
+# Connect to Redis CLI
+redis-cli
+
+# Common commands
+KEYS potentia:*          # List all keys
+GET potentia:balance:*   # Get specific key
+FLUSHALL                 # Clear all cache (dev only)
+```
+
+## Troubleshooting
+
+### PostgreSQL Connection Issues
+
+**Error:** "could not connect to server"
+```bash
+# Check if PostgreSQL is running
+pg_isready
+
+# Start PostgreSQL
+sudo service postgresql start
+```
+
+**Error:** "database does not exist"
+```bash
+# Create the database
+createdb potentia_ludi
+```
+
+### Redis Connection Issues
+
+**Error:** "Redis connection refused"
+```bash
+# Check if Redis is running
+redis-cli ping
+
+# Start Redis
+redis-server
+```
+
+### Node.js Version Issues
+
+**Error:** "unsupported engine"
+```bash
+# Check Node version
+node --version
+
+# Install correct version using nvm
+nvm install 20
+nvm use 20
+```
+
+### Port Already in Use
+
+**Error:** "Port 3000 is already in use"
+```bash
+# Find and kill process using port 3000
+# macOS/Linux:
+lsof -ti:3000 | xargs kill -9
+
+# Windows:
+netstat -ano | findstr :3000
+taskkill /PID <PID> /F
+```
+
+### Missing Environment Variables
+
+**Error:** "OPENAI_API_KEY is not defined"
+```bash
+# Make sure .env file exists
+ls -la .env
+
+# Check environment variables are loaded
+cat .env
+```
+
+## Testing the Conversational Features
+
+### Test Natural Language Queries
+
+Once setup is complete, try these commands in the chat interface:
+
+```
+"What's my balance?"
+"Show my USDC balance on Polygon"
+"Swap 1 ETH for USDC"
+"Bridge 100 MATIC to Ethereum"
+"Show my transaction history"
+```
+
+### Check Database for Intents
+
+```sql
+-- Connect to database
+psql potentia_ludi
+
+-- View recent intents
+SELECT 
+  raw_message, 
+  parsed_intent->>'intent' as intent_type,
+  status,
+  created_at
+FROM intents
+ORDER BY created_at DESC
+LIMIT 10;
+```
+
+### Check Redis Cache
+
+```bash
 # Connect to Redis
 redis-cli
 
-# Monitor all commands
-redis-cli MONITOR
+# View cached balances
+KEYS potentia:balance:*
 
-# Flush all data (BE CAREFUL!)
-redis-cli FLUSHALL
-
-# Get all keys matching pattern
-redis-cli KEYS "gas:prices:*"
+# View cached prices
+KEYS potentia:price:*
 ```
 
 ## Next Steps
 
-1. **Explore the Codebase**
-   - Review [ARCHITECTURE.md](./ARCHITECTURE.md) for system design
-   - Check [README.md](./README.md) for feature overview
-   - Browse `lib/workflows/` for workflow implementations
+Now that your development environment is set up:
 
-2. **Start Contributing**
-   - Pick an issue from GitHub Issues
-   - Create a feature branch
-   - Make your changes
-   - Submit a pull request
+1. **Read the Architecture**: Review [ARCHITECTURE.md](./ARCHITECTURE.md) for system design
+2. **Explore Workflows**: Check `src/workflows/` for implementation examples
+3. **Review Types**: See `src/workflows/*/types.ts` for data structures
+4. **Implement Features**: Follow patterns in existing workflows
+5. **Test Changes**: Use the chat interface to test your implementations
 
-3. **Extend the System**
-   - Add new workflow modules
-   - Integrate additional APIs
-   - Improve intent recognition
-   - Enhance safety validations
+## Development Best Practices
 
-## Getting API Keys
+### Code Style
+- Use TypeScript for all new code
+- Follow existing naming conventions
+- Add JSDoc comments for public APIs
+- Keep functions small and focused
 
-### OpenAI
-1. Go to https://platform.openai.com/api-keys
-2. Sign up or log in
-3. Create new API key
-4. Add to `.env.local` as `OPENAI_API_KEY`
+### Git Workflow
+```bash
+# Create feature branch
+git checkout -b feature/your-feature-name
 
-### Alchemy
-1. Go to https://dashboard.alchemy.com/
-2. Sign up for free account
-3. Create apps for each chain (Ethereum, Polygon, etc.)
-4. Copy API keys to `.env.local`
+# Make changes and commit
+git add .
+git commit -m "Description of changes"
 
-### 0x Protocol
-1. Go to https://0x.org/
-2. Request API access
-3. Add API key to `.env.local`
+# Push to GitHub
+git push origin feature/your-feature-name
+```
 
-### Tenderly
-1. Go to https://dashboard.tenderly.co/
-2. Create account and project
-3. Get API key from settings
-4. Add to `.env.local`
+### Testing
+- Test with real wallet connections
+- Verify database queries work
+- Check Redis caching is effective
+- Test error handling
+
+## Getting Help
+
+If you encounter issues:
+
+1. Check this guide for troubleshooting steps
+2. Review [ARCHITECTURE.md](./ARCHITECTURE.md) for design details
+3. Check the [README.md](./README.md) for additional information
+4. Open an issue on GitHub with:
+   - Error message
+   - Steps to reproduce
+   - Your environment details (OS, Node version, etc.)
 
 ## Additional Resources
 
-- [OpenAI API Documentation](https://platform.openai.com/docs)
-- [Viem Documentation](https://viem.sh/)
-- [Wagmi Documentation](https://wagmi.sh/)
-- [PostgreSQL Documentation](https://www.postgresql.org/docs/)
-- [Redis Documentation](https://redis.io/docs/)
-- [Next.js Documentation](https://nextjs.org/docs) (for future migration)
+- **OpenAI API**: https://platform.openai.com/docs
+- **PostgreSQL Docs**: https://www.postgresql.org/docs/
+- **Redis Docs**: https://redis.io/docs/
+- **Ethers.js**: https://docs.ethers.org/v6/
+- **Viem**: https://viem.sh/
+- **Wagmi**: https://wagmi.sh/
 
-## Support
+---
 
-If you encounter issues:
-1. Check this guide thoroughly
-2. Search existing GitHub Issues
-3. Create a new issue with:
-   - Error message
-   - Steps to reproduce
-   - Your environment (OS, Node version, etc.)
-   - Relevant logs
-
-## Security Notes
-
-⚠️ **Important Security Practices:**
-- Never commit `.env.local` to version control
-- Use different API keys for development and production
-- Rotate API keys regularly
-- Keep dependencies updated
-- Review security advisories regularly
-- Use environment-specific database credentials
-- Enable Redis authentication in production
+Happy coding! 🚀
