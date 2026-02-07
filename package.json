@@ -20,6 +20,13 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@circle-fin/adapter-circle-wallets": "^1.0.0",
+    "@circle-fin/adapter-ethers-v6": "^1.1.1",
+    "@circle-fin/adapter-solana": "^1.1.2",
+    "@circle-fin/adapter-solana-kit": "^1.0.0",
+    "@circle-fin/adapter-viem-v2": "^1.1.1",
+    "@circle-fin/bridge-kit": "^1.1.2",
+    "@circle-fin/provider-cctp-v2": "^1.0.4",
     "@rainbow-me/rainbowkit": "^2.0.0",
     "@tanstack/react-query": "^5.17.0",
     "axios": "^1.6.0",
