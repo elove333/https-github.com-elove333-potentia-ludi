@@ -239,6 +239,25 @@ src/
 - `npm run build` - Build for production
 - `npm run preview` - Preview production build
 - `npm run lint` - Run ESLint
+- `npm test` - Run unit tests
+
+## API Endpoints
+
+### Webhook Endpoints
+
+The application includes webhook endpoints for receiving and processing game events from external systems:
+
+- **`POST /api/webhooks/game-event-transfer`** - Receives game event transfers with HMAC signature verification
+- **`POST /api/webhooks/test`** - Test endpoint for simulating webhook requests
+
+**Key Features:**
+- ✅ HMAC-SHA256 signature verification for security
+- ✅ Rate limiting (100 req/min for main endpoint, 10 req/min for test)
+- ✅ Comprehensive emoji-coded logging (🔗📊✅❌💾)
+- ✅ Database event logging via telemetry system
+- ✅ Input validation and error handling
+
+For complete webhook documentation, setup instructions, and security best practices, see [docs/WEBHOOK_ENDPOINTS.md](./docs/WEBHOOK_ENDPOINTS.md).
 
 ## Contributing
 
