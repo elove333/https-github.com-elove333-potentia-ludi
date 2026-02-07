@@ -10,7 +10,7 @@
  * - Token balance queries
  */
 
-import { solanaIntegrationService } from '../services/solanaIntegrationService';
+import { solanaIntegrationService } from '../src/services/solanaIntegrationService';
 
 async function solanaIntegrationExample() {
   console.log('=== Solana Integration Example ===\n');

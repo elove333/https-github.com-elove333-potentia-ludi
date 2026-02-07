@@ -10,7 +10,7 @@
  * - Enhanced Solana recipient handling
  */
 
-import { crossChainBridgeService, BridgeError, BridgeErrorCode } from '../services/crossChainBridgeService';
+import { crossChainBridgeService, BridgeError } from '../src/services/crossChainBridgeService';
 
 async function crossChainFlowExample() {
   console.log('=== Cross-Chain Transfer Example ===\n');

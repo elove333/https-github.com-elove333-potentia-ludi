@@ -1,9 +1,14 @@
 /**
- * Circle Wallet Service
+ * Circle Wallet Service (Mock Implementation)
  * 
  * Multi-chain wallet management using @circle-fin/adapter-circle-wallets v1.0.0
- * Supports developer-controlled wallets across 16+ networks including:
- * - Ethereum, Base, Arbitrum, Polygon (EVM chains)
+ * 
+ * NOTE: This is a mock/demo implementation for development and testing.
+ * In production, replace mock address generation and balance queries with actual
+ * Circle SDK API calls.
+ * 
+ * Supports developer-controlled wallets across 16 networks including:
+ * - Ethereum, Base, Arbitrum, Polygon, Avalanche, BSC, Fantom (EVM chains)
  * - Solana
  * - Testnets for all supported chains
  */
@@ -29,7 +34,7 @@ class CircleWalletService {
   private wallets: Map<string, CircleWallet> = new Map();
   private initialized = false;
 
-  // Supported chains configuration (16+ networks)
+  // Supported chains configuration (16 networks)
   private readonly supportedChains: ChainConfig[] = [
     // Mainnet EVM Chains
     { chainId: 1, name: 'Ethereum', type: 'evm' },
@@ -39,6 +44,7 @@ class CircleWalletService {
     { chainId: 10, name: 'Optimism', type: 'evm' },
     { chainId: 43114, name: 'Avalanche', type: 'evm' },
     { chainId: 56, name: 'BSC', type: 'evm' },
+    { chainId: 250, name: 'Fantom', type: 'evm' },
     
     // Solana
     { chainId: 1399811149, name: 'Solana', type: 'solana' },
@@ -49,6 +55,7 @@ class CircleWalletService {
     { chainId: 421614, name: 'Arbitrum Sepolia', type: 'evm', testnet: true },
     { chainId: 80002, name: 'Polygon Amoy', type: 'evm', testnet: true },
     { chainId: 11155420, name: 'Optimism Sepolia', type: 'evm', testnet: true },
+    { chainId: 43113, name: 'Avalanche Fuji', type: 'evm', testnet: true },
     
     // Solana Testnet
     { chainId: 1399811150, name: 'Solana Devnet', type: 'solana', testnet: true },

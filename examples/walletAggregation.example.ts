@@ -5,7 +5,7 @@
  * using @circle-fin/adapter-circle-wallets v1.0.0
  */
 
-import { circleWalletService } from '../services/circleWalletService';
+import { circleWalletService } from '../src/services/circleWalletService';
 
 async function walletAggregationExample() {
   console.log('=== Wallet Aggregation Example ===\n');

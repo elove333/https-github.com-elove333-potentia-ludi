@@ -121,7 +121,7 @@ try {
     8453,     // Base
     'USDC',
     '100.00',
-    '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb'
+    '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0'
   );
   
   console.log(`Transfer initiated: ${transfer.id}`);
@@ -342,17 +342,20 @@ You should see:
 
 ### Running Examples
 
-Run the example scripts to see the integration in action:
+Run the example TypeScript files to see the integration in action. You can use a TS runner like `tsx` via `npx`:
 
 ```bash
+# Install tsx if needed
+npm install -D tsx
+
 # Wallet aggregation example
-npm run example:wallet-aggregation
+npx tsx examples/walletAggregation.example.ts
 
 # Cross-chain flow example
-npm run example:cross-chain-flow
+npx tsx examples/crossChainFlow.example.ts
 
 # Solana integration example
-npm run example:solana-integration
+npx tsx examples/solanaIntegration.example.ts
 ```
 
 ### Integration Checklist
@@ -373,9 +376,9 @@ npm run example:solana-integration
 - [Circle Wallets API](https://developers.circle.com/w3s/docs/programmable-wallets)
 
 ### Potentia Ludi Resources
-- [Architecture Guide](./ARCHITECTURE.md)
-- [Setup Instructions](./SETUP.md)
-- [Contributing Guidelines](./CONTRIBUTING.md)
+- [Architecture Guide](../ARCHITECTURE.md)
+- [Setup Instructions](../SETUP.md)
+- [Contributing Guidelines](../CONTRIBUTING.md)
 
 ## Security Considerations
 
@@ -398,7 +401,7 @@ For complete security details, see [Security Advisory](./SECURITY_ADVISORY.md).
 
 For issues or questions about the Circle BridgeKit integration:
 
-1. Check the [examples folder](./examples/) for usage patterns
+1. Check the [examples folder](../examples/) for usage patterns
 2. Review error messages - they include helpful guidance
 3. Consult the [Circle Developer Docs](https://developers.circle.com/)
 4. Review [Security Advisory](./SECURITY_ADVISORY.md) for known vulnerabilities

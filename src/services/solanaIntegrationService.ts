@@ -1,7 +1,12 @@
 /**
- * Solana Integration Service
+ * Solana Integration Service (Mock Implementation)
  * 
  * Enhanced Solana integration using @circle-fin/adapter-solana-kit v1.0.0
+ * 
+ * NOTE: This is a mock/demo implementation for development and testing.
+ * In production, replace mock operations with actual Solana Kit adapter calls
+ * and real RPC interactions.
+ * 
  * Features:
  * - Native Solana support including burn + mint functionality
  * - Automatic ATA (Associated Token Account) creation

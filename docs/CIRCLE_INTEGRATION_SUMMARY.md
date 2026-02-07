@@ -30,11 +30,11 @@
 - `docs/CIRCLE_BRIDGEKIT.md` - Complete integration guide
 - `README.md` - Updated with Circle features and expanded chain list
 
-## Supported Chains (16+)
+## Supported Chains (16)
 
-**Mainnet**: Ethereum (1), Base (8453), Arbitrum (42161), Polygon (137), Optimism (10), Avalanche (43114), BSC (56), Solana (1399811149)
+**Mainnet**: Ethereum (1), Base (8453), Arbitrum (42161), Polygon (137), Optimism (10), Avalanche (43114), BSC (56), Fantom (250), Solana (1399811149)
 
-**Testnet**: Sepolia (11155111), Base Sepolia (84532), Arbitrum Sepolia (421614), Polygon Amoy (80002), Optimism Sepolia (11155420), Solana Devnet (1399811150)
+**Testnet**: Sepolia (11155111), Base Sepolia (84532), Arbitrum Sepolia (421614), Polygon Amoy (80002), Optimism Sepolia (11155420), Avalanche Fuji (43113), Solana Devnet (1399811150)
 
 ## Error Codes
 
@@ -70,8 +70,8 @@
 
 ```typescript
 // Initialize services
-import { circleWalletService } from './services/circleWalletService';
-import { crossChainBridgeService } from './services/crossChainBridgeService';
+import { circleWalletService } from '../src/services/circleWalletService';
+import { crossChainBridgeService } from '../src/services/crossChainBridgeService';
 
 // Create multi-chain wallet
 await circleWalletService.initialize();

@@ -1,8 +1,12 @@
 /**
- * Cross-Chain Bridge Service
+ * Cross-Chain Bridge Service (Mock Implementation)
  * 
  * Enhanced error handling and preventive safety using @circle-fin/bridge-kit v1.1.2
  * and @circle-fin/provider-cctp-v2 v1.0.4
+ * 
+ * NOTE: This is a mock/demo implementation for development and testing.
+ * In production, replace mock transfer execution with actual BridgeKit/CCTP
+ * provider calls.
  * 
  * Features:
  * - Prevents fund loss on unsupported routes
@@ -60,6 +64,7 @@ interface BridgeTransfer {
 
 class CrossChainBridgeService {
   private transfers: Map<string, BridgeTransfer> = new Map();
+  private pendingTimeouts: Map<string, NodeJS.Timeout> = new Map();
   
   // Supported CCTP chains (from Circle documentation)
   private readonly supportedChains = [
@@ -136,21 +141,14 @@ class CrossChainBridgeService {
     const routeKey = `${fromChain}-${toChain}`;
     const supported = this.supportedRoutes.has(routeKey);
 
-    if (!supported) {
-      throw new BridgeError(
-        BridgeErrorCode.UNSUPPORTED_ROUTE,
-        `Route from ${this.getChainName(fromChain)} to ${this.getChainName(toChain)} is not supported`,
-        this.supportedChains.map(c => c.name)
-      );
-    }
-
+    // Return route info even if unsupported, allowing callers to check
     return {
       fromChain,
       toChain,
       token: 'USDC',
       supported,
-      estimatedTime: this.estimateTransferTime(fromChain, toChain),
-      estimatedFee: this.estimateBridgeFee(fromChain, toChain),
+      estimatedTime: supported ? this.estimateTransferTime(fromChain, toChain) : undefined,
+      estimatedFee: supported ? this.estimateBridgeFee(fromChain, toChain) : undefined,
     };
   }
 
@@ -204,20 +202,46 @@ class CrossChainBridgeService {
     recipient: string
   ): Promise<BridgeTransfer> {
     try {
+      // Validate token (only USDC supported via CCTP)
+      if (token !== 'USDC') {
+        throw new BridgeError(
+          BridgeErrorCode.INVALID_AMOUNT,
+          'Only USDC is supported for cross-chain transfers via CCTP'
+        );
+      }
+
       // Validate route
       const route = this.validateRoute(fromChain, toChain);
+      
+      // Check if route is actually supported
+      if (!route.supported) {
+        throw new BridgeError(
+          BridgeErrorCode.UNSUPPORTED_ROUTE,
+          `Route from ${this.getChainName(fromChain)} to ${this.getChainName(toChain)} is not supported`,
+          this.supportedChains.map(c => c.name)
+        );
+      }
+      
       console.log(`✅ Route validated: ${this.getChainName(fromChain)} → ${this.getChainName(toChain)}`);
 
       // Validate recipient
       this.validateRecipient(toChain, recipient);
       console.log(`✅ Recipient validated: ${recipient}`);
 
-      // Validate amount
-      const amountNum = parseFloat(amount);
-      if (isNaN(amountNum) || amountNum <= 0) {
+      // Validate amount with better decimal handling
+      const normalizedAmount = amount.trim();
+      const amountPattern = /^\d+(\.\d+)?$/;
+      if (!amountPattern.test(normalizedAmount)) {
         throw new BridgeError(
           BridgeErrorCode.INVALID_AMOUNT,
           'Amount must be a positive number'
+        );
+      }
+      const amountNum = parseFloat(normalizedAmount);
+      if (amountNum <= 0) {
+        throw new BridgeError(
+          BridgeErrorCode.INVALID_AMOUNT,
+          'Amount must be greater than zero'
         );
       }
 
@@ -227,7 +251,7 @@ class CrossChainBridgeService {
         fromChain,
         toChain,
         token,
-        amount,
+        amount: normalizedAmount,
         recipient,
         status: 'pending',
         createdAt: new Date(),
@@ -262,16 +286,22 @@ class CrossChainBridgeService {
       transfer.status = 'in-progress';
       
       // Simulate transfer process
-      setTimeout(() => {
+      const timeoutId = setTimeout(() => {
         // Mock successful transfer
         transfer.status = 'completed';
         transfer.txHash = this.generateMockTxHash();
         transfer.attestation = this.generateMockAttestation();
         transfer.completedAt = new Date();
         
+        // Clean up timeout tracking
+        this.pendingTimeouts.delete(transfer.id);
+        
         console.log(`✅ Transfer completed: ${transfer.id}`);
         console.log(`   TX Hash: ${transfer.txHash}`);
       }, 3000);
+      
+      // Track timeout for cleanup
+      this.pendingTimeouts.set(transfer.id, timeoutId);
     } catch (error) {
       transfer.status = 'failed';
       transfer.error = error instanceof Error ? error.message : 'Unknown error';
@@ -342,6 +372,11 @@ class CrossChainBridgeService {
    * Reset service (useful for testing)
    */
   reset(): void {
+    // Clear all pending timeouts
+    this.pendingTimeouts.forEach((timeoutId) => {
+      clearTimeout(timeoutId);
+    });
+    this.pendingTimeouts.clear();
     this.transfers.clear();
   }
 }
