@@ -7,6 +7,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- Players table
 CREATE TABLE IF NOT EXISTS players (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    auth_user_id UUID UNIQUE,
     wallet_address VARCHAR(42) NOT NULL UNIQUE,
     email VARCHAR(255),
     username VARCHAR(100),
@@ -16,6 +17,7 @@ CREATE TABLE IF NOT EXISTS players (
 
 CREATE INDEX idx_players_wallet ON players(wallet_address);
 CREATE INDEX idx_players_email ON players(email);
+CREATE INDEX idx_players_auth_user ON players(auth_user_id);
 
 -- Wallets table (multi-wallet support)
 CREATE TABLE IF NOT EXISTS wallets (
@@ -122,59 +124,59 @@ ALTER TABLE nft_collections ENABLE ROW LEVEL SECURITY;
 -- RLS Policies for players
 CREATE POLICY "Users can view their own player data"
     ON players FOR SELECT
-    USING (auth.uid()::text = id::text OR wallet_address = current_setting('request.jwt.claims', true)::json->>'wallet_address');
+    USING (auth.uid() = auth_user_id OR wallet_address = current_setting('request.jwt.claims', true)::json->>'wallet_address');
 
 CREATE POLICY "Users can insert their own player data"
     ON players FOR INSERT
-    WITH CHECK (auth.uid()::text = id::text OR wallet_address = current_setting('request.jwt.claims', true)::json->>'wallet_address');
+    WITH CHECK (auth.uid() = auth_user_id OR wallet_address = current_setting('request.jwt.claims', true)::json->>'wallet_address');
 
 CREATE POLICY "Users can update their own player data"
     ON players FOR UPDATE
-    USING (auth.uid()::text = id::text OR wallet_address = current_setting('request.jwt.claims', true)::json->>'wallet_address');
+    USING (auth.uid() = auth_user_id OR wallet_address = current_setting('request.jwt.claims', true)::json->>'wallet_address');
 
 -- RLS Policies for wallets
 CREATE POLICY "Users can view their own wallets"
     ON wallets FOR SELECT
-    USING (player_id IN (SELECT id FROM players WHERE auth.uid()::text = id::text));
+    USING (player_id IN (SELECT id FROM players WHERE auth.uid() = auth_user_id));
 
 CREATE POLICY "Users can insert their own wallets"
     ON wallets FOR INSERT
-    WITH CHECK (player_id IN (SELECT id FROM players WHERE auth.uid()::text = id::text));
+    WITH CHECK (player_id IN (SELECT id FROM players WHERE auth.uid() = auth_user_id));
 
 CREATE POLICY "Users can update their own wallets"
     ON wallets FOR UPDATE
-    USING (player_id IN (SELECT id FROM players WHERE auth.uid()::text = id::text));
+    USING (player_id IN (SELECT id FROM players WHERE auth.uid() = auth_user_id));
 
 -- RLS Policies for rewards
 CREATE POLICY "Users can view their own rewards"
     ON rewards FOR SELECT
-    USING (player_id IN (SELECT id FROM players WHERE auth.uid()::text = id::text));
+    USING (player_id IN (SELECT id FROM players WHERE auth.uid() = auth_user_id));
 
 CREATE POLICY "Users can update their own rewards"
     ON rewards FOR UPDATE
-    USING (player_id IN (SELECT id FROM players WHERE auth.uid()::text = id::text));
+    USING (player_id IN (SELECT id FROM players WHERE auth.uid() = auth_user_id));
 
 -- RLS Policies for game_sessions
 CREATE POLICY "Users can view their own game sessions"
     ON game_sessions FOR SELECT
-    USING (player_id IN (SELECT id FROM players WHERE auth.uid()::text = id::text));
+    USING (player_id IN (SELECT id FROM players WHERE auth.uid() = auth_user_id));
 
 CREATE POLICY "Users can insert their own game sessions"
     ON game_sessions FOR INSERT
-    WITH CHECK (player_id IN (SELECT id FROM players WHERE auth.uid()::text = id::text));
+    WITH CHECK (player_id IN (SELECT id FROM players WHERE auth.uid() = auth_user_id));
 
 CREATE POLICY "Users can update their own game sessions"
     ON game_sessions FOR UPDATE
-    USING (player_id IN (SELECT id FROM players WHERE auth.uid()::text = id::text));
+    USING (player_id IN (SELECT id FROM players WHERE auth.uid() = auth_user_id));
 
 -- RLS Policies for nft_collections
 CREATE POLICY "Users can view their own NFTs"
     ON nft_collections FOR SELECT
-    USING (player_id IN (SELECT id FROM players WHERE auth.uid()::text = id::text));
+    USING (player_id IN (SELECT id FROM players WHERE auth.uid() = auth_user_id));
 
 CREATE POLICY "Users can insert their own NFTs"
     ON nft_collections FOR INSERT
-    WITH CHECK (player_id IN (SELECT id FROM players WHERE auth.uid()::text = id::text));
+    WITH CHECK (player_id IN (SELECT id FROM players WHERE auth.uid() = auth_user_id));
 
 -- Create storage buckets (run via Supabase dashboard or API)
 -- INSERT INTO storage.buckets (id, name, public) VALUES 

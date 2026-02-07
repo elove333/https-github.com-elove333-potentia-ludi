@@ -66,7 +66,8 @@ export class AuthManager {
         await supabaseHelpers.createPlayer(
           data.walletAddress,
           data.email,
-          data.username
+          data.username,
+          authData.user.id
         );
       } catch (err) {
         console.error('Error creating player record:', err);
@@ -199,7 +200,8 @@ export class AuthManager {
         await supabaseHelpers.createPlayer(
           walletAddress,
           user.email,
-          user.user_metadata?.username
+          user.user_metadata?.username,
+          user.id
         );
       }
 

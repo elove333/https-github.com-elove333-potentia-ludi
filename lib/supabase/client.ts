@@ -6,6 +6,7 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 // Database types
 export interface Player {
   id: string;
+  auth_user_id?: string;
   wallet_address: string;
   email?: string;
   username?: string;
@@ -161,13 +162,14 @@ export const supabaseHelpers = {
     return data;
   },
 
-  async createPlayer(walletAddress: string, email?: string, username?: string) {
+  async createPlayer(walletAddress: string, email?: string, username?: string, authUserId?: string) {
     const { data, error } = await supabase
       .from('players')
       .insert({
         wallet_address: walletAddress.toLowerCase(),
         email,
         username,
+        auth_user_id: authUserId,
       })
       .select()
       .single();
