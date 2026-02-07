@@ -11,7 +11,7 @@
   polygon, 
   mainnet, 
   polygonMumbai 
-} from 'wagmi;chains'; // Fixed: Explicit chain imports [web:44]
+} from 'wagmi/chains'; // Fixed: Explicit chain imports [web:44]
 'import { formatEther, formatUnits, Address } from 'viem'; // Proper types [web:36]
 'import { OnchainKitProvider, CoinbaseSmartWalletProvider } from '@coinbase/onchainkit'; // From template [web:31]
 
