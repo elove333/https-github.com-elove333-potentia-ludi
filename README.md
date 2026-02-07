@@ -75,6 +75,9 @@ Unlike traditional Web3 wallets that require navigating complex UIs and understa
 - **Frontend**: React 18 + TypeScript
 - **State Management**: Zustand
 - **Web3 Integration**: Ethers.js v6, Wagmi, Viem
+- **Multi-Chain Wallets**: Circle BridgeKit (`@circle-fin/adapter-circle-wallets v1.0.0`)
+- **Solana Support**: Circle Solana Kit (`@circle-fin/adapter-solana-kit v1.0.0`)
+- **Cross-Chain Bridging**: Circle Bridge Kit (`@circle-fin/bridge-kit v1.1.2`, `@circle-fin/provider-cctp-v2 v1.0.4`)
 - **Build Tool**: Vite
 - **Styling**: Inline styles with CSS animations
 
@@ -202,14 +205,38 @@ The build output will be in the `dist` directory.
 See [ARCHITECTURE.md](./ARCHITECTURE.md) for complete specifications.
 <!-- END CHUNK -->
 
+## Multi-Chain Wallet & Bridge Integration
+
+Potentia Ludi integrates Circle BridgeKit for enterprise-grade multi-chain wallet management and cross-chain bridging:
+
+### Features
+- 🌐 **16+ Supported Chains**: Ethereum, Base, Arbitrum, Polygon, Optimism, Avalanche, BSC, Solana, and testnets
+- 🔄 **Cross-Chain Transfers**: USDC bridging via CCTP (Cross-Chain Transfer Protocol)
+- ☀️ **Native Solana Support**: Automatic ATA creation, burn + mint functionality
+- 🛡️ **Enhanced Safety**: Prevents fund loss on unsupported routes with clear error messages
+- ⚡ **Fast Transfers**: As fast as 1 minute for Solana transfers
+
+For complete integration guide, see [Circle BridgeKit Documentation](./docs/CIRCLE_BRIDGEKIT.md).
+
 ## Supported Chains
 
+### Mainnet
 - Ethereum (Chain ID: 1)
-- Polygon (Chain ID: 137)
-- BSC (Chain ID: 56)
-- Arbitrum (Chain ID: 42161)
-- Optimism (Chain ID: 10)
 - Base (Chain ID: 8453)
+- Arbitrum (Chain ID: 42161)
+- Polygon (Chain ID: 137)
+- Optimism (Chain ID: 10)
+- Avalanche (Chain ID: 43114)
+- BSC (Chain ID: 56)
+- Solana (Chain ID: 1399811149)
+
+### Testnets
+- Sepolia (Chain ID: 11155111)
+- Base Sepolia (Chain ID: 84532)
+- Arbitrum Sepolia (Chain ID: 421614)
+- Polygon Amoy (Chain ID: 80002)
+- Optimism Sepolia (Chain ID: 11155420)
+- Solana Devnet (Chain ID: 1399811150)
 
 ## Supported Games
 
