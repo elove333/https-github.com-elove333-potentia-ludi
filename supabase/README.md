@@ -299,9 +299,9 @@ Use the Docker Compose setup for local testing:
 # Start services
 docker-compose up -d
 
-# Set environment variables for local
+# For local testing
 export SUPABASE_URL=http://localhost:3000
-export SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+export SUPABASE_ANON_KEY=your-local-anon-key-here
 
 # Run tests
 npm test

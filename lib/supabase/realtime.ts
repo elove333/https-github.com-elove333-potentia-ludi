@@ -186,15 +186,12 @@ class RealtimeSubscriptionManager {
     // Remove existing subscription if any
     this.unsubscribe(channelName);
 
-    const config: any = {
-      event: event === '*' ? '*' : `postgres_changes`,
+    const config = {
+      event: event === '*' ? '*' : 'postgres_changes',
       schema: 'public',
       table,
+      filter,
     };
-
-    if (filter) {
-      config.filter = filter;
-    }
 
     const channel = supabase
       .channel(channelName)

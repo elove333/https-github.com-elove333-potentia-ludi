@@ -3,6 +3,48 @@
 
 import { supabase } from './client';
 
+export interface NFTMetadata {
+  name?: string;
+  description?: string;
+  image?: string;
+  external_url?: string;
+  attributes?: Array<{
+    trait_type: string;
+    value: string | number;
+  }>;
+  [key: string]: any; // Allow additional custom properties
+}
+
+export interface WalletSnapshot {
+  wallet_id: string;
+  timestamp: string;
+  balance: {
+    native: string;
+    tokens: Array<{
+      address: string;
+      symbol: string;
+      balance: string;
+      usd_value?: number;
+    }>;
+  };
+  nfts_count: number;
+  recent_transactions: Array<{
+    hash: string;
+    timestamp: string;
+    type: string;
+    value: string;
+  }>;
+}
+
+export interface FileMetadata {
+  name: string;
+  id: string;
+  created_at: string;
+  updated_at: string;
+  last_accessed_at: string;
+  metadata: Record<string, any>;
+}
+
 export interface UploadOptions {
   cacheControl?: string;
   contentType?: string;
@@ -65,7 +107,7 @@ export class StorageManager {
   async uploadNFTMetadata(
     playerId: string,
     tokenId: string,
-    metadata: any
+    metadata: NFTMetadata
   ): Promise<FileUploadResult> {
     const path = `nft-metadata/${playerId}/${tokenId}.json`;
     const blob = new Blob([JSON.stringify(metadata, null, 2)], {
@@ -103,7 +145,7 @@ export class StorageManager {
   async uploadWalletSnapshot(
     playerId: string,
     walletId: string,
-    snapshotData: any
+    snapshotData: WalletSnapshot
   ): Promise<FileUploadResult> {
     const timestamp = new Date().toISOString().replace(/:/g, '-');
     const path = `wallet-snapshots/${playerId}/${walletId}_${timestamp}.json`;
@@ -156,7 +198,7 @@ export class StorageManager {
   /**
    * List files in a bucket folder
    */
-  async listFiles(bucket: string, path: string): Promise<any[]> {
+  async listFiles(bucket: string, path: string): Promise<FileMetadata[]> {
     const { data, error } = await supabase.storage.from(bucket).list(path);
 
     if (error) {
@@ -164,7 +206,7 @@ export class StorageManager {
       return [];
     }
 
-    return data || [];
+    return (data || []) as FileMetadata[];
   }
 
   /**

@@ -107,7 +107,10 @@ const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC
 
 // Validate required environment variables
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn('Supabase configuration missing. Set SUPABASE_URL and SUPABASE_ANON_KEY in environment.');
+  console.warn(
+    'Supabase configuration missing. Set SUPABASE_URL and SUPABASE_ANON_KEY in environment. ' +
+    'Features requiring Supabase (real-time updates, authentication, storage) will not be available.'
+  );
 }
 
 // Create Supabase client

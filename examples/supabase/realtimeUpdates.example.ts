@@ -4,6 +4,10 @@
 import { realtimeSubscriptions } from '../../lib/supabase/realtime';
 import { supabaseHelpers } from '../../lib/supabase/client';
 
+// Constants for example subscription durations
+const EXAMPLE_SUBSCRIPTION_DURATION = 300000; // 5 minutes
+const DASHBOARD_SUBSCRIPTION_DURATION = 600000; // 10 minutes
+
 /**
  * Example 1: Subscribe to new rewards
  */
@@ -27,8 +31,8 @@ async function subscribeToNewRewards() {
     }
   );
 
-  // Keep subscription active for 5 minutes
-  await new Promise((resolve) => setTimeout(resolve, 300000));
+  // Keep subscription active
+  await new Promise((resolve) => setTimeout(resolve, EXAMPLE_SUBSCRIPTION_DURATION));
   
   // Clean up
   unsubscribe();
@@ -62,7 +66,7 @@ async function subscribeToUnclaimedCount() {
   );
 
   // Keep subscription active for 5 minutes
-  await new Promise((resolve) => setTimeout(resolve, 300000));
+  await new Promise((resolve) => setTimeout(resolve, EXAMPLE_SUBSCRIPTION_DURATION));
   
   // Clean up
   unsubscribe();
@@ -98,7 +102,7 @@ async function subscribeToGameSessions() {
   );
 
   // Keep subscription active for 5 minutes
-  await new Promise((resolve) => setTimeout(resolve, 300000));
+  await new Promise((resolve) => setTimeout(resolve, EXAMPLE_SUBSCRIPTION_DURATION));
   
   // Clean up
   unsubscribe();
@@ -126,7 +130,7 @@ async function subscribeToWalletUpdates() {
   );
 
   // Keep subscription active for 5 minutes
-  await new Promise((resolve) => setTimeout(resolve, 300000));
+  await new Promise((resolve) => setTimeout(resolve, EXAMPLE_SUBSCRIPTION_DURATION));
   
   // Clean up
   unsubscribe();
@@ -196,7 +200,7 @@ async function dashboardRealtimeSubscriptions() {
   }
 
   // Keep subscriptions active for 10 minutes
-  await new Promise((resolve) => setTimeout(resolve, 600000));
+  await new Promise((resolve) => setTimeout(resolve, DASHBOARD_SUBSCRIPTION_DURATION));
   
   // Clean up all subscriptions
   rewardsUnsub();
@@ -271,7 +275,7 @@ async function realtimeNotificationSystem() {
   console.log('Notification system active. Listening for events...');
 
   // Keep subscriptions active for 10 minutes
-  await new Promise((resolve) => setTimeout(resolve, 600000));
+  await new Promise((resolve) => setTimeout(resolve, DASHBOARD_SUBSCRIPTION_DURATION));
   
   // Clean up
   rewardsUnsub();
