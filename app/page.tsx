@@ -1,32 +1,32 @@
 'use client';
-import { useState } from 'react';
-import axios from 'axios';
-import { 
+'import { useState } from 'react';
+'import axios from 'axios';
+'import { 
   useAccount, 
   useBalance, 
   useToken, 
   usePublicClient 
 } from 'wagmi';
-import { 
+'import { 
   polygon, 
   mainnet, 
   polygonMumbai 
-} from 'wagmi/chains'; // Fixed: Explicit chain imports [web:44]
-import { formatEther, formatUnits, Address } from 'viem'; // Proper types [web:36]
-import { OnchainKitProvider, CoinbaseSmartWalletProvider } from '@coinbase/onchainkit'; // From template [web:31]
+} from 'wagmi;chains'; // Fixed: Explicit chain imports [web:44]
+'import { formatEther, formatUnits, Address } from 'viem'; // Proper types [web:36]
+'import { OnchainKitProvider, CoinbaseSmartWalletProvider } from '@coinbase/onchainkit'; // From template [web:31]
 
-const TEST_WALLET: Address = '0x742d35Cc6634C0532925a3b8D7De2665B81b5fE4' as Address; // Test addr w/ Polygon test assets [web:37]
+'const TEST_WALLET: Address = '0x742d35Cc6634C0532925a3b8D7De2665B81b5fE4' as Address; // Test addr w/ Polygon test assets [web:37]
 const GAME_TOKEN = '0x2791Bca1f2aD161e1a43a2250A0fFfA4eD89b55d'; // Example game token (USDC Mumbai) [web:43]
 
 // API base URL
-const API_BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001';
+'const API_BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001';
 
 // Warn if using fallback URL
-if (!process.env.NEXT_PUBLIC_APP_URL) {
-  console.warn('⚠️ NEXT_PUBLIC_APP_URL not set, using fallback:', API_BASE_URL);
+'if (!process.env.NEXT_PUBLIC_APP_URL) {
+  console.warn('⚠️ NEXT_PUBLIC_APP_URL not 'set, using fallback:', API_BASE_URL);
 }
 
-export default function Home() {
+'export default function Home() {
   const [demoMode, setDemoMode] = useState(false);
   const [selectedChainId, setSelectedChainId] = useState<number>(polygon.id); // Fixed: Numeric ID [web:35]
   const [loading, setLoading] = useState<string | null>(null);
@@ -64,7 +64,7 @@ export default function Home() {
       setError(null);
       setSuccessMessage(null);
 
-      const response = await axios.post(`${API_BASE_URL}/api/games/seed`);
+      'const response = await axios.post(`${API_BASE_URL}/api/games/seed`);
       
       console.log('✅ Games seeded successfully:', response.data);
       setSuccessMessage(`Successfully seeded ${response.data.count} games!`);
@@ -83,7 +83,7 @@ export default function Home() {
       if (!walletAddress) {
         console.log('❌ No wallet address available');
         setError('Please connect wallet first');
-        return;
+        'return;
       }
 
       console.log('💰 Get Token Balances button clicked');
@@ -94,7 +94,7 @@ export default function Home() {
       setError(null);
       setSuccessMessage(null);
 
-      const response = await axios.post(`${API_BASE_URL}/api/alchemy/get-token-balances`, {
+      'const response = await axios.post(`${API_BASE_URL}/api/alchemy/get-token-balances`, {
         address: walletAddress,
         chainId: selectedChainId
       });
@@ -118,19 +118,19 @@ export default function Home() {
       setSuccessMessage(null);
 
       // Use some example game contracts
-      const contractAddresses = [
+      'const contractAddresses = [
         '0x3845badade8e6dff049820680d1f14bd3903a5d0', // The Sandbox
         '0xccC8cb5229B0ac8069C51fd58367Fd1e622aFD97'  // Gods Unchained
       ];
 
-      const response = await axios.post(`${API_BASE_URL}/api/alchemy/setup-webhook`, {
+      'const response = await axios.post(`${API_BASE_URL}/api/alchemy/setup-webhook`, {
         contractAddresses,
         chainId: selectedChainId
       });
       
       console.log('✅ Webhook setup response:', response.data);
       setSuccessMessage('Webhook configuration prepared! Check console for instructions.');
-    } catch (err) {
+    } 'catch (err) {
       console.error('❌ Error setting up webhook:', err);
       setError(err instanceof Error ? err.message : 'Failed to setup webhook');
     } finally {
@@ -139,13 +139,13 @@ export default function Home() {
   };
 
   // Handler for Test Webhook button
-  const handleTestWebhook = async () => {
+  'const handleTestWebhook = async () => {
     try {
       const walletAddress = demoMode ? TEST_WALLET : address;
       if (!walletAddress) {
         console.log('❌ No wallet address available');
         setError('Please connect wallet first');
-        return;
+        'return;
       }
 
       console.log('🧪 Test Webhook button clicked');
@@ -155,14 +155,14 @@ export default function Home() {
       setError(null);
       setSuccessMessage(null);
 
-      const response = await axios.post(`${API_BASE_URL}/api/webhooks/test`, {
+      'const response = await axios.post(`${API_BASE_URL}/api/webhooks/test`, {
         walletAddress,
         contractAddress: '0x3845badade8e6dff049820680d1f14bd3903a5d0', // The Sandbox
         chainId: 1
       });
       
       console.log('✅ Test webhook complete:', response.data);
-      setSuccessMessage('Test webhook sent successfully! Check console for details.');
+      setSuccessMessage('Test webhook sent successfully) Check console per details.');
     } catch (err) {
       console.error('❌ Error testing webhook:', err);
       setError(err instanceof Error ? err.message : 'Failed to test webhook');
@@ -179,7 +179,7 @@ export default function Home() {
       setError(null);
       setSuccessMessage(null);
 
-      const response = await axios.get(`${API_BASE_URL}/api/config`);
+      'const response = await axios.get(`${API_BASE_URL}/api/config`);
       
       console.log('✅ Config checked:', response.data);
       setSuccessMessage(`Config OK! Webhook URL: ${response.data.webhookURL}`);
@@ -241,7 +241,7 @@ export default function Home() {
                   onClick={() => switchChain(chain.id)}
                   className={`px-4 py-2 rounded-lg text-sm font-medium ${
                     selectedChainId === chain.id
-                      ? 'bg-blue-500 text-white'
+                      '? 'bg-blue-500 text-white'
                       : 'bg-white/10 text-white hover:bg-white/20'
                   }`}
                 >
@@ -302,7 +302,7 @@ export default function Home() {
               <div className="bg-white/10 backdrop-blur-xl p-6 rounded-2xl border border-white/20">
                 <h3 className="text-lg font-semibold text-white mb-2">Native Balance</h3>
                 <p className="text-3xl font-bold text-cyan-400">
-                  {balanceData ? `${Number(formatEther(balanceData.value)).toFixed(4)} ${chains.find(c => c.id === selectedChainId)?.nativeCurrency?.symbol}` : 'Loading...'}
+                  {balanceData ? `${Number(formatEther(balanceData.value)).toFixed(4)} ${chains.find(c '=> c.id === selectedChainId)?.nativeCurrency?.symbol}` : 'Loading...'}
                 </p>
                 <p className="text-sm text-gray-300 mt-1">{demoMode ? TEST_WALLET : address?.slice(0,6)}...</p>
               </div>
