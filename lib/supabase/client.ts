@@ -111,7 +111,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 // Create Supabase client
-export const supabase: SupabaseClient<Database> = createClient<Database>(
+export const supabase = createClient(
   supabaseUrl || '',
   supabaseAnonKey || '',
   {
@@ -129,14 +129,14 @@ export const supabase: SupabaseClient<Database> = createClient<Database>(
 );
 
 // Helper function to create admin client (server-side only)
-export function createAdminClient(): SupabaseClient<Database> {
+export function createAdminClient() {
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   
   if (!serviceRoleKey || !supabaseUrl) {
     throw new Error('SUPABASE_SERVICE_ROLE_KEY and SUPABASE_URL required for admin client');
   }
 
-  return createClient<Database>(supabaseUrl, serviceRoleKey, {
+  return createClient(supabaseUrl, serviceRoleKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,
@@ -170,7 +170,7 @@ export const supabaseHelpers = {
       .single();
     
     if (error) throw error;
-    return data;
+    return data as Player;
   },
 
   // Wallet operations
@@ -199,7 +199,7 @@ export const supabaseHelpers = {
       .single();
     
     if (error) throw error;
-    return data;
+    return data as Wallet;
   },
 
   // Reward operations
@@ -218,13 +218,16 @@ export const supabaseHelpers = {
   async claimReward(rewardId: string) {
     const { data, error } = await supabase
       .from('rewards')
-      .update({ claimed: true, claimed_at: new Date().toISOString() })
+      .update({ 
+        claimed: true, 
+        claimed_at: new Date().toISOString() 
+      })
       .eq('id', rewardId)
       .select()
       .single();
     
     if (error) throw error;
-    return data;
+    return data as Reward;
   },
 
   async addReward(
@@ -254,7 +257,7 @@ export const supabaseHelpers = {
       .single();
     
     if (error) throw error;
-    return data;
+    return data as Reward;
   },
 
   // Game session operations
@@ -272,7 +275,7 @@ export const supabaseHelpers = {
       .single();
     
     if (error) throw error;
-    return data;
+    return data as GameSession;
   },
 
   async endGameSession(sessionId: string, transactionsCount: number, gasSpent?: string, rewardsEarned?: number) {
@@ -301,7 +304,7 @@ export const supabaseHelpers = {
       .single();
     
     if (error) throw error;
-    return data;
+    return data as GameSession;
   },
 
   // NFT operations
@@ -334,7 +337,7 @@ export const supabaseHelpers = {
       .single();
     
     if (error) throw error;
-    return data;
+    return data as NFTCollection;
   },
 
   async getPlayerNFTs(playerId: string, chainId?: number) {
