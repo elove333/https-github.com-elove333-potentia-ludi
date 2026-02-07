@@ -93,7 +93,20 @@ router.post('/', async (req: Request, res: Response) => {
           chain: game.chain_name
         });
       } catch (gameError) {
-        console.error(`  ❌ Error seeding ${gameData.name}:`, gameError);
+        // In production, treat unique/duplicate constraint violations as "already exists"
+        const errorObj = gameError as { code?: string; message?: string } | null;
+        const message = errorObj && typeof errorObj.message === 'string' ? errorObj.message.toLowerCase() : '';
+        const isDuplicateError =
+          (errorObj && errorObj.code === '23505') || // PostgreSQL unique_violation
+          message.includes('duplicate key') ||
+          message.includes('unique constraint') ||
+          message.includes('unique violation');
+
+        if (isProduction && isDuplicateError) {
+          console.log(`  ℹ️ ${gameData.name} already exists, skipping.`);
+        } else {
+          console.error(`  ❌ Error seeding ${gameData.name}:`, gameError);
+        }
       }
     }
 
