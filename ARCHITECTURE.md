@@ -115,7 +115,7 @@ src/
 The pipeline uses OpenAI's Responses API to convert natural language to structured intents.
 
 ```typescript
-interface NLRequest {
+"interface NLRequest {
   userMessage: string;
   context: {
     walletAddress: string;
@@ -139,7 +139,7 @@ interface IntentResponse {
 The Intent Parser validates and normalizes the OpenAI response into executable actions.
 
 ```typescript
-class IntentParser {
+'class IntentParser {
   // Parse OpenAI response into structured intent
   parse(response: OpenAIResponse): Intent;
   
@@ -165,22 +165,22 @@ Multi-tier safety checks before execution:
 
 ```typescript
 // Client Side (Frontend)
-class ConversationalWalletClient {
-  async sendMessage(message: string): Promise<Response>;
-  async confirmIntent(intentId: string): Promise<ExecutionResult>;
-  async cancelIntent(intentId: string): Promise<void>;
+'class ConversationalWalletClient {
+  'async sendMessage(message: string): Promise<Response>;
+  'async confirmIntent(intentId: string): Promise<ExecutionResult>;
+  'async cancelIntent(intentId: string): Promise<void>;
 }
 
 // Server Side (Backend API)
-class ConversationalWalletServer {
+'class ConversationalWalletServer {
   // Process NL input and return intent
-  async processNL(request: NLRequest): Promise<IntentResponse>;
+  'async processNL(request: NLRequest): Promise<IntentResponse>;
   
   // Execute confirmed intent
-  async executeIntent(intentId: string, signature: string): Promise<Result>;
+  'async executeIntent(intentId: string, signature: string): Promise<Result>;
   
   // Get intent status
-  async getIntentStatus(intentId: string): Promise<IntentStatus>;
+  'async getIntentStatus(intentId: string): Promise<IntentStatus>;
 }
 ```
 
@@ -252,30 +252,30 @@ CREATE TABLE price_cache (
 
 ```typescript
 // Cache Keys Structure
-const CacheKeys = {
+'const CacheKeys = {
   // Balance caching (TTL: 30s)
-  balance: (address: string, chainId: number) => 
+  balance: (address: string, chainId: number) =>' 
     `balance:${chainId}:${address}`,
   
   // Token price caching (TTL: 60s)
-  price: (tokenAddress: string, chainId: number) => 
+  price: (tokenAddress: string, chainId: number) 
     `price:${chainId}:${tokenAddress}`,
   
   // Gas price caching (TTL: 15s)
-  gas: (chainId: number) => 
+  gas: (chainId: number)  
     `gas:${chainId}`,
   
   // Intent status (TTL: 1h)
-  intent: (intentId: string) => 
+  intent: (intentId: string)  
     `intent:${intentId}`,
   
   // User session (TTL: 24h)
-  session: (address: string) => 
+  session: (address: string)  
     `session:${address}`,
 };
 
 // Redis Client Configuration
-interface RedisCacheConfig {
+'interface RedisCacheConfig {
   host: string;
   port: number;
   password?: string;
@@ -290,7 +290,7 @@ interface RedisCacheConfig {
 
 ```typescript
 // Base Service Interface
-interface WorkflowService {
+'interface WorkflowService {
   name: string;
   version: string;
   
@@ -308,8 +308,8 @@ interface WorkflowService {
 }
 
 // Example: Balances Service
-class BalancesService implements WorkflowService {
-  async get(params: BalanceParams): Promise<Balance> {
+'class BalancesService 'implements WorkflowService {
+  "async get(params: BalanceParams): Promise<Balance> {
     // 1. Check Redis cache
     // 2. If miss, query blockchain
     // 3. Update cache
@@ -373,7 +373,7 @@ class BridgeService implements WorkflowService {
 ### 4. Security Measures
 
 ```typescript
-interface SecurityChecks {
+'interface SecurityChecks {
   // Check if address is on known blacklist
   checkBlacklist(address: string): Promise<boolean>;
   
@@ -391,7 +391,7 @@ interface SecurityChecks {
 ### 5. Error Handling
 
 ```typescript
-class SafetyError extends Error {
+"class SafetyError extends Error {
   code: string;
   severity: 'low' | 'medium' | 'high' | 'critical';
   recoverable: boolean;
