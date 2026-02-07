@@ -377,6 +377,23 @@ npm run example:solana-integration
 - [Setup Instructions](./SETUP.md)
 - [Contributing Guidelines](./CONTRIBUTING.md)
 
+## Security Considerations
+
+⚠️ **Important**: The Circle BridgeKit Solana packages have upstream dependencies with known vulnerabilities.
+
+- **Issue**: bigint-buffer vulnerability (GHSA-3gc7-fjrx-p6mg) in Solana dependencies
+- **Impact**: Affects Solana-related operations only
+- **Status**: Awaiting upstream fix from Solana community
+- **Mitigation**: Limit exposure to untrusted Solana transaction data
+
+For complete security details, see [Security Advisory](./SECURITY_ADVISORY.md).
+
+**Production Recommendations**:
+1. Implement additional input validation for Solana operations
+2. Monitor Circle BridgeKit updates for security patches
+3. Consider using EVM-only features until Solana vulnerability is resolved
+4. Track upstream fix: https://github.com/advisories/GHSA-3gc7-fjrx-p6mg
+
 ## Support
 
 For issues or questions about the Circle BridgeKit integration:
@@ -384,7 +401,8 @@ For issues or questions about the Circle BridgeKit integration:
 1. Check the [examples folder](./examples/) for usage patterns
 2. Review error messages - they include helpful guidance
 3. Consult the [Circle Developer Docs](https://developers.circle.com/)
-4. Open an issue on the repository
+4. Review [Security Advisory](./SECURITY_ADVISORY.md) for known vulnerabilities
+5. Open an issue on the repository
 
 ## Changelog
 
