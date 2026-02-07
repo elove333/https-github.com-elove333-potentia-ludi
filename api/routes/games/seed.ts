@@ -53,17 +53,22 @@ const GAMES = [
 ];
 
 router.post('/', async (req: Request, res: Response) => {
+  const isProduction = process.env.NODE_ENV === 'production';
+
+  // Disallow seeding entirely in production environments
+  if (isProduction) {
+    return res.status(403).json({
+      error: 'Forbidden',
+      message: 'Game seeding is disabled in production environment'
+    });
+  }
+
   try {
     console.log('🌱 Starting game database seeding...');
 
     // Clear existing games first - ONLY in development/test environments
-    const isProduction = process.env.NODE_ENV === 'production';
-    if (!isProduction) {
-      await gameQueries.deleteAll();
-      console.log('🗑️ Cleared existing games (development mode)');
-    } else {
-      console.log('⚠️ Production mode - skipping delete (games will be added if not exist)');
-    }
+    await gameQueries.deleteAll();
+    console.log('🗑️ Cleared existing games (development mode)');
 
     const seededGames = [];
 
