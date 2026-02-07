@@ -457,3 +457,147 @@ export async function checkDatabaseHealth(): Promise<boolean> {
 export async function closeDatabaseConnection(): Promise<void> {
   await pool.end();
 }
+
+// Game queries
+export const gameQueries = {
+  async create(
+    name: string,
+    tokenSymbol: string,
+    contractAddress: string,
+    chainId: number,
+    chainName: string
+  ) {
+    const result = await query<{
+      id: string;
+      name: string;
+      token_symbol: string;
+      contract_address: string;
+      chain_id: number;
+      chain_name: string;
+      created_at: Date;
+    }>(
+      `INSERT INTO games (name, token_symbol, contract_address, chain_id, chain_name)
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING *`,
+      [name, tokenSymbol, contractAddress, chainId, chainName]
+    );
+    return result.rows[0];
+  },
+
+  async findAll() {
+    const result = await query<{
+      id: string;
+      name: string;
+      token_symbol: string;
+      contract_address: string;
+      chain_id: number;
+      chain_name: string;
+      created_at: Date;
+    }>(
+      'SELECT * FROM games ORDER BY created_at DESC'
+    );
+    return result.rows;
+  },
+
+  async findByContract(contractAddress: string, chainId: number) {
+    const result = await query<{
+      id: string;
+      name: string;
+      token_symbol: string;
+      contract_address: string;
+      chain_id: number;
+      chain_name: string;
+    }>(
+      'SELECT * FROM games WHERE contract_address = $1 AND chain_id = $2',
+      [contractAddress, chainId]
+    );
+    return result.rows[0] || null;
+  },
+
+  async deleteAll() {
+    await query('DELETE FROM games');
+  }
+};
+
+// Game event queries
+export const gameEventQueries = {
+  async create(
+    userId: string,
+    gameId: string,
+    eventType: string,
+    walletAddress: string,
+    contractAddress: string,
+    tokenId: string | null,
+    amount: string | null,
+    txHash: string,
+    chainId: number,
+    metadata: Record<string, any>
+  ) {
+    const result = await query<{
+      id: string;
+      user_id: string;
+      game_id: string;
+      event_type: string;
+      wallet_address: string;
+      contract_address: string;
+      token_id: string | null;
+      amount: string | null;
+      tx_hash: string;
+      chain_id: number;
+      metadata: Record<string, any>;
+      created_at: Date;
+    }>(
+      `INSERT INTO game_events (user_id, game_id, event_type, wallet_address, contract_address, token_id, amount, tx_hash, chain_id, metadata)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+       RETURNING *`,
+      [userId, gameId, eventType, walletAddress, contractAddress, tokenId, amount, txHash, chainId, metadata]
+    );
+    return result.rows[0];
+  },
+
+  async findByUser(userId: string, limit: number = 50) {
+    const result = await query<{
+      id: string;
+      game_id: string;
+      event_type: string;
+      wallet_address: string;
+      contract_address: string;
+      token_id: string | null;
+      amount: string | null;
+      tx_hash: string;
+      chain_id: number;
+      metadata: Record<string, any>;
+      created_at: Date;
+    }>(
+      `SELECT * FROM game_events 
+       WHERE user_id = $1 
+       ORDER BY created_at DESC 
+       LIMIT $2`,
+      [userId, limit]
+    );
+    return result.rows;
+  },
+
+  async findByGame(gameId: string, limit: number = 50) {
+    const result = await query<{
+      id: string;
+      user_id: string;
+      event_type: string;
+      wallet_address: string;
+      contract_address: string;
+      token_id: string | null;
+      amount: string | null;
+      tx_hash: string;
+      chain_id: number;
+      metadata: Record<string, any>;
+      created_at: Date;
+    }>(
+      `SELECT * FROM game_events 
+       WHERE game_id = $1 
+       ORDER BY created_at DESC 
+       LIMIT $2`,
+      [gameId, limit]
+    );
+    return result.rows;
+  }
+};
