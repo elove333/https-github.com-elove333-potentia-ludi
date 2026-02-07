@@ -14,8 +14,13 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@/app/*": ["./src/app/*"]
+    }
   },
-  "include": ["src"],
+  "include": ["src/**/*", "app/**/*"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

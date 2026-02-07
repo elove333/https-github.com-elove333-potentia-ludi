@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "lint": "eslint src --ext ts,tsx",
+    "lint": "eslint \"src/**/*.{ts,tsx,js,jsx,json}\" \"app/**/*.{ts,tsx,js,jsx,json}\"",
+    "lint:fix": "eslint \"src/**/*.{ts,tsx,js,jsx,json}\" \"app/**/*.{ts,tsx,js,jsx,json}\" --fix",
     "test": "vitest"
   },
   "keywords": [

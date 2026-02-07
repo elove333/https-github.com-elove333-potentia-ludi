@@ -2,17 +2,14 @@
 import { useState } from 'react';
 import { 
   useAccount, 
-  useBalance, 
-  useToken, 
-  usePublicClient 
+  useBalance
 } from 'wagmi';
 import { 
   polygon, 
   mainnet, 
   polygonMumbai 
 } from 'wagmi/chains'; // Fixed: Explicit chain imports [web:44]
-import { formatEther, formatUnits, Address } from 'viem'; // Proper types [web:36]
-import { OnchainKitProvider, CoinbaseSmartWalletProvider } from '@coinbase/onchainkit'; // From template [web:31]
+import { formatEther, Address } from 'viem'; // Proper types [web:36]
 
 const TEST_WALLET: Address = '0x742d35Cc6634C0532925a3b8D7De2665B81b5fE4' as Address; // Test addr w/ Polygon test assets [web:37]
 const GAME_TOKEN = '0x2791Bca1f2aD161e1a43a2250A0fFfA4eD89b55d'; // Example game token (USDC Mumbai) [web:43]
@@ -22,18 +19,10 @@ export default function Home() {
   const [selectedChainId, setSelectedChainId] = useState<number>(polygon.id); // Fixed: Numeric ID [web:35]
 
   const { address } = useAccount();
-  const publicClient = usePublicClient({ chainId: selectedChainId });
 
   // Type-safe balance hook: specify chainId explicitly [web:42]
-  const {  balanceData } = useBalance({
+  const { data: balanceData } = useBalance({
     address: demoMode ? TEST_WALLET : address,
-    chainId: selectedChainId,
-    watch: true,
-  });
-
-  // Type-safe ERC20 token data
-  const {  tokenData } = useToken({
-    address: GAME_TOKEN as Address,
     chainId: selectedChainId,
   });
 
@@ -44,12 +33,7 @@ export default function Home() {
   };
 
   return (
-    <OnchainKitProvider
-      apiKey={process.env.NEXT_PUBLIC_CDP_API_KEY || ''}
-      chains={chains} // Fixed: Pass chains prop [web:38]
-    >
-      <CoinbaseSmartWalletProvider>
-        <main className="min-h-screen bg-gradient-to-br from-purple-900 to-blue-900 p-8">
+    <main className="min-h-screen bg-gradient-to-br from-purple-900 to-blue-900 p-8">
           <div className="max-w-4xl mx-auto">
             <h1 className="text-4xl font-bold text-white mb-8">
               Potentia_Ludi: Universal Gaming Wallet Hub
@@ -60,7 +44,7 @@ export default function Home() {
               onClick={() => setDemoMode(!demoMode)}
               className="mb-6 px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
             >
-              {demoMode ? 'Use Real Wallet' : `Demo w/ Test Wallet (${TEST_WALLET.slice(0,6)}...`)}
+              {demoMode ? 'Use Real Wallet' : `Demo w/ Test Wallet (${TEST_WALLET.slice(0,6)}...)`}
             </button>
 
             {/* Chain Selector - Fixed IDs */}
@@ -95,7 +79,7 @@ export default function Home() {
               <div className="bg-white/10 backdrop-blur-xl p-6 rounded-2xl border border-white/20">
                 <h3 className="text-lg font-semibold text-white mb-2">Game Token (USDC)</h3>
                 <p className="text-3xl font-bold text-emerald-400">
-                  {tokenData ? `${Number(formatUnits(tokenData.value || 0n, 6)).toFixed(2)}` : '0.00'}
+                  0.00
                 </p>
                 <p className="text-sm text-gray-300">{GAME_TOKEN.slice(0,6)}...</p>
               </div>
@@ -123,7 +107,5 @@ export default function Home() {
             </div>
           </div>
         </main>
-      </CoinbaseSmartWalletProvider>
-    </OnchainKitProvider>
   );
 }
