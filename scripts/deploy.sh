@@ -144,7 +144,12 @@ fi
 
 # Check if doctl is authenticated
 if ! doctl account get &> /dev/null; then
-    log_error "doctl is not authenticated. Run: doctl auth init"
+    log_error "doctl is not authenticated."
+    echo ""
+    echo "To authenticate doctl:"
+    echo "  1. Create a DigitalOcean API token at: https://cloud.digitalocean.com/account/api/tokens"
+    echo "  2. Run: doctl auth init"
+    echo "  3. Enter your API token when prompted"
     exit 1
 fi
 
@@ -212,6 +217,9 @@ set -e
 
 echo "=== Setting up Potentia Ludi Server ==="
 
+# Generate random password for PostgreSQL
+DB_PASSWORD=$(openssl rand -base64 32 | tr -d "=+/" | cut -c1-25)
+
 # Update system
 echo "Updating system packages..."
 apt-get update
@@ -241,7 +249,7 @@ npm install -g pm2
 # Configure PostgreSQL
 echo "Configuring PostgreSQL..."
 sudo -u postgres psql -c "CREATE DATABASE potentia_ludi;" || echo "Database already exists"
-sudo -u postgres psql -c "CREATE USER potentia_user WITH PASSWORD 'changeme123';" || echo "User already exists"
+sudo -u postgres psql -c "CREATE USER potentia_user WITH PASSWORD '$DB_PASSWORD';" || echo "User already exists"
 sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE potentia_ludi TO potentia_user;" || true
 
 # Configure Redis
@@ -274,12 +282,12 @@ echo "5. Start with PM2: pm2 start npm --name potentia-ludi -- start"
 echo "6. Save PM2 config: pm2 save && pm2 startup"
 echo ""
 echo "Database connection string:"
-echo "  postgresql://potentia_user:changeme123@localhost:5432/potentia_ludi"
+echo "  postgresql://potentia_user:$DB_PASSWORD@localhost:5432/potentia_ludi"
 echo ""
 echo "Redis connection string:"
 echo "  redis://localhost:6379"
 echo ""
-echo "IMPORTANT: Change the default database password!"
+echo "IMPORTANT: Save the database password above - it will not be shown again!"
 EOFSCRIPT
 )
 
@@ -305,7 +313,8 @@ echo "   ssh root@$DROPLET_IP"
 echo ""
 echo "2. Clone your repository:"
 echo "   cd /opt/potentia-ludi"
-echo "   git clone https://github.com/elove333/https-github.com-elove333-potentia-ludi.git app"
+echo "   git clone <your-repository-url> app"
+echo "   # Example: git clone https://github.com/yourusername/yourrepo.git app"
 echo ""
 echo "3. Configure your environment:"
 echo "   cd app"

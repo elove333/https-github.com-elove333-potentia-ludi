@@ -151,6 +151,8 @@ tar xf ~/doctl-1.104.0-linux-amd64.tar.gz
 sudo mv ~/doctl /usr/local/bin
 ```
 
+> **Note:** Check for the latest version at [doctl releases](https://github.com/digitalocean/doctl/releases)
+
 #### Windows
 ```bash
 # Using Chocolatey
@@ -199,12 +201,20 @@ doctl compute droplet create potentia-ludi-app \
 The repository includes a deployment helper script for automated infrastructure setup:
 
 ```bash
-# Make the script executable
+# Make the script executable (first time only)
 chmod +x scripts/deploy.sh
 
-# Run the deployment script
-./scripts/deploy.sh
+# View available options
+./scripts/deploy.sh --help
+
+# Run the deployment script (requires SSH key ID)
+./scripts/deploy.sh --ssh-key-id YOUR_SSH_KEY_ID
+
+# With custom configuration
+./scripts/deploy.sh --droplet-name my-app --region nyc3 --size s-2vcpu-4gb --ssh-key-id YOUR_SSH_KEY_ID
 ```
+
+Get your SSH key ID: `doctl compute ssh-key list`
 
 See `scripts/deploy.sh` for detailed usage and configuration options.
 
