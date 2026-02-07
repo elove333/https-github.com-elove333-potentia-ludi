@@ -12,6 +12,7 @@ import {
 import { formatEther, Address } from 'viem'; // Proper types [web:36]
 
 const TEST_WALLET: Address = '0x742d35Cc6634C0532925a3b8D7De2665B81b5fE4' as Address; // Test addr w/ Polygon test assets [web:37]
+const MOCK_NFT_COUNT = 12; // Placeholder until Alchemy NFT API integration
 
 export default function Home() {
   const [demoMode, setDemoMode] = useState(false);
@@ -84,7 +85,7 @@ export default function Home() {
           {/* NFT Count Placeholder */}
           <div className="bg-white/10 backdrop-blur-xl p-6 rounded-2xl border border-white/20">
             <h3 className="text-lg font-semibold text-white mb-2">NFTs Owned</h3>
-            <p className="text-3xl font-bold text-purple-400">12</p> {/* Mock; add Alchemy NFT API */}
+            <p className="text-3xl font-bold text-purple-400">{MOCK_NFT_COUNT}</p> {/* Mock; add Alchemy NFT API */}
             <p className="text-sm text-gray-300">Across games</p>
           </div>
         </div>
