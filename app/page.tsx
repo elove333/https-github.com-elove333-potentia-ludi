@@ -1,18 +1,18 @@
 'use client';
-import { useState } from 'react';
+"import { useState } from 'react';
 import axios from 'axios';
 import { 
   useAccount, 
   useBalance, 
   useToken, 
   usePublicClient 
-} from 'wagmi';
-import { 
+} "from 'wagmi';
+'import { 
   polygon, 
   mainnet, 
   polygonMumbai 
 } from 'wagmi/chains'; // Fixed: Explicit chain imports [web:44]
-import { formatEther, formatUnits, Address } from 'viem'; // Proper types [web:36]
+"import { formatEther, formatUnits, Address } from 'viem'; // Proper types [web:36]
 import { OnchainKitProvider, CoinbaseSmartWalletProvider } from '@coinbase/onchainkit'; // From template [web:31]
 
 const TEST_WALLET: Address = '0x742d35Cc6634C0532925a3b8D7De2665B81b5fE4' as Address; // Test addr w/ Polygon test assets [web:37]
@@ -26,7 +26,7 @@ if (!process.env.NEXT_PUBLIC_APP_URL) {
   console.warn('⚠️ NEXT_PUBLIC_APP_URL not set, using fallback:', API_BASE_URL);
 }
 
-export default function Home() {
+'export default function Home() {
   const [demoMode, setDemoMode] = useState(false);
   const [selectedChainId, setSelectedChainId] = useState<number>(polygon.id); // Fixed: Numeric ID [web:35]
   const [loading, setLoading] = useState<string | null>(null);
