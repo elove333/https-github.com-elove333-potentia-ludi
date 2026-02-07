@@ -248,3 +248,47 @@ COMMENT ON TABLE audit_log IS 'Security audit trail for all significant events';
 -- Grant permissions (adjust as needed for your setup)
 -- GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA public TO app_user;
 -- GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO app_user;
+
+-- Games table - stores game metadata and contract addresses
+CREATE TABLE IF NOT EXISTS games (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name VARCHAR(255) NOT NULL,
+  token_symbol VARCHAR(20) NOT NULL,
+  contract_address VARCHAR(42) NOT NULL,
+  chain_id INTEGER NOT NULL,
+  chain_name VARCHAR(50) NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW(),
+  CONSTRAINT valid_game_contract_address CHECK (contract_address ~ '^0x[a-fA-F0-9]{40}$'),
+  CONSTRAINT unique_game_contract UNIQUE (contract_address, chain_id)
+);
+
+CREATE INDEX idx_games_contract ON games(contract_address, chain_id);
+CREATE INDEX idx_games_chain ON games(chain_id);
+
+COMMENT ON TABLE games IS 'Stores game metadata and contract addresses for tracking';
+
+-- Game events table - tracks in-game asset transfers and events
+CREATE TABLE IF NOT EXISTS game_events (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  game_id UUID NOT NULL REFERENCES games(id) ON DELETE CASCADE,
+  event_type VARCHAR(50) NOT NULL,
+  wallet_address VARCHAR(42) NOT NULL,
+  contract_address VARCHAR(42) NOT NULL,
+  token_id VARCHAR(255),
+  amount VARCHAR(78),
+  tx_hash VARCHAR(66) NOT NULL,
+  chain_id INTEGER NOT NULL,
+  metadata JSONB DEFAULT '{}',
+  created_at TIMESTAMP DEFAULT NOW(),
+  CONSTRAINT valid_event_wallet CHECK (wallet_address ~ '^0x[a-fA-F0-9]{40}$'),
+  CONSTRAINT valid_event_contract CHECK (contract_address ~ '^0x[a-fA-F0-9]{40}$'),
+  CONSTRAINT valid_event_tx_hash CHECK (tx_hash ~ '^0x[a-fA-F0-9]{64}$')
+);
+
+CREATE INDEX idx_game_events_user ON game_events(user_id, created_at DESC);
+CREATE INDEX idx_game_events_game ON game_events(game_id, created_at DESC);
+CREATE INDEX idx_game_events_wallet ON game_events(wallet_address, created_at DESC);
+CREATE INDEX idx_game_events_tx ON game_events(tx_hash);
+
+COMMENT ON TABLE game_events IS 'Tracks in-game asset transfers and events from blockchain webhooks';

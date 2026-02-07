@@ -18,6 +18,12 @@ import logoutRouter from './routes/siwe/logout';
 import submitIntentRouter from './routes/intents/submit';
 import buildIntentRouter from './routes/intents/build';
 import getIntentRouter from './routes/intents/get';
+import configRouter from './routes/config';
+import getTokenBalancesRouter from './routes/alchemy/get-token-balances';
+import setupWebhookRouter from './routes/alchemy/setup-webhook';
+import gameEventTransferRouter from './routes/webhooks/game-event-transfer';
+import seedGamesRouter from './routes/games/seed';
+import testWebhookRouter from './routes/webhooks/test';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -44,6 +50,20 @@ app.get('/health', async (req, res) => {
 });
 
 // API Routes
+
+// Config
+app.use('/api/config', configRouter);
+
+// Alchemy
+app.use('/api/alchemy/get-token-balances', getTokenBalancesRouter);
+app.use('/api/alchemy/setup-webhook', setupWebhookRouter);
+
+// Webhooks
+app.use('/api/webhooks/game-event-transfer', gameEventTransferRouter);
+app.use('/api/webhooks/test', testWebhookRouter);
+
+// Games
+app.use('/api/games/seed', seedGamesRouter);
 
 // SIWE Authentication
 app.use('/api/siwe/nonce', nonceRouter);
