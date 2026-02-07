@@ -2,7 +2,6 @@
 // Sets up Alchemy webhooks for game event monitoring
 
 import { Router, Request, Response } from 'express';
-import axios from 'axios';
 
 const router = Router();
 
