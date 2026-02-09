@@ -133,6 +133,20 @@ npm run build
 
 The build output will be in the `dist` directory.
 
+### Deploying to Vercel
+
+This project includes automated deployment to Vercel via GitHub Actions. For manual deployments and API integrations, see our comprehensive [Vercel API Integration Guide](./docs/VERCEL_API_GUIDE.md).
+
+**What's covered in the guide:**
+- Creating and managing Vercel Access Tokens
+- Authentication and security best practices
+- API request/response formats
+- Pagination and rate limiting
+- Team resource access
+- Complete code examples
+
+For CI/CD setup, the `.github/workflows/deploy.yml` workflow handles automatic deployments on push to any branch.
+
 ## Infrastructure Management with doctl
 
 ### Overview
@@ -373,6 +387,17 @@ The application includes webhook endpoints for receiving and processing game eve
 - ✅ Input validation and error handling
 
 For complete webhook documentation, setup instructions, and security best practices, see [docs/WEBHOOK_ENDPOINTS.md](./docs/WEBHOOK_ENDPOINTS.md).
+
+### Vercel API Integration
+
+The project is deployed on Vercel with automated CI/CD through GitHub Actions. For developers who need to interact with the Vercel API programmatically:
+
+- **[Vercel API Integration Guide](./docs/VERCEL_API_GUIDE.md)** - Comprehensive guide covering:
+  - Creating and managing Access Tokens
+  - Authentication patterns
+  - Pagination and rate limiting
+  - Team resource access
+  - Complete code examples
 
 ## Contributing
 
