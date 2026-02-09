@@ -1,282 +1,135 @@
-# Potentia Ludi 🎮
+# Potentia Ludi — Conversational Web3 Wallet Hub
 
-A Conversational Web3 Wallet Hub powered by natural-language input (NL → Intent). This full-stack application enables users to interact with Web3 using plain English, automatically routing through the optimal execution path with comprehensive safety features.
+A conversational Web3 wallet hub that translates natural language into typed intents (balances, swaps, bridges, claims) and safely executes them through a Planner → Executor pipeline:
+Parse → Preflight (balances/allowances, quote, simulate) → Preview (human-readable risk checks) → Build (Permit2/approve + action) → Wallet.
 
-## 🌟 Features
+This project focuses on non-custodial UX, SIWE authentication, and opt-in telemetry for analytics.
 
-### Core Capabilities
+Status
+------
+- Backend skeleton implemented: SIWE routes, intent parsing, pipeline executor (preflight + preview), PostgreSQL schema, telemetry, and unit tests for intent parsing.
+- Provider integrations (Alchemy, 0x, Tenderly, LI.FI) are scaffolded or mocked; provide API keys in .env for full E2E behavior.
 
-#### 🗣️ Natural Language Processing
-- Convert plain English to structured intents
-- Support for complex multi-step operations
-- Confidence scoring and validation
-- Helpful suggestions when parsing fails
+Quickstart (local)
+------------------
+1. Clone
 
-#### 🔐 SIWE Authentication
-- Sign-In with Ethereum (SIWE) standard
-- Secure session management with Iron Session
-- Redis-backed nonce validation
-- Database session tracking
-
-#### 🎯 Intent Pipeline
-Parse → Preflight → Preview → Execute flow supporting:
-- **`balances.get`**: Read balances, NFTs, and approvals across chains
-- **`trade.swap`**: Perform token swaps with constraints like slippage
-- **`bridge.transfer`**: Bridge assets across multiple chains
-- **`rewards.claim`**: Aggregate claimable gaming rewards
-
-#### 🛡️ Safety Features
-- **Transaction Simulation**: Tenderly integration for pre-execution validation
-- **Risk Assessment**: Automatic risk level detection (low, medium, high, critical)
-- **Decoded Calls**: Human-readable transaction breakdown
-- **Token Deltas**: Clear before/after balance changes
-- **Gas Estimation**: Accurate cost predictions
-- **Guardrails**: Block on negative simulations, stale quotes, unverified routers
-
-#### 📊 Multi-Chain Support
-- Ethereum (Chain ID: 1)
-- Polygon (Chain ID: 137)
-- Arbitrum (Chain ID: 42161)
-- Optimism (Chain ID: 10)
-- Base (Chain ID: 8453)
-
-## 🏗️ Technology Stack
-
-### Backend
-- **Framework**: Next.js 14 with App Router
-- **Database**: PostgreSQL (optimized for Neon)
-- **Cache**: Redis (optimized for Upstash)
-- **Authentication**: SIWE + Iron Session
-- **Logging**: Pino with structured logging
-- **Validation**: Zod schemas
-
-### Integrations
-- **Alchemy**: Portfolio & NFT APIs (primary read layer)
-- **Moralis**: Fallback provider
-- **0x API**: DEX swap quotes with Permit2
-- **Tenderly**: Transaction simulation
-- **Blocknative**: Gas advisories (planned)
-- **LI.FI SDK**: Cross-chain bridging (planned)
-- **Galxe, RabbitHole, Layer3**: Rewards aggregation
-
-## 🚀 Quick Start
-
-### Prerequisites
-- Node.js 18+
-- PostgreSQL database
-- Redis instance
-- API keys (see `.env.example`)
-
-### Installation
-
-1. **Clone the repository**
 ```bash
 git clone https://github.com/elove333/https-github.com-elove333-potentia-ludi.git
 cd https-github.com-elove333-potentia-ludi
 ```
 
-2. **Install dependencies**
+2. Create a branch (optional)
+
+```bash
+git checkout -b my-dev-branch
+```
+
+3. Install
+
 ```bash
 npm install
 ```
 
-3. **Set up environment variables**
+4. Configure
+
 ```bash
 cp .env.example .env
-# Edit .env with your configuration
+# Edit .env and set DATABASE_URL and any external API keys you plan to use.
 ```
 
-Required variables:
-- `DATABASE_URL` - PostgreSQL connection string
-- `REDIS_URL` - Redis connection string
-- `SESSION_SECRET` - 32+ character secret for session encryption
-- `ALCHEMY_API_KEY` - Alchemy API key
-
-Optional (for full functionality):
-- `TENDERLY_API_KEY`, `TENDERLY_PROJECT`, `TENDERLY_ACCOUNT` - Transaction simulation
-- `ZEROX_API_KEY` - Enhanced 0x API access
-- `GALXE_API_KEY`, `RABBITHOLE_API_KEY`, `LAYER3_API_KEY` - Rewards
-
-4. **Run database migrations**
-```bash
-psql $DATABASE_URL < migrations/001_initial_schema.sql
-```
-
-5. **Start development server**
-```bash
-npm run dev
-```
-
-Visit `http://localhost:3000`
-
-### Production Build
-```bash
-npm run build
-npm start
-```
-
-## 📡 API Endpoints
-
-### Authentication
-- `GET /api/siwe/nonce` - Generate SIWE nonce
-- `POST /api/siwe/verify` - Verify signature and create session
-- `POST /api/siwe/logout` - Destroy session
-
-### Intents
-- `POST /api/intents/parse` - Parse natural language to intent
-- `POST /api/intents/quote` - Get swap quote for trade intent
-- `POST /api/intents/preview` - Preview transaction with risk assessment
-
-### Data
-- `GET /api/balances?chainId=1&includeNFTs=true` - Fetch portfolio balances
-- `GET /api/rewards?platforms=galxe,rabbithole` - Get claimable rewards
-
-## 💬 Natural Language Examples
-
-```
-"Show me my balance"
-→ balances.get intent
-
-"Swap 100 USDC for ETH"
-→ trade.swap intent with fromToken=USDC, toToken=ETH, amount=100
-
-"Bridge 0.5 ETH to Polygon"
-→ bridge.transfer intent with toChainId=137
-
-"Show my claimable rewards"
-→ rewards.claim intent
-```
-
-## 📚 Documentation
-
-- [Technical Specification](./TECHNICAL_SPEC.md) - Detailed API documentation
-- [Database Schema](./migrations/001_initial_schema.sql) - PostgreSQL schema
-- [Environment Variables](./.env.example) - Configuration reference
-
-## 🗄️ Database Schema
-
-### Core Tables
-- **users**: User accounts indexed by wallet address
-- **sessions**: SIWE session records with expiry
-- **intents**: Intent processing history with status tracking
-- **limits**: Per-user spending and approval limits
-- **telemetry**: Event logging for observability
-
-## 🔒 Security
-
-- **SIWE Authentication**: Cryptographic wallet authentication
-- **Session Encryption**: Iron Session with secure HTTP-only cookies
-- **Nonce Validation**: One-time use nonces with Redis TTL
-- **Transaction Simulation**: Pre-execution validation via Tenderly
-- **Risk Assessment**: Automated risk scoring
-- **Spending Limits**: Daily USD caps per user
-- **Approval Bounds**: Maximum approval amounts
-
-## 📊 Observability
-
-- **Structured Logging**: Pino with correlation IDs
-- **Telemetry Events**: All user actions logged to PostgreSQL
-- **Cache Metrics**: Redis hit/miss tracking
-- **Error Tracking**: Comprehensive error logging
-
-## 🚢 Deployment
-
-### Vercel (Recommended)
-
-1. Push code to GitHub
-2. Import project in Vercel
-3. Configure environment variables:
-   - Database (Neon PostgreSQL)
-   - Cache (Upstash Redis)
-   - API keys
-4. Deploy
-
-### Manual Deployment
+5. Database
 
 ```bash
-npm run build
-npm start
+createdb potentia_ludi
+psql -d potentia_ludi -f database/schema.sql
+# Or run the npm helper script:
+# npm run db:setup
 ```
 
-## 🛣️ Roadmap
-
-### Phase 1: Core Infrastructure ✅
-- [x] Next.js 14 setup
-- [x] PostgreSQL schema
-- [x] SIWE authentication
-- [x] Intent schemas
-- [x] Basic API endpoints
-
-### Phase 2: Integrations ✅
-- [x] Alchemy Portfolio API
-- [x] 0x DEX integration
-- [x] Tenderly simulation
-- [x] Rewards aggregation (Galxe, RabbitHole, Layer3)
-
-### Phase 3: Enhanced Features 🚧
-- [ ] LI.FI bridging integration
-- [ ] Permit2 support
-- [ ] Blocknative gas optimization
-- [ ] ML-based intent parser
-- [ ] Spending limit enforcement
-
-### Phase 4: Frontend 📋
-- [ ] React UI components
-- [ ] Natural language input widget
-- [ ] Transaction preview modal
-- [ ] Rewards dashboard
-- [ ] Multi-wallet support
-
-### Phase 5: Production 📋
-- [ ] Comprehensive test suite
-- [ ] Security audit
-- [ ] Performance optimization
-- [ ] Monitoring & alerts
-- [ ] Documentation site
-
-## 🧪 Testing
+6. Run API
 
 ```bash
-# Run tests (when implemented)
+npm run api:dev
+```
+
+- Health: http://localhost:3001/health
+- SIWE endpoints: /api/siwe/*
+- Intent endpoints: /api/intents/*
+
+7. Run tests
+
+```bash
 npm test
-
-# Lint code
-npm run lint
-
-# Type check
-npx tsc --noEmit
 ```
 
-## 🤝 Contributing
+Environment variables
+---------------------
+Minimum for local testing (see .env.example):
 
-Contributions are welcome! Please:
+- DATABASE_URL — Postgres connection string
+- PORT — API port (default 3001)
+- FRONTEND_URL — Frontend origin for CORS
+- SESSION_SECRET — cookie signing secret
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
+Optional (for full features):
 
-## 📝 License
+- ALCHEMY_API_KEY, MORALIS_API_KEY — read layer (balances, NFTs)
+- OX_API_KEY — 0x swap quotes and permit2 flow
+- TENDERLY_ACCESS_KEY — transaction simulation
+- BLOCKNATIVE_API_KEY — gas advisories
+- NEXT_PUBLIC_WC_PROJECT_ID — WalletConnect v2 (frontend)
 
-MIT License - see LICENSE file for details
+Project layout
+--------------
+- api/: Backend TypeScript code (routes, services, lib)
+  - api/lib: DB helpers and auth utilities (SIWE)
+  - api/services: intentParser, pipelineExecutor (preflight/preview/build)
+  - api/routes: HTTP route handlers
+- database/: schema.sql and DB docs
+- src/types/: TypeScript intent and pipeline type definitions
+- tests/: unit tests (intent parser)
+- PLANNER_EXECUTOR_GUIDE.md, IMPLEMENTATION_SUMMARY.md: architecture and implementation documentation
 
-## 🙏 Acknowledgments
+Key features
+------------
+- SIWE (EIP-4361) authentication and session management
+- NL → Intent parser (balances.get, trade.swap, bridge.transfer, rewards.claim)
+- Preflight checks: balances, allowances, quotes, simulation
+- Preview: decoded calls, token deltas, gas estimates, slippage, revert reasons
+- Build: Permit2 preferred; bounded allowance fallback
+- Telemetry and funnel events (opt-in)
+- Safety: spend limits, allowlists, stale-quote protection, gas advisories
 
-Built with:
-- [Next.js](https://nextjs.org/)
-- [SIWE](https://login.xyz/)
-- [Alchemy](https://www.alchemy.com/)
-- [0x Protocol](https://0x.org/)
-- [Tenderly](https://tenderly.co/)
-- [LI.FI](https://li.fi/)
+Development notes
+-----------------
+- TypeScript projects: API builds with `tsc -p tsconfig.api.json`.
+- Start the API during development with `npm run api:dev`.
+- For formatting, use Prettier if configured: `npx prettier --write "api/**/*.ts" "src/**/*.ts" "tests/**/*.ts"`.
 
-## 📞 Support
+Testing
+-------
+- Unit tests: `npm test`
+- Type check: `npx tsc -p tsconfig.api.json`
 
-For issues and questions:
-- Open an issue on GitHub
-- Check the [Technical Specification](./TECHNICAL_SPEC.md)
-- Review API endpoint documentation
+Security &amp; privacy
+------------------
+- Non-custodial: no private keys are stored server-side. All signing is client-side.
+- Analytics opt-in: telemetry is stored only for users who opt-in; only pseudonymous IDs are retained.
+- Redaction: raw signatures and private wallet data are not persisted.
+- Data retention: telemetry rows are pruned (90 days); keep aggregated rollups as needed.
 
----
+Troubleshooting
+---------------
+- DB connection issues: ensure `DATABASE_URL` is correct and Postgres is running.
+- Port conflicts: change `PORT` in .env if necessary.
+- Missing API keys: many integrations are mocked without keys; add keys to enable full functionality.
 
-Made with ❤️ for the Web3 gaming community
+Contributing
+------------
+- Follow TypeScript strict mode, add tests for new features, and update PLANNER_EXECUTOR_GUIDE.md when making architectural changes.
+- Open pull requests against `main` or the feature branch you are working on. Include a clear description and tests when applicable.
+
+License
+-------
+MIT
