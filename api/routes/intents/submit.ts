@@ -1,9 +1,11 @@
 // Submit Intent Route
 import { Router } from 'express';
-import { requireAuth, AuthenticatedRequest, validateRequest, rateLimit, success, error } from '../../client';
-import { parseIntent, validateIntent } from '../../services/intentParser';
+import { requireAuth, AuthenticatedRequest, validateRequest, rateLimit, success } from '../../client';
 import { executeIntent } from '../../services/pipelineExecutor';
-import { conversationQueries, intentQueries, userQueries } from '../../lib/database';
+import { intentQueries, conversationQueries } from '../../lib/database';
+import { parseAndValidateIntent } from '../../utils/intent';
+import { getUserAndConversation } from '../../utils/user';
+import { handleRouteError } from '../../utils/errors';
 
 const router = Router();
 
@@ -23,26 +25,15 @@ router.post(
       const { input, chainId } = req.body;
       const userId = req.userId!;
 
-      // Parse intent
-      const parsed = await parseIntent(input);
+      // Parse and validate intent
+      const parsed = await parseAndValidateIntent(input, res);
+      if (!parsed) return;
 
-      if (!parsed) {
-        error(res, 'Could not understand input', 400);
-        return;
-      }
+      // Get user and conversation
+      const userConv = await getUserAndConversation(userId, res);
+      if (!userConv) return;
 
-      // Validate parsed intent
-      const validation = validateIntent(parsed);
-      if (!validation.valid) {
-        error(res, `Invalid intent: ${validation.errors.join(', ')}`, 400);
-        return;
-      }
-
-      // Get or create active conversation
-      let conversation = await conversationQueries.findActive(userId);
-      if (!conversation) {
-        conversation = await conversationQueries.create(userId);
-      }
+      const { conversation, user } = userConv;
 
       // Create intent record
       const intent = await intentQueries.create(
@@ -56,13 +47,6 @@ router.post(
 
       // Increment conversation message count
       await conversationQueries.incrementMessageCount(conversation.id);
-
-      // Get user wallet address
-      const user = await userQueries.findByAddress(userId);
-      if (!user) {
-        error(res, 'User not found', 404);
-        return;
-      }
 
       // Execute intent if confidence is high enough and doesn't require confirmation
       if (parsed.confidence >= 0.7 && !parsed.requiresConfirmation) {
@@ -100,8 +84,7 @@ router.post(
         });
       }
     } catch (err) {
-      console.error('Intent submission error:', err);
-      error(res, err instanceof Error ? err.message : 'Failed to process intent', 500);
+      handleRouteError(res, err, 'Intent submission error', 500);
     }
   }
 );

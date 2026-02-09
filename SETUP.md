@@ -353,6 +353,27 @@ redis-cli FLUSHALL
 redis-cli KEYS "gas:prices:*"
 ```
 
+### Import Aliases
+
+The project uses path aliases for cleaner imports:
+
+```typescript
+// Use @ alias to import from src directory
+import App from '@/components/App';
+import { useStore } from '@/store';
+
+// Use @/app alias for app directory imports
+import Home from '@/app/page';
+```
+
+**Configuration:**
+- Vite alias configuration: `vite.config.ts`
+- TypeScript path mapping: `tsconfig.json`
+
+**Available aliases:**
+- `@/*` → `./src/*`
+- `@/app/*` → `./src/app/*`
+
 ## Next Steps
 
 1. **Explore the Codebase**

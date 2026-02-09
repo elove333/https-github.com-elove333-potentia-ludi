@@ -421,6 +421,22 @@ See the detailed contributor guidelines in [ARCHITECTURE.md](./ARCHITECTURE.md#c
 - Testing strategies
 - Security best practices
 
+## Security & Compliance
+
+### GitHub Enterprise Security Features
+
+For organizations using GitHub Enterprise, we provide comprehensive guidance for configuring advanced security features:
+
+- **IP Allow Lists**: Restrict repository access to trusted IP ranges
+- **Audit Log Streaming**: Real-time audit log streaming to SIEM (Splunk, Azure, AWS)
+- **Repository Rulesets**: Enforce commit signing, branch protection, and naming conventions
+
+See [GitHub Enterprise Security Guide](./docs/GITHUB_ENTERPRISE_SECURITY.md) for detailed configuration instructions.
+
+### Security Advisories
+
+For information about current security vulnerabilities and mitigation strategies, see [SECURITY_ADVISORY.md](./docs/SECURITY_ADVISORY.md).
+
 ## License
 
 MIT License - see LICENSE file for details

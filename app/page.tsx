@@ -12,6 +12,11 @@ import {
 import { formatEther, Address } from 'viem';
 
 const TEST_WALLET: Address = '0x742d35Cc6634C0532925a3b8D7De2665B81b5fE4' as Address;
+} from 'wagmi/chains'; // Fixed: Explicit chain imports [web:44]
+import { formatEther, Address } from 'viem'; // Proper types [web:36]
+
+const TEST_WALLET: Address = '0x742d35Cc6634C0532925a3b8D7De2665B81b5fE4' as Address; // Test addr w/ Polygon test assets [web:37]
+const MOCK_NFT_COUNT = 12; // Placeholder until Alchemy NFT API integration
 
 export default function Home() {
   const [demoMode, setDemoMode] = useState(false);
@@ -26,6 +31,13 @@ export default function Home() {
   });
 
   const chains = [polygon, polygonMumbai, mainnet];
+  // Type-safe balance hook: specify chainId explicitly [web:42]
+  const { data: balanceData } = useBalance({
+    address: demoMode ? TEST_WALLET : address,
+    chainId: selectedChainId
+  });
+
+  const chains = [polygon, polygonMumbai, mainnet]; // Fixed: Defined chains array for multi-chain [web:44]
 
   const switchChain = (chainId: number) => {
     setSelectedChainId(chainId);
@@ -79,12 +91,18 @@ export default function Home() {
             <h3 className="text-lg font-semibold text-white mb-2">Game Token (USDC)</h3>
             <p className="text-3xl font-bold text-emerald-400">0.00</p>
             <p className="text-sm text-gray-300">Coming soon</p>
+          {/* Game Token Balance - Placeholder */}
+          <div className="bg-white/10 backdrop-blur-xl p-6 rounded-2xl border border-white/20">
+            <h3 className="text-lg font-semibold text-white mb-2">Game Token (USDC)</h3>
+            <p className="text-3xl font-bold text-emerald-400">0.00</p>
+            <p className="text-sm text-gray-300">Placeholder</p>
           </div>
 
           {/* NFT Count Placeholder */}
           <div className="bg-white/10 backdrop-blur-xl p-6 rounded-2xl border border-white/20">
             <h3 className="text-lg font-semibold text-white mb-2">NFTs Owned</h3>
             <p className="text-3xl font-bold text-purple-400">12</p>
+            <p className="text-3xl font-bold text-purple-400">{MOCK_NFT_COUNT}</p> {/* Mock; add Alchemy NFT API */}
             <p className="text-sm text-gray-300">Across games</p>
           </div>
         </div>
