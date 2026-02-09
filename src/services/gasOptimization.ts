@@ -14,6 +14,8 @@ interface Transaction {
 class GasOptimizationService {
   private gasPriceCache: Map<number, bigint> = new Map();
   private updateInterval: NodeJS.Timeout | null = null;
+  private isMonitoring: boolean = false;
+  private pendingTransactions: number = 0;
 
   /**
    * Initialize gas monitoring
@@ -26,13 +28,35 @@ class GasOptimizationService {
    * Start monitoring gas prices across chains
    */
   private startGasMonitoring() {
-    // Update gas prices every 15 seconds
+    if (this.isMonitoring) return;
+    
+    this.isMonitoring = true;
+    // Update gas prices every 15 seconds when monitoring is active
     this.updateInterval = setInterval(() => {
-      this.updateGasPrices();
+      // Only update if there are pending transactions
+      if (this.pendingTransactions > 0) {
+        this.updateGasPrices();
+      } else if (this.isMonitoring) {
+        // Stop monitoring if no pending transactions
+        this.stopGasMonitoring();
+      }
     }, 15000);
 
     // Initial update
     this.updateGasPrices();
+  }
+
+  /**
+   * Stop monitoring gas prices
+   */
+  private stopGasMonitoring() {
+    if (!this.isMonitoring) return;
+    
+    this.isMonitoring = false;
+    if (this.updateInterval) {
+      clearInterval(this.updateInterval);
+      this.updateInterval = null;
+    }
   }
 
   /**
@@ -41,14 +65,17 @@ class GasOptimizationService {
   private async updateGasPrices() {
     const chains = [1, 137, 56, 42161, 10, 8453]; // ETH, Polygon, BSC, Arbitrum, Optimism, Base
     
-    for (const chainId of chains) {
-      try {
-        const gasPrice = await this.fetchGasPrice(chainId);
-        this.gasPriceCache.set(chainId, gasPrice);
-      } catch (error) {
-        console.error(`Failed to fetch gas price for chain ${chainId}:`, error);
-      }
-    }
+    // Fetch gas prices in parallel for better performance
+    await Promise.all(
+      chains.map(async (chainId) => {
+        try {
+          const gasPrice = await this.fetchGasPrice(chainId);
+          this.gasPriceCache.set(chainId, gasPrice);
+        } catch (error) {
+          console.error(`Failed to fetch gas price for chain ${chainId}:`, error);
+        }
+      })
+    );
   }
 
   /**
@@ -106,13 +133,31 @@ class GasOptimizationService {
     chainId: number,
     transaction: Transaction
   ): Promise<Transaction> {
-    const optimization = await this.getOptimization(chainId, transaction.type || 'default');
+    // Track that we're preparing a transaction (increment before async operation)
+    this.pendingTransactions++;
     
-    return {
-      ...transaction,
-      maxFeePerGas: optimization.optimizedGasPrice,
-      maxPriorityFeePerGas: optimization.optimizedGasPrice / BigInt(10),
-    };
+    try {
+      const optimization = await this.getOptimization(chainId, transaction.type || 'default');
+      
+      // NOTE: This is demo code. In production:
+      // - Don't use setTimeout for transaction tracking
+      // - Decrement counter when tx is confirmed/failed via event listeners
+      // - Track actual transaction hashes to avoid race conditions
+      // For demo purposes, we simulate a delay to demonstrate conditional monitoring
+      setTimeout(() => {
+        this.pendingTransactions = Math.max(0, this.pendingTransactions - 1);
+      }, 2000);
+      
+      return {
+        ...transaction,
+        maxFeePerGas: optimization.optimizedGasPrice,
+        maxPriorityFeePerGas: optimization.optimizedGasPrice / BigInt(10),
+      };
+    } catch (error) {
+      // Ensure counter is decremented even on error
+      this.pendingTransactions = Math.max(0, this.pendingTransactions - 1);
+      throw error;
+    }
   }
 
   /**
