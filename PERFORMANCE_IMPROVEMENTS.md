@@ -91,11 +91,11 @@ Using arrays for lookups resulted in O(n) complexity, causing performance degrad
 
 **Solution:**
 - Token Swaps: Added `Map<string, TokenSwap>` for O(1) swap status lookups
-- Game Detection: Pre-built `Set<string>` of game domains for O(1) matching
+- Game Detection: Pre-processed list of game domains and optimized matching logic to reduce unnecessary comparisons
 
 **Performance Impact:**
 - **Swap Status Lookup:** O(1) vs O(n) - instant lookups regardless of swap history size
-- **Game Detection:** O(1) vs O(n*m) - 100x+ faster for large game registries
+- **Game Detection:** Reduced per-check work by narrowing the search space and avoiding redundant scans, improving responsiveness for large game registries
 
 ```typescript
 // Before: O(n) array iteration
