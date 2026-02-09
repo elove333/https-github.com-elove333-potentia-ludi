@@ -13,8 +13,8 @@ body {
     font-family: 'IBM Plex Sans', sans-serif;
     font-size: 16px;
     color: #333;
-}Import
- 'use client';
+}
+import {'use client'};
 import { useState } from 'react';
  { 
   import user Account, 
