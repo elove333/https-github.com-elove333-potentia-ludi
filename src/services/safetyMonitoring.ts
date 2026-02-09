@@ -75,7 +75,7 @@ class SafetyMonitoringService {
     const failureRate = 100 - metrics.executionReliability;
     if (failureRate >= this.thresholds.maxFailureRate) {
       this.triggerGuardrail({
-        violationType: 'high_revert_rate',
+        violationType: 'high_failure_rate',
         reason: `Transaction failure rate (${failureRate.toFixed(2)}%) exceeds threshold (${this.thresholds.maxFailureRate}%)`,
         severity: failureRate >= this.thresholds.maxFailureRate * 2 ? 'critical' : 'warning',
         metadata: {
