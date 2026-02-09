@@ -18,6 +18,8 @@ import logoutRouter from './routes/siwe/logout';
 import submitIntentRouter from './routes/intents/submit';
 import buildIntentRouter from './routes/intents/build';
 import getIntentRouter from './routes/intents/get';
+import gameEventTransferRouter from './routes/webhooks/game-event-transfer';
+import testWebhookRouter from './routes/webhooks/test';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -54,6 +56,10 @@ app.use('/api/siwe/logout', logoutRouter);
 app.use('/api/intents/submit', submitIntentRouter);
 app.use('/api/intents/build', buildIntentRouter);
 app.use('/api/intents', getIntentRouter);
+
+// Webhook endpoints
+app.use('/api/webhooks/game-event-transfer', gameEventTransferRouter);
+app.use('/api/webhooks/test', testWebhookRouter);
 
 // 404 handler
 app.use((req, res) => {

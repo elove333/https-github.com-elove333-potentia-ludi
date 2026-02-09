@@ -8,9 +8,21 @@ import DetectedGames from './DetectedGames';
 import RewardsPanel from './RewardsPanel';
 import ClipsGallery from './ClipsGallery';
 
+/* CHILD_CHUNK: App Component - Main Structure (300 tokens) */
+/**
+ * Main application component for Potentia Ludi
+ * Manages service initialization and component layout
+ */
 const App: React.FC = () => {
   const { wallet, addDetectedGame } = useGamingWalletStore();
 
+  /* CHILD_CHUNK: Service Initialization Effect (300 tokens) */
+  /**
+   * Initialize all core services on component mount
+   * - Game detection service for auto-detecting Web3 games
+   * - Gas optimization service for transaction cost reduction
+   * - Reward tracking service for cross-chain reward monitoring
+   */
   useEffect(() => {
     // Initialize services
     gameDetectionService.init();
@@ -32,7 +44,13 @@ const App: React.FC = () => {
       rewardTrackingService.cleanup();
     };
   }, [wallet?.address, addDetectedGame]);
+  /* END CHILD_CHUNK */
 
+  /* CHILD_CHUNK: App Component - Render Layout (300 tokens) */
+  /**
+   * Render main application layout
+   * Contains header, main grid with four sections, and footer
+   */
   return (
     <div style={styles.app}>
       <header style={styles.header}>
@@ -65,8 +83,14 @@ const App: React.FC = () => {
       </footer>
     </div>
   );
+  /* END CHILD_CHUNK */
 };
+/* END CHILD_CHUNK */
 
+/* CHILD_CHUNK: Styles - App Container and Header (300 tokens) */
+/**
+ * Style definitions for main app container and header
+ */
 const styles = {
   app: {
     minHeight: '100vh',
@@ -92,6 +116,12 @@ const styles = {
     margin: 0,
     color: '#a0a0a0',
   },
+  /* END CHILD_CHUNK */
+  
+  /* CHILD_CHUNK: Styles - Layout and Grid (300 tokens) */
+  /**
+   * Style definitions for main content layout and grid system
+   */
   main: {
     padding: '2rem',
     maxWidth: '1400px',
@@ -115,6 +145,7 @@ const styles = {
     color: '#666',
     fontSize: '0.9rem',
   },
+  /* END CHILD_CHUNK */
 };
 
 export default App;
