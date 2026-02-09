@@ -80,9 +80,12 @@ class TokenSwapService {
     // In production, this would execute the actual swap
     // For demo, simulate completion after delay
     setTimeout(() => {
-      // Update status to completed and refresh map entry
-      swap.status = 'completed';
-      this.swapStatusMap.set(key, swap);
+      // Only update if this swap is still the latest entry for this pair
+      const current = this.swapStatusMap.get(key);
+      if (current === swap) {
+        swap.status = 'completed';
+        this.swapStatusMap.set(key, swap);
+      }
     }, 2000);
 
     return swap;
