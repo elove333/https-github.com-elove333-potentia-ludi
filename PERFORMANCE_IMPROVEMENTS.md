@@ -176,11 +176,13 @@ Missing cleanup for timers and intervals could cause memory leaks.
 
 **Solution:**
 - Added `cleanup()` methods to all services
-- Proper clearInterval/clearTimeout on shutdown
-- Ensured debounce timers are cleared
+- Store references to setInterval and event listeners for proper disposal
+- Clear intervals, timeouts, and remove event listeners on shutdown
+- Clear notification queues to prevent memory retention
 
 **Performance Impact:**
 - Prevents memory leaks on service shutdown
+- Proper cleanup of URL monitoring interval and popstate listener
 - Improved stability for long-running sessions
 - Better memory management
 

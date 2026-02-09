@@ -31,17 +31,21 @@ const KNOWN_WEB3_GAMES = [
 class GameDetectionService {
   private detectedGames: Map<string, Web3Game> = new Map();
   private observers: Array<(game: Web3Game) => void> = [];
-  private domainSet: Set<string> = new Set();
+  private domainToGameMap: Map<string, typeof KNOWN_WEB3_GAMES[0]> = new Map();
   private urlCheckDebounceTimer: NodeJS.Timeout | null = null;
   private pendingNotifications: Map<string, Web3Game> = new Map();
+  private urlCheckInterval: NodeJS.Timeout | null = null;
+  private popStateHandler: (() => void) | null = null;
 
   /**
    * Initialize the game detection service
    */
   init() {
-    // Build domain set for O(1) lookups
+    // Build domain-to-game map for O(1) lookups
     KNOWN_WEB3_GAMES.forEach((game) => {
-      game.domains.forEach((domain) => this.domainSet.add(domain));
+      game.domains.forEach((domain) => {
+        this.domainToGameMap.set(domain, game);
+      });
     });
     
     this.startUrlMonitoring();
@@ -62,10 +66,14 @@ class GameDetectionService {
 
       // Check on load and navigation
       checkUrl();
-      window.addEventListener('popstate', checkUrl);
+      
+      // Store handler reference for cleanup
+      this.popStateHandler = checkUrl;
+      window.addEventListener('popstate', this.popStateHandler);
       
       // Check periodically but less aggressively (30s instead of 5s)
-      setInterval(checkUrl, 30000);
+      // Store interval reference for cleanup
+      this.urlCheckInterval = setInterval(checkUrl, 30000);
     }
   }
 
@@ -73,22 +81,21 @@ class GameDetectionService {
    * Check if a URL matches any known Web3 games
    */
   private checkUrlForGame(url: string) {
-    for (const gameConfig of KNOWN_WEB3_GAMES) {
-      for (const domain of gameConfig.domains) {
-        if (url.includes(domain)) {
-          const game: Web3Game = {
-            id: gameConfig.name.toLowerCase().replace(/\s+/g, '-'),
-            name: gameConfig.name,
-            url: url,
-            chainId: gameConfig.chainId,
-            contractAddresses: gameConfig.contractPatterns,
-            detected: true,
-            lastActive: new Date(),
-          };
-          
-          this.addDetectedGame(game);
-          return;
-        }
+    // Use O(1) domain lookup instead of nested loops
+    for (const [domain, gameConfig] of this.domainToGameMap.entries()) {
+      if (url.includes(domain)) {
+        const game: Web3Game = {
+          id: gameConfig.name.toLowerCase().replace(/\s+/g, '-'),
+          name: gameConfig.name,
+          url: url,
+          chainId: gameConfig.chainId,
+          contractAddresses: gameConfig.contractPatterns,
+          detected: true,
+          lastActive: new Date(),
+        };
+        
+        this.addDetectedGame(game);
+        return;
       }
     }
   }
@@ -171,10 +178,25 @@ class GameDetectionService {
    * Clean up resources
    */
   cleanup() {
+    // Clear debounce timer
     if (this.urlCheckDebounceTimer) {
       clearTimeout(this.urlCheckDebounceTimer);
       this.urlCheckDebounceTimer = null;
     }
+    
+    // Clear URL monitoring interval
+    if (this.urlCheckInterval) {
+      clearInterval(this.urlCheckInterval);
+      this.urlCheckInterval = null;
+    }
+    
+    // Remove popstate event listener
+    if (typeof window !== 'undefined' && this.popStateHandler) {
+      window.removeEventListener('popstate', this.popStateHandler);
+      this.popStateHandler = null;
+    }
+    
+    // Clear notification queue
     this.pendingNotifications.clear();
   }
 }

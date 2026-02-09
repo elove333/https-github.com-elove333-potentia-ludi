@@ -33,7 +33,7 @@ class GasOptimizationService {
     this.isMonitoring = true;
     // Update gas prices every 15 seconds when monitoring is active
     this.updateInterval = setInterval(() => {
-      // Only update if there are pending transactions
+      // Only update if there are pending transactions; keep interval alive
       if (this.pendingTransactions > 0) {
         this.updateGasPrices();
       } else if (this.isMonitoring) {
@@ -134,7 +134,13 @@ class GasOptimizationService {
     transaction: Transaction
   ): Promise<Transaction> {
     // Track that we're preparing a transaction (increment before async operation)
+    const wasIdle = this.pendingTransactions === 0;
     this.pendingTransactions++;
+    
+    // Restart monitoring if we were idle
+    if (wasIdle) {
+      this.startGasMonitoring();
+    }
     
     try {
       const optimization = await this.getOptimization(chainId, transaction.type || 'default');
