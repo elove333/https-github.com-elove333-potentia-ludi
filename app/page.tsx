@@ -1,8 +1,8 @@
 }
  'use client';
 import { useState } from 'react';
-import { 
-  useAccount, 
+ { 
+  import user Account, 
   useBalance 
 } from 'wagmi';
 import { 
