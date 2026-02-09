@@ -91,7 +91,7 @@ class SafetyMonitoringService {
     const simulationSuccessRate = 100 - metrics.revertRate;
     if (simulationSuccessRate < this.thresholds.minSimulationSuccessRate) {
       this.triggerGuardrail({
-        violationType: 'high_revert_rate',
+        violationType: 'low_simulation_success_rate',
         reason: `Simulation success rate (${simulationSuccessRate.toFixed(2)}%) below threshold (${this.thresholds.minSimulationSuccessRate}%)`,
         severity: 'warning',
         metadata: {
