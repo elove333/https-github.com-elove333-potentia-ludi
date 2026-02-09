@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "lint": "eslint src --ext ts,tsx",
+    "lint": "eslint src app --ext ts,tsx",
     "test": "vitest"
   },
   "keywords": [
@@ -20,6 +20,13 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@circle-fin/adapter-circle-wallets": "^1.0.0",
+    "@circle-fin/adapter-ethers-v6": "^1.1.1",
+    "@circle-fin/adapter-solana": "^1.1.2",
+    "@circle-fin/adapter-solana-kit": "^1.0.0",
+    "@circle-fin/adapter-viem-v2": "^1.1.1",
+    "@circle-fin/bridge-kit": "^1.1.2",
+    "@circle-fin/provider-cctp-v2": "^1.0.4",
     "@rainbow-me/rainbowkit": "^2.0.0",
     "@tanstack/react-query": "^5.17.0",
     "axios": "^1.6.0",
@@ -31,16 +38,24 @@
     "zustand": "^4.4.0"
   },
   "devDependencies": {
+    "@types/cookie-parser": "^1.4.10",
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.0.9",
+    "@types/pg": "^8.16.0",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "@vitejs/plugin-react": "^4.2.0",
+    "cookie-parser": "^1.4.7",
     "eslint": "^8.0.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.26",
+    "express": "^5.2.1",
+    "pg": "^8.17.1",
+    "siwe": "^3.0.0",
     "typescript": "^5.0.0",
-    "vite": "^5.0.0",
-    "vitest": "^1.0.0"
+    "vite": "^7.3.1",
+    "vitest": "^4.0.18"
   }
 }
