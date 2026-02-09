@@ -1,4 +1,4 @@
-/* IBM Plex Sans Fonts - Basic Integration */
+#/* IBM Plex Sans Fonts - Basic Integration */
 @font-face {
     font-family: 'IBM Plex Sans';
     font-style: normal;
