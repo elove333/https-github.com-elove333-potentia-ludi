@@ -19,6 +19,7 @@ export interface GasOptimization {
 }
 
 export interface TokenSwap {
+  id: string; // Unique identifier for the swap
   fromToken: string;
   toToken: string;
   amount: string;

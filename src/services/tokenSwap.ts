@@ -8,7 +8,8 @@ interface SwapRoute {
 
 class TokenSwapService {
   private swapHistory: TokenSwap[] = [];
-  private swapStatusMap: Map<string, TokenSwap> = new Map();
+  private swapByIdMap: Map<string, TokenSwap> = new Map(); // Track swaps by unique ID
+  private latestSwapPerPairMap: Map<string, TokenSwap> = new Map(); // Track latest swap per pair
 
   /**
    * Generate a consistent key for token pair lookups
@@ -16,6 +17,13 @@ class TokenSwapService {
   private getSwapKey(fromToken: string, toToken: string): string {
     // Use pipe delimiter which is safe for addresses
     return `${fromToken.toLowerCase()}|${toToken.toLowerCase()}`;
+  }
+
+  /**
+   * Generate a unique ID for a swap
+   */
+  private generateSwapId(): string {
+    return `swap-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   }
 
   /**
@@ -63,6 +71,7 @@ class TokenSwapService {
     const route = await this.getBestRoute(chainId, fromToken, toToken, amount);
 
     const swap: TokenSwap = {
+      id: this.generateSwapId(),
       fromToken,
       toToken,
       amount,
@@ -73,18 +82,26 @@ class TokenSwapService {
     };
 
     this.swapHistory.push(swap);
-    // Add to map for O(1) lookups - initial status is 'pending'
-    const key = this.getSwapKey(fromToken, toToken);
-    this.swapStatusMap.set(key, swap);
+    
+    // Store by unique ID for tracking individual swaps
+    this.swapByIdMap.set(swap.id, swap);
+    
+    // Update latest swap per pair for quick status lookups
+    const pairKey = this.getSwapKey(fromToken, toToken);
+    this.latestSwapPerPairMap.set(pairKey, swap);
 
     // In production, this would execute the actual swap
     // For demo, simulate completion after delay
     setTimeout(() => {
-      // Only update if this swap is still the latest entry for this pair
-      const current = this.swapStatusMap.get(key);
-      if (current === swap) {
-        swap.status = 'completed';
-        this.swapStatusMap.set(key, swap);
+      // Update status using the unique ID to avoid race conditions
+      const swapToUpdate = this.swapByIdMap.get(swap.id);
+      if (swapToUpdate) {
+        swapToUpdate.status = 'completed';
+        // Update latest per pair if this is still the latest
+        const currentLatest = this.latestSwapPerPairMap.get(pairKey);
+        if (currentLatest?.id === swap.id) {
+          this.latestSwapPerPairMap.set(pairKey, swapToUpdate);
+        }
       }
     }, 2000);
 
@@ -131,11 +148,18 @@ class TokenSwapService {
   }
 
   /**
-   * Get swap status
+   * Get swap status by token pair (returns latest swap for that pair)
    */
   getSwapStatus(fromToken: string, toToken: string): TokenSwap | undefined {
-    // Use consistent key generation for O(1) lookup
-    return this.swapStatusMap.get(this.getSwapKey(fromToken, toToken));
+    // Use consistent key generation for O(1) lookup of latest swap per pair
+    return this.latestSwapPerPairMap.get(this.getSwapKey(fromToken, toToken));
+  }
+
+  /**
+   * Get swap by unique ID
+   */
+  getSwapById(id: string): TokenSwap | undefined {
+    return this.swapByIdMap.get(id);
   }
 }
 
