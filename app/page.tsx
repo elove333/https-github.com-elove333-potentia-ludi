@@ -1,23 +1,7 @@
-}
- /* IBM Plex Sans Fonts - Basic Integration */
-@font-face {
-    font-family: 'IBM Plex Sans';
-    font-style: normal;
-    font-weight: 400;
-    src: url(https://fonts.gstatic.com/s/ibmplexsans/v23/zYXGKVElMYYaJe8bpLHnCwDKr932-G7dytD-Dmu1swZSAXcomDVmadSD6llDB6g4tIWm6w.woff2) format('woff2');
-    font-display: swap;
-}
-
-/* Apply the Font Throughout */
-body {
-    font-family: 'IBM Plex Sans', sans-serif;
-    font-size: 16px;
-    color: #333;
-}
-import {'use client'};
+'use client';
 import { useState } from 'react';
- { 
-  import user Account, 
+import { 
+  useAccount, 
   useBalance 
 } from 'wagmi';
 import { 
