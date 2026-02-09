@@ -22,7 +22,7 @@ class TokenSwapService {
     // like 1inch, Paraswap, Matcha, etc.
     
     // Mock implementation
-    const routes = [
+    const availableRoutes = [
       {
         dex: 'Uniswap V3',
         path: [fromToken, toToken],
@@ -36,8 +36,8 @@ class TokenSwapService {
     ];
 
     // Return best route (highest output)
-    return routes.reduce((best, current) =>
-      parseFloat(current.estimatedOutput) > parseFloat(best.estimatedOutput) ? current : best
+    return availableRoutes.reduce((bestRoute, currentRoute) =>
+      parseFloat(currentRoute.estimatedOutput) > parseFloat(bestRoute.estimatedOutput) ? currentRoute : bestRoute
     );
   }
 
@@ -51,27 +51,27 @@ class TokenSwapService {
     amount: string,
     slippage: number = 0.5
   ): Promise<TokenSwap> {
-    const route = await this.getBestRoute(chainId, fromToken, toToken, amount);
+    const optimalRoute = await this.getBestRoute(chainId, fromToken, toToken, amount);
 
-    const swap: TokenSwap = {
+    const swapTransaction: TokenSwap = {
       fromToken,
       toToken,
       amount,
-      estimatedOutput: route.estimatedOutput,
-      route: route.path,
+      estimatedOutput: optimalRoute.estimatedOutput,
+      route: optimalRoute.path,
       slippage,
       status: 'pending',
     };
 
-    this.swapHistory.push(swap);
+    this.swapHistory.push(swapTransaction);
 
     // In production, this would execute the actual swap
     // For demo, simulate completion after delay
     setTimeout(() => {
-      swap.status = 'completed';
+      swapTransaction.status = 'completed';
     }, 2000);
 
-    return swap;
+    return swapTransaction;
   }
 
   /**
@@ -91,19 +91,19 @@ class TokenSwapService {
 
     // Find best token to swap from
     const availableTokens = Object.entries(userBalance)
-      .filter(([token, balance]) => token !== requiredToken && parseFloat(balance) > 0);
+      .filter(([tokenAddress, tokenBalance]) => tokenAddress !== requiredToken && parseFloat(tokenBalance) > 0);
 
     if (availableTokens.length === 0) {
       throw new Error('No tokens available for swap');
     }
 
     // For simplicity, use the first available token
-    const [fromToken, balance] = availableTokens[0];
+    const [sourceTokenAddress, sourceTokenBalance] = availableTokens[0];
 
     // Calculate amount to swap
-    const swapAmount = Math.min(parseFloat(balance), parseFloat(requiredAmount) * 1.1).toString();
+    const swapAmount = Math.min(parseFloat(sourceTokenBalance), parseFloat(requiredAmount) * 1.1).toString();
 
-    return await this.executeSwap(chainId, fromToken, requiredToken, swapAmount);
+    return await this.executeSwap(chainId, sourceTokenAddress, requiredToken, swapAmount);
   }
 
   /**
@@ -118,7 +118,7 @@ class TokenSwapService {
    */
   getSwapStatus(fromToken: string, toToken: string): TokenSwap | undefined {
     return this.swapHistory.find(
-      (swap) => swap.fromToken === fromToken && swap.toToken === toToken
+      (swapTransaction) => swapTransaction.fromToken === fromToken && swapTransaction.toToken === toToken
     );
   }
 }

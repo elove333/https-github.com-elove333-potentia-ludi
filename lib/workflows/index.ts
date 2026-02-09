@@ -64,7 +64,7 @@ export function getWorkflow(action: string) {
  * @returns Array of workflow metadata
  */
 export function getAllWorkflowMetadata() {
-  return Object.values(WORKFLOW_REGISTRY).map(w => w.metadata);
+  return Object.values(WORKFLOW_REGISTRY).map(workflowEntry => workflowEntry.metadata);
 }
 
 /**
@@ -114,9 +114,9 @@ export interface WorkflowResult<T = any> {
  * Execute a workflow by action name
  * Provides unified error handling and logging
  * 
- * @param action - Intent action name
- * @param params - Workflow-specific parameters
- * @param context - Execution context
+ * @param workflowAction - Intent action name
+ * @param workflowParams - Workflow-specific parameters
+ * @param executionContext - Execution context
  * @returns Workflow result
  * 
  * TODO: Add execution telemetry
@@ -124,48 +124,48 @@ export interface WorkflowResult<T = any> {
  * TODO: Add circuit breaker for failing workflows
  */
 export async function executeWorkflow<T = any>(
-  action: string,
-  params: any,
-  context: WorkflowContext
+  workflowAction: string,
+  workflowParams: any,
+  executionContext: WorkflowContext
 ): Promise<WorkflowResult<T>> {
-  const startTime = Date.now();
+  const workflowStartTime = Date.now();
   
   try {
-    const workflow = getWorkflow(action);
+    const registeredWorkflow = getWorkflow(workflowAction);
     
-    if (!workflow) {
+    if (!registeredWorkflow) {
       return {
         success: false,
         error: {
           code: 'WORKFLOW_NOT_FOUND',
-          message: `No workflow found for action: ${action}`,
+          message: `No workflow found for action: ${workflowAction}`,
         },
       };
     }
     
     // Execute workflow
     // Note: Type casting needed as registry has generic types
-    const result = await (workflow.execute as any)(params, context);
+    const workflowResult = await (registeredWorkflow.execute as any)(workflowParams, executionContext);
     
     return {
       success: true,
-      data: result,
+      data: workflowResult,
       metadata: {
-        executionTime: Date.now() - startTime,
+        executionTime: Date.now() - workflowStartTime,
       },
     };
-  } catch (error) {
-    console.error(`Workflow execution failed for ${action}:`, error);
+  } catch (executionError) {
+    console.error(`Workflow execution failed for ${workflowAction}:`, executionError);
     
     return {
       success: false,
       error: {
         code: 'WORKFLOW_EXECUTION_ERROR',
-        message: error instanceof Error ? error.message : 'Unknown error',
-        details: error,
+        message: executionError instanceof Error ? executionError.message : 'Unknown error',
+        details: executionError,
       },
       metadata: {
-        executionTime: Date.now() - startTime,
+        executionTime: Date.now() - workflowStartTime,
       },
     };
   }
@@ -175,13 +175,13 @@ export async function executeWorkflow<T = any>(
  * Validate workflow parameters
  * Each workflow should implement its own validation
  * 
- * @param action - Intent action name
- * @param params - Parameters to validate
+ * @param workflowAction - Intent action name
+ * @param parametersToValidate - Parameters to validate
  * @returns Validation result
  */
 export async function validateWorkflowParams(
-  action: string,
-  params: any
+  workflowAction: string,
+  parametersToValidate: any
 ): Promise<{
   valid: boolean;
   errors: string[];
@@ -189,10 +189,10 @@ export async function validateWorkflowParams(
   // TODO: Implement schema-based validation
   // For now, just check if workflow exists
   
-  if (!hasWorkflow(action)) {
+  if (!hasWorkflow(workflowAction)) {
     return {
       valid: false,
-      errors: [`Unknown workflow action: ${action}`],
+      errors: [`Unknown workflow action: ${workflowAction}`],
     };
   }
   
