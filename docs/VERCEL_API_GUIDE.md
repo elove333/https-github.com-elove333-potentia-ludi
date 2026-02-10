@@ -179,7 +179,10 @@ try {
 } catch (error) {
   if (error.response) {
     // The request was made and server responded with error status
-    const { code, message } = error.response.data.error;
+    const {
+      code = 'unknown_error',
+      message = 'An unexpected error occurred',
+    } = (error.response.data && error.response.data.error) || {};
     
     if (code === 'forbidden') {
       console.error('Authentication failed. Check your token.');
