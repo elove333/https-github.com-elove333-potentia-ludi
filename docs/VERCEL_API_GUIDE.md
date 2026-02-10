@@ -86,7 +86,7 @@ For CI/CD pipelines (GitHub Actions), add the token as a repository secret:
 
 ## Request Format
 
-All requests to the Vercel API must be encoded as **JSON** with the `Content-Type: application/json` header.
+For requests that include a body, the payload should be encoded as **JSON** and sent with the `Content-Type: application/json` header. When you expect a JSON response, you can also include `Accept: application/json` to indicate the desired response format.
 
 ### Example Request
 
