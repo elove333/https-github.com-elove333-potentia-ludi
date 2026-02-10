@@ -16,6 +16,8 @@ This guide provides comprehensive documentation for integrating with the Vercel 
 - [API Versioning](#api-versioning)
 - [Best Practices](#best-practices)
 - [Examples](#examples)
+- [Additional Resources](#additional-resources)
+- [Support](#support)
 
 ## Authentication
 
@@ -322,7 +324,7 @@ When the rate limit is exceeded, an error is returned with the status **429 Too 
 ### Handling Rate Limits
 
 ```javascript
-async function makeVercelRequest(config) {
+async function makeVercelRequest(config, retryCount = 0, maxRetries = 3) {
   try {
     const response = await axios(config);
     
@@ -336,16 +338,20 @@ async function makeVercelRequest(config) {
     return response.data;
   } catch (error) {
     if (error.response?.status === 429) {
-      const resetTime = error.response.headers['x-ratelimit-reset'];
-      const waitTime = (resetTime * 1000) - Date.now();
+      if (retryCount >= maxRetries) {
+        throw new Error(`Rate limit exceeded after ${maxRetries} retries`);
+      }
       
-      console.log(`Rate limit exceeded. Waiting ${waitTime}ms before retry...`);
+      const resetTime = parseInt(error.response.headers['x-ratelimit-reset'], 10);
+      const waitTime = Math.max(0, (resetTime * 1000) - Date.now());
       
-      // Wait until rate limit resets
+      console.log(`Rate limit exceeded. Waiting ${waitTime}ms before retry ${retryCount + 1}/${maxRetries}...`);
+      
+      // Wait until rate limit resets (with minimum 0ms)
       await new Promise(resolve => setTimeout(resolve, waitTime));
       
       // Retry request
-      return makeVercelRequest(config);
+      return makeVercelRequest(config, retryCount + 1, maxRetries);
     }
     throw error;
   }
