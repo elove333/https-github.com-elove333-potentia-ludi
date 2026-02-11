@@ -13,7 +13,6 @@ import { formatEther, Address } from 'viem';
 const TEST_WALLET: Address = '0x742d35Cc6634C0532925a3b8D7De2665B81b5fE4' as Address;
 } from 'wagmi/chains'; // Fixed: Explicit chain imports [web:44]
 import { formatEther, Address } from 'viem'; // Proper types [web:36]
-
 const TEST_WALLET: Address = '0x742d35Cc6634C0532925a3b8D7De2665B81b5fE4' as Address; // Test addr w/ Polygon test assets [web:37]
 const MOCK_NFT_COUNT = 12; // Placeholder until Alchemy NFT API integration
 
