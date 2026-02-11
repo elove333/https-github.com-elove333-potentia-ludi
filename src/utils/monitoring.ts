@@ -17,10 +17,10 @@ export abstract class PeriodicMonitor {
     // Update at specified interval with error handling
     this.updateInterval = setInterval(() => {
       try {
-        const result = this.performUpdate();
+        const updateResult = this.performUpdate();
         // Handle async performUpdate
-        if (result instanceof Promise) {
-          result.catch((error: unknown) => {
+        if (updateResult instanceof Promise) {
+          updateResult.catch((error: unknown) => {
             console.error('Error in periodic update:', error);
           });
         }
@@ -31,9 +31,9 @@ export abstract class PeriodicMonitor {
 
     // Initial update with error handling
     try {
-      const result = this.performUpdate();
-      if (result instanceof Promise) {
-        result.catch((error: unknown) => {
+      const initialResult = this.performUpdate();
+      if (initialResult instanceof Promise) {
+        initialResult.catch((error: unknown) => {
           console.error('Error in initial update:', error);
         });
       }
