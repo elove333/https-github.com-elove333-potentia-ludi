@@ -20,8 +20,7 @@ const MOCK_NFT_COUNT = 12; // Placeholder until Alchemy NFT API integration
 
 export default function Home() {
   const [demoMode, setDemoMode] = useState(false);
-  const [selectedChainId, setSelectedChainId] = useState<number>(polygon.id);
-
+  const [selectedChainId, setSelectedChain Id] = useState‹number>(polygon.id);
   const { address } = useAccount();
 
   // Type-safe balance hook: specify chainId explicitly
