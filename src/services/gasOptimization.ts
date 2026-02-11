@@ -134,8 +134,12 @@ class GasOptimizationService {
     transaction: Transaction
   ): Promise<Transaction> {
     // Track that we're preparing a transaction (increment before async operation)
+    // Track that we're preparing a transaction (increment before async operation)
     const wasIdle = this.pendingTransactions === 0;
     this.pendingTransactions++;
+    if (wasIdle) {
+      this.startGasMonitoring();
+    }
     
     // Restart monitoring if we were idle
     if (wasIdle) {
