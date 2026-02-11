@@ -25,7 +25,6 @@ const RewardsPanel: React.FC = () => {
     };
 
     fetchRewards();
-    
     // Poll to keep component in sync with service updates
     const updateInterval = setInterval(fetchRewards, 30000);
 

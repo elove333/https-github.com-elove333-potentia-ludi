@@ -66,11 +66,9 @@ class GameDetectionService {
 
       // Check on load and navigation
       checkUrl();
-      
       // Store handler reference for cleanup
       this.popStateHandler = checkUrl;
       window.addEventListener('popstate', this.popStateHandler);
-      
       // Check periodically but less aggressively (30s instead of 5s)
       // Store interval reference for cleanup
       this.urlCheckInterval = setInterval(checkUrl, 30000);
@@ -93,7 +91,6 @@ class GameDetectionService {
           detected: true,
           lastActive: new Date(),
         };
-        
         this.addDetectedGame(game);
         return;
       }

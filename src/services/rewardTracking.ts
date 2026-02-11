@@ -29,7 +29,6 @@ class RewardTrackingService {
    */
   private async updateRewards(walletAddress: string) {
     const chains = [1, 137, 56, 42161, 10, 8453];
-    
     // Fetch rewards in parallel for better performance
     await Promise.all(
       chains.map(async (chainId) => {
