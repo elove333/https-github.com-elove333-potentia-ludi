@@ -119,7 +119,7 @@ If not otherwise specified, responses from the Vercel API, including errors, are
 
 ```json
 {
-  "projects": [...],
+  "projects": [],
   "pagination": {
     "count": 20,
     "next": 1555072968396,
