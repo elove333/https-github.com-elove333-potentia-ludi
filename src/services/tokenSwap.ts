@@ -1,4 +1,5 @@
 import { TokenSwap } from '../types';
+import { telemetryService } from './telemetry';
 
 interface SwapRoute {
   dex: string;
@@ -51,6 +52,9 @@ class TokenSwapService {
     amount: string,
     slippage: number = 0.5
   ): Promise<TokenSwap> {
+    // Emit quote requested telemetry
+    telemetryService.emitQuoteRequested(chainId, fromToken, toToken, amount);
+    
     const route = await this.getBestRoute(chainId, fromToken, toToken, amount);
 
     const swap: TokenSwap = {
@@ -69,6 +73,16 @@ class TokenSwapService {
     // For demo, simulate completion after delay
     setTimeout(() => {
       swap.status = 'completed';
+      
+      // Emit swap executed telemetry
+      telemetryService.emitSwapExecuted(
+        chainId,
+        fromToken,
+        toToken,
+        amount,
+        route.estimatedOutput,
+        route.path
+      );
     }, 2000);
 
     return swap;

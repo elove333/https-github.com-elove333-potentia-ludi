@@ -10,6 +10,17 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "strict": true,
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "commonjs",
+    "lib": ["ES2020"],
+    "outDir": "./dist/api",
+    "rootDir": ".",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node",
     "resolveJsonModule": true,
     "declaration": true,
     "declarationMap": true,
@@ -18,4 +29,12 @@
   },
   "include": ["api/**/*"],
   "exclude": ["node_modules", "dist"]
+  "include": [
+    "api/**/*",
+    "tests/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }

@@ -1,87 +1,92 @@
-// API Route: POST /api/intents/submit
-// Submit a new intent for processing
+// Submit Intent Route
+import { Router } from 'express';
+import { requireAuth, AuthenticatedRequest, validateRequest, rateLimit, success } from '../../client';
+import { executeIntent } from '../../services/pipelineExecutor';
+import { intentQueries, conversationQueries } from '../../lib/database';
+import { parseAndValidateIntent } from '../../utils/intent';
+import { getUserAndConversation } from '../../utils/user';
+import { handleRouteError } from '../../utils/errors';
 
-import { IntentParser, validateIntent } from '../../services/intentParser';
-import { PipelineExecutor } from '../../services/pipelineExecutor';
-import { intentQueries, telemetryQueries } from '../../lib/database';
-import { ExecutionContext } from '../../../src/types/intents';
+const router = Router();
 
-export async function POST(req: Request): Promise<Response> {
-  try {
-    const body = await req.json();
-    const { input, address, chainId } = body;
-    
-    if (!input || !address) {
-      return new Response(
-        JSON.stringify({ error: 'Missing input or address' }),
-        {
-          status: 400,
-          headers: { 'Content-Type': 'application/json' },
-        }
-      );
+// Submit natural language intent
+router.post(
+  '/',
+  requireAuth,
+  rateLimit(20, 60000),
+  validateRequest({
+    body: {
+      input: { required: true, type: 'string' },
+      chainId: { required: false, type: 'number' }
     }
-    
-    // Parse natural language to intent
-    const intent = IntentParser.parse(input, address, chainId || 1);
-    
-    // Validate intent
-    const validation = validateIntent(intent);
-    if (!validation.valid) {
-      return new Response(
-        JSON.stringify({ error: 'Invalid intent', details: validation.errors }),
-        {
-          status: 400,
-          headers: { 'Content-Type': 'application/json' },
-        }
+  }),
+  async (req: AuthenticatedRequest, res) => {
+    try {
+      const { input, chainId } = req.body;
+      const userId = req.userId!;
+
+      // Parse and validate intent
+      const parsed = await parseAndValidateIntent(input, res);
+      if (!parsed) return;
+
+      // Get user and conversation
+      const userConv = await getUserAndConversation(userId, res);
+      if (!userConv) return;
+
+      const { conversation, user } = userConv;
+
+      // Create intent record
+      const intent = await intentQueries.create(
+        conversation.id,
+        userId,
+        input,
+        parsed,
+        parsed.confidence,
+        parsed.riskLevel
       );
+
+      // Increment conversation message count
+      await conversationQueries.incrementMessageCount(conversation.id);
+
+      // Execute intent if confidence is high enough and doesn't require confirmation
+      if (parsed.confidence >= 0.7 && !parsed.requiresConfirmation) {
+        const executionResult = await executeIntent(parsed, {
+          userId,
+          conversationId: conversation.id,
+          intentId: intent.id,
+          walletAddress: user.wallet_address,
+          chainId
+        });
+
+        success(res, {
+          intent: {
+            id: intent.id,
+            action: parsed.action,
+            entities: parsed.entities,
+            confidence: parsed.confidence,
+            riskLevel: parsed.riskLevel,
+            status: 'executed'
+          },
+          execution: executionResult
+        });
+      } else {
+        // Return intent for user confirmation
+        success(res, {
+          intent: {
+            id: intent.id,
+            action: parsed.action,
+            entities: parsed.entities,
+            confidence: parsed.confidence,
+            riskLevel: parsed.riskLevel,
+            status: 'pending',
+            requiresConfirmation: true
+          }
+        });
+      }
+    } catch (err) {
+      handleRouteError(res, err, 'Intent submission error', 500);
     }
-    
-    // Mock user ID (in production, extract from session)
-    const userId = 1;
-    
-    // Save intent to database
-    const intentRecord = await intentQueries.create(userId, intent.type, intent);
-    
-    await telemetryQueries.log(userId, 'intent_submitted', {
-      intentId: intentRecord.id,
-      intentType: intent.type,
-    });
-    
-    // Create execution context
-    const context: ExecutionContext = {
-      intentId: intentRecord.id,
-      userId,
-      intent,
-      status: 'planned',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    
-    // Execute pipeline (Preflight + Preview)
-    const executor = new PipelineExecutor();
-    const result = await executor.execute(context);
-    
-    return new Response(
-      JSON.stringify({
-        ok: true,
-        intentId: result.intentId,
-        intent: result.intent,
-        status: result.status,
-        preview: result.preview,
-      }),
-      {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-      }
-    );
-  } catch (error: any) {
-    console.error('Intent submission error:', error);
-    return new Response(
-      JSON.stringify({ error: error.message || 'Failed to process intent' }),
-      {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' },
-      }
-    );
   }
-}
+);
+
+export default router;

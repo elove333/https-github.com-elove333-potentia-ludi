@@ -1,63 +1,64 @@
-// API Route: POST /api/siwe/verify
-// Verify SIWE message and signature, create session
+// SIWE Verification Route
+import { Router } from 'express';
+import { authenticateWithSiwe } from '../../lib/auth';
+import { validateRequest, rateLimit, success, error } from '../../client';
 
-import { verifySiwe } from '../../lib/auth';
-import { telemetryQueries } from '../../lib/database';
+const router = Router();
 
-export async function POST(req: Request): Promise<Response> {
-  try {
-    const body = await req.json();
-    const { message, signature } = body;
-    
-    if (!message || !signature) {
-      return new Response(
-        JSON.stringify({ error: 'Missing message or signature' }),
-        {
-          status: 400,
-          headers: { 'Content-Type': 'application/json' },
-        }
-      );
+// Verify SIWE signature and create session
+router.post(
+  '/',
+  rateLimit(5, 60000),
+  validateRequest({
+    body: {
+      message: { required: true, type: 'string' },
+      signature: { required: true, type: 'string' },
+      nonce: { required: true, type: 'string' }
     }
-    
-    // Get user agent and IP from headers
-    const userAgent = req.headers.get('user-agent') || undefined;
-    const ip = req.headers.get('x-forwarded-for') || 
-               req.headers.get('x-real-ip') || 
-               undefined;
-    
-    // Verify SIWE
-    const result = await verifySiwe(message, signature, userAgent, ip);
-    
-    await telemetryQueries.log(result.userId, 'siwe_verified', {
-      address: result.address,
-      sessionId: result.sessionId,
-    });
-    
-    // Set session cookie (httpOnly, secure)
-    const response = new Response(
-      JSON.stringify({
-        ok: true,
-        address: result.address,
-        userId: result.userId,
-      }),
-      {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
+  }),
+  async (req, res) => {
+    try {
+      const { message, signature, nonce } = req.body;
+
+      // Get IP and user agent for session tracking
+      const ipAddress = req.ip;
+      const userAgent = req.get('user-agent');
+
+      // Authenticate with SIWE
+      const result = await authenticateWithSiwe(
+        message,
+        signature,
+        nonce,
+        ipAddress,
+        userAgent
+      );
+
+      // Set session cookie
+      res.cookie('session', result.sessionToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+      });
+
+      success(res, {
+        user: result.user,
+        sessionToken: result.sessionToken
+      });
+    } catch (err) {
+      console.error('SIWE verification error:', err);
+      
+      const errorMessage = err instanceof Error ? err.message : 'Verification failed';
+      
+      if (errorMessage.includes('Invalid signature') || 
+          errorMessage.includes('Nonce mismatch') || 
+          errorMessage.includes('expired')) {
+        error(res, errorMessage, 401);
+      } else {
+        error(res, 'Verification failed', 500);
       }
-    );
-    
-    // In production: Set httpOnly, secure cookie
-    // response.headers.set('Set-Cookie', `sessionId=${result.sessionId}; HttpOnly; Secure; SameSite=Strict; Max-Age=${7*24*60*60}`);
-    
-    return response;
-  } catch (error: any) {
-    console.error('SIWE verification error:', error);
-    return new Response(
-      JSON.stringify({ error: error.message || 'Verification failed' }),
-      {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      }
-    );
+    }
   }
-}
+);
+
+export default router;
