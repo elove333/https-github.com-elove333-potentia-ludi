@@ -18,6 +18,8 @@ This guide provides comprehensive documentation for integrating with the Vercel 
 - [Examples](#examples)
 - [Additional Resources](#additional-resources)
 - [Support](#support)
+- [Additional Resources](#additional-resources)
+- [Support](#support)
 
 ## Authentication
 
