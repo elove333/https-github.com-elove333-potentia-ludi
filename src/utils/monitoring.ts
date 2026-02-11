@@ -20,11 +20,11 @@ export abstract class PeriodicMonitor {
         const result = this.performUpdate();
         // Handle async performUpdate
         if (result instanceof Promise) {
-          result.catch((error) => {
+          result.catch((error: unknown) => {
             console.error('Error in periodic update:', error);
           });
         }
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Error in periodic update:', error);
       }
     }, intervalMs);
@@ -33,11 +33,11 @@ export abstract class PeriodicMonitor {
     try {
       const result = this.performUpdate();
       if (result instanceof Promise) {
-        result.catch((error) => {
+        result.catch((error: unknown) => {
           console.error('Error in initial update:', error);
         });
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error in initial update:', error);
     }
   }

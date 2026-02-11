@@ -38,7 +38,7 @@ class GasOptimizationService extends PeriodicMonitor {
       try {
         const gasPrice = await this.fetchGasPrice(chainId);
         this.gasPriceCache.set(chainId, gasPrice);
-      } catch (error) {
+      } catch (error: unknown) {
         console.error(`Failed to fetch gas price for chain ${chainId}:`, error);
       }
     }

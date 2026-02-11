@@ -31,7 +31,7 @@ class RewardTrackingService extends PeriodicMonitor {
       try {
         const rewards = await this.fetchRewardsForChain(walletAddress, chainId);
         this.trackedRewards.set(`${walletAddress}-${chainId}`, rewards);
-      } catch (error) {
+      } catch (error: unknown) {
         console.error(`Failed to fetch rewards for chain ${chainId}:`, error);
       }
     }

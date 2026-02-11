@@ -83,7 +83,7 @@ class CircleWalletService {
       this.initialized = true;
       console.log('✅ Circle Wallet Service initialized successfully');
       console.log(`📊 Supporting ${this.supportedChains.length} chains`);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('❌ Failed to initialize Circle Wallet Service:', error);
       throw error;
     }

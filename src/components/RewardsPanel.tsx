@@ -37,7 +37,7 @@ const RewardsPanel: React.FC = () => {
       // Refresh rewards
       const allRewards = rewardTrackingService.getAllRewards(wallet.address);
       setRewards(allRewards);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to claim reward:', error);
     }
   };

@@ -62,7 +62,7 @@ class SolanaIntegrationService {
       
       this.initialized = true;
       console.log('✅ Solana Integration initialized successfully');
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('❌ Failed to initialize Solana Integration:', error);
       throw error;
     }
@@ -104,7 +104,7 @@ class SolanaIntegrationService {
 
       console.log(`✅ Connected to Solana wallet: ${address}`);
       return this.connectedWallet;
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('❌ Failed to connect Solana wallet:', error);
       throw error;
     }
@@ -208,7 +208,7 @@ class SolanaIntegrationService {
       
       console.log(`✅ Burn completed: ${operation.signature}`);
       return operation;
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('❌ Burn failed:', error);
       operation.status = 'failed';
       throw error;
@@ -254,7 +254,7 @@ class SolanaIntegrationService {
       
       console.log(`✅ Mint completed: ${operation.signature}`);
       return operation;
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('❌ Mint failed:', error);
       operation.status = 'failed';
       throw error;

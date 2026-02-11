@@ -264,7 +264,7 @@ class CrossChainBridgeService {
       this.executeTransfer(transfer);
 
       return transfer;
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof BridgeError) {
         console.error(`❌ Bridge error [${error.code}]:`, error.message);
         if (error.supportedChains) {
@@ -302,7 +302,7 @@ class CrossChainBridgeService {
       
       // Track timeout for cleanup
       this.pendingTimeouts.set(transfer.id, timeoutId);
-    } catch (error) {
+    } catch (error: unknown) {
       transfer.status = 'failed';
       transfer.error = error instanceof Error ? error.message : 'Unknown error';
       console.error(`❌ Transfer failed: ${transfer.id}`, error);

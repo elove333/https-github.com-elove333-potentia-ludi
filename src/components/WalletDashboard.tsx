@@ -28,7 +28,7 @@ const WalletDashboard: React.FC = () => {
         balance: '1.5',
         isConnected: true,
       });
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to connect wallet:', error);
     } finally {
       setIsConnecting(false);
