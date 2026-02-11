@@ -181,7 +181,7 @@ export async function executeWorkflow<T = any>(
  */
 export async function validateWorkflowParams(
   workflowAction: string,
-  parametersToValidate: any
+  _parametersToValidate: any
 ): Promise<{
   valid: boolean;
   errors: string[];

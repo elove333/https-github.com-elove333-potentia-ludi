@@ -69,7 +69,7 @@ const intentPatterns = [
 // Calculate confidence score based on pattern match
 function calculateConfidence(
   userInput: string,
-  patternRegex: RegExp,
+  _patternRegex: RegExp,
   extractedEntities: Record<string, any>
 ): number {
   let confidenceScore = 0.7; // Base confidence for pattern match
