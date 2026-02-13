@@ -22,6 +22,7 @@ console.log('Validating JSON files...\n');
 
 jsonFiles.forEach(file => {
   const filePath = path.join(process.cwd(), file);
+  let content;
   
   try {
     if (!fs.existsSync(filePath)) {
@@ -29,16 +30,15 @@ jsonFiles.forEach(file => {
       return;
     }
     
-    const content = fs.readFileSync(filePath, 'utf8');
+    content = fs.readFileSync(filePath, 'utf8');
     JSON.parse(content);
     console.log(`✓ ${file}: Valid JSON`);
   } catch (error) {
     hasErrors = true;
     console.error(`✗ ${file}: ${error.message}`);
     
-    if (error instanceof SyntaxError) {
+    if (error instanceof SyntaxError && content) {
       // Try to provide more context about the error
-      const lines = content.split('\n');
       const errorPosition = error.message.match(/position (\d+)/);
       if (errorPosition) {
         const pos = parseInt(errorPosition[1], 10);
