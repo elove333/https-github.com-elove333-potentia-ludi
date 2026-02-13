@@ -1,36 +1,34 @@
 import { ChainReward } from '../types';
+import { telemetryService } from './telemetry';
+import { SUPPORTED_CHAIN_IDS, CHAIN_NAMES } from '../constants/chains';
+import { PeriodicMonitor } from '../utils/monitoring';
 
-class RewardTrackingService {
+class RewardTrackingService extends PeriodicMonitor {
   private trackedRewards: Map<string, ChainReward[]> = new Map();
-  private updateInterval: NodeJS.Timeout | null = null;
+  private currentWalletAddress: string | null = null;
 
   /**
    * Initialize reward tracking
    */
   init(walletAddress: string) {
-    this.startRewardTracking(walletAddress);
+    this.currentWalletAddress = walletAddress;
+    this.startMonitoring(30000); // Update every 30 seconds
   }
 
   /**
-   * Start tracking rewards across all chains
+   * Implementation of periodic update
    */
-  private startRewardTracking(walletAddress: string) {
-    // Update rewards every 30 seconds
-    this.updateInterval = setInterval(() => {
-      this.updateRewards(walletAddress);
-    }, 30000);
-
-    // Initial update
-    this.updateRewards(walletAddress);
+  protected async performUpdate() {
+    if (this.currentWalletAddress) {
+      await this.updateRewards(this.currentWalletAddress);
+    }
   }
 
   /**
    * Update rewards from all chains
    */
   private async updateRewards(walletAddress: string) {
-    const chains = [1, 137, 56, 42161, 10, 8453];
-    
-    for (const chainId of chains) {
+    for (const chainId of SUPPORTED_CHAIN_IDS) {
       try {
         const rewards = await this.fetchRewardsForChain(walletAddress, chainId);
         this.trackedRewards.set(`${walletAddress}-${chainId}`, rewards);
@@ -49,21 +47,33 @@ class RewardTrackingService {
   ): Promise<ChainReward[]> {
     // In production, this would query blockchain data
     // For demo, return mock rewards
-    const chainNames: Record<number, string> = {
-      1: 'Ethereum',
-      137: 'Polygon',
-      56: 'BSC',
-      42161: 'Arbitrum',
-      10: 'Optimism',
-      8453: 'Base',
-    };
 
     // Simulate some rewards
     if (Math.random() > 0.5) {
+      const reward: ChainReward = {
+        chainId,
+        chainName: chainNames[chainId] || `Chain ${chainId}`,
+        tokenAddress: '0x1234567890123456789012345678901234567890',
+        tokenSymbol: 'GAME',
+        amount: (Math.random() * 100).toFixed(2),
+        usdValue: Math.random() * 500,
+        claimable: Math.random() > 0.3,
+      };
+      
+      // Emit telemetry event for reward found
+      telemetryService.emitRewardFound(
+        chainId,
+        reward.tokenSymbol,
+        reward.amount,
+        reward.usdValue,
+        'gameplay'
+      );
+      
+      return [reward];
       return [
         {
           chainId,
-          chainName: chainNames[chainId] || `Chain ${chainId}`,
+          chainName: CHAIN_NAMES[chainId] || `Chain ${chainId}`,
           tokenAddress: '0x1234567890123456789012345678901234567890',
           tokenSymbol: 'GAME',
           amount: (Math.random() * 100).toFixed(2),
@@ -120,19 +130,18 @@ class RewardTrackingService {
     // In production, this would execute the claim transaction
     console.log(`Claiming reward:`, reward);
     
+    // Emit telemetry event for reward claimed
+    const txHash = `0x${Math.random().toString(16).substring(2, 66)}`;
+    telemetryService.emitRewardClaimed(
+      reward.chainId,
+      reward.tokenSymbol,
+      reward.amount,
+      txHash
+    );
+    
     // Simulate claim
     reward.claimable = false;
     return true;
-  }
-
-  /**
-   * Clean up resources
-   */
-  cleanup() {
-    if (this.updateInterval) {
-      clearInterval(this.updateInterval);
-      this.updateInterval = null;
-    }
   }
 }
 

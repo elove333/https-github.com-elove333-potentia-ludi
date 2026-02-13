@@ -2,6 +2,20 @@
 
 A conversational Web3 wallet hub that translates natural language into typed intents (balances, swaps, bridges, claims) and safely executes them through a Planner → Executor pipeline:
 Parse → Preflight (balances/allowances, quote, simulate) → Preview (human-readable risk checks) → Build (Permit2/approve + action) → Wallet.
+# Potentia Ludi 🎮💬
+
+## Conversational Web3 Wallet Hub
+
+A Universal On-Chain Gaming Wallet Hub with natural language capabilities – interact with Web3 through simple conversations. Just say "swap 100 USDC to ETH" or "show my NFT balance" and let AI handle the complexity. The app auto-detects games, optimizes gas, swaps tokens, tracks rewards across chains, and generates creator-ready clips.
+
+## What Makes This Different?
+
+Unlike traditional Web3 wallets that require navigating complex UIs and understanding technical jargon:
+- **Natural Language First**: Speak or type commands naturally - "send 0.1 ETH to vitalik.eth"
+- **Context-Aware**: Remembers your conversation and preferences
+- **Safety by Design**: AI-powered risk scoring and transaction simulation before execution
+- **Multi-Chain Native**: Seamlessly operate across Ethereum, Polygon, Arbitrum, Optimism, Base, and BSC
+- **Gaming Focused**: Automatic game detection and reward tracking built-in
 
 This project focuses on non-custodial UX, SIWE authentication, and opt-in telemetry for analytics.
 
@@ -14,6 +28,90 @@ Quickstart (local)
 ------------------
 1. Clone
 
+## 💬 Conversational Features
+<!-- CHUNK: Conversational Features - Natural Language Interface (max 800 chars) -->
+**Natural Language Interface (Coming Soon)**
+- Natural language processing for all Web3 operations
+- AI-powered intent recognition and entity extraction
+- Multi-turn conversations with context awareness
+- Voice and text input support
+- Real-time streaming responses
+- Smart clarification questions for ambiguous requests
+
+**Conversational Commands**
+- Text-based commands like "Show my balance on Polygon"
+- Voice input for hands-free gaming interactions
+- Smart confirmations with AI-powered risk assessment
+- Context memory for natural conversation flow
+<!-- END CHUNK -->
+
+## 🎮 Gaming Features
+<!-- CHUNK: Gaming Features - Core Functionality (max 800 chars) -->
+**🔍 Auto Game Detection**
+- Automatically detects Web3 games when you open them
+- Monitors known gaming platforms across multiple chains
+- Supports Axie Infinity, Gods Unchained, The Sandbox, Decentraland, and more
+- Custom game addition support
+
+**🎬 Creator-Ready Clips & Stats**
+- Automatic recording of gaming sessions
+- Real-time stats overlay generation
+- Track transactions, gas spent, rewards earned, and win rates
+- Export clips with professional stats overlays
+- Social media ready format
+<!-- END CHUNK -->
+
+## ⛓️ Blockchain Features
+<!-- CHUNK: Blockchain Features - Transaction Management (max 800 chars) -->
+**⛽ Gas Optimization**
+- Real-time gas price monitoring across all major chains
+- Automatic transaction optimization to reduce costs
+- Smart scheduling for non-urgent transactions
+- Average savings of 30% on gas fees
+
+**🔄 Automatic Token Swaps**
+- Behind-the-scenes token swapping when games need specific tokens
+- Aggregates best routes from multiple DEX platforms
+- Minimal slippage with optimal routing
+- Supports all major tokens and chains
+
+**🏆 Multi-Chain Reward Tracking**
+- Tracks rewards across Ethereum, Polygon, BSC, Arbitrum, Optimism, and Base
+- Real-time USD value calculation
+- One-click reward claiming
+- Comprehensive reward history
+<!-- END CHUNK -->
+
+## Technology Stack
+
+## Current Implementation
+- **Frontend**: React 18 + TypeScript
+- **State Management**: Zustand
+- **Web3 Integration**: Ethers.js v6, Wagmi, Viem
+- **Multi-Chain Wallets**: Circle BridgeKit (`@circle-fin/adapter-circle-wallets v1.0.0`)
+- **Solana Support**: Circle Solana Kit (`@circle-fin/adapter-solana-kit v1.0.0`)
+- **Cross-Chain Bridging**: Circle Bridge Kit (`@circle-fin/bridge-kit v1.1.2`, `@circle-fin/provider-cctp-v2 v1.0.4`)
+- **Build Tool**: Vite
+- **Styling**: Inline styles with CSS animations
+
+## Conversational Hub Stack (Planned)
+- **Framework**: Next.js 16 (App Router)
+- **Runtime**: Node.js 24 LTS
+- **AI/NLP**: OpenAI Responses API (GPT-4)
+- **Database**: PostgreSQL 16+
+- **Cache**: Redis 7+
+- **Authentication**: Sign-In with Ethereum (SIWE)
+
+## Getting Started
+
+## Prerequisites
+- Node.js 18+ and npm (Node.js 24+ recommended for full conversational features)
+- PostgreSQL 16+ (for conversational features)
+- Redis 7+ (for conversational features)
+
+## Installation
+
+1. Clone the repository:
 ```bash
 git clone https://github.com/elove333/https-github.com-elove333-potentia-ludi.git
 cd https-github.com-elove333-potentia-ludi
@@ -21,11 +119,24 @@ cd https-github.com-elove333-potentia-ludi
 
 2. Create a branch (optional)
 
+3. Set up environment variables (for conversational features):
+```bash
+cp .env.example .env.local
+# Edit .env.local with your configuration:
+# - OPENAI_API_KEY=your_openai_api_key
+# - DATABASE_URL=postgresql://user:pass@localhost:5432/potentia
+# - REDIS_URL=redis://localhost:6379
+```
+
+4. Start the development server:
 ```bash
 git checkout -b my-dev-branch
 ```
 
 3. Install
+5. Open http://localhost:3000 in your browser
+
+### Building for Production
 
 ```bash
 npm install
@@ -37,6 +148,222 @@ npm install
 cp .env.example .env
 # Edit .env and set DATABASE_URL and any external API keys you plan to use.
 ```
+The build output will be in the `dist` directory.
+
+### Deploying to Vercel
+
+This project includes automated deployment to Vercel via GitHub Actions. For manual deployments and API integrations, see our comprehensive [Vercel API Integration Guide](./docs/VERCEL_API_GUIDE.md).
+
+**What's covered in the guide:**
+- Creating and managing Vercel Access Tokens
+- Authentication and security best practices
+- API request/response formats
+- Pagination and rate limiting
+- Team resource access
+- Complete code examples
+
+For CI/CD setup, the `.github/workflows/deploy.yml` workflow handles automatic deployments on push to any branch.
+
+## Infrastructure Management with doctl
+
+### Overview
+
+This project uses `doctl` (DigitalOcean CLI) to streamline infrastructure management for hosting the application and backend services. The integration supports deployment, scaling, and resource monitoring for the Potentia Ludi project.
+
+### Installing doctl
+
+#### macOS
+```bash
+brew install doctl
+```
+
+#### Linux
+```bash
+cd ~
+wget https://github.com/digitalocean/doctl/releases/download/v1.104.0/doctl-1.104.0-linux-amd64.tar.gz
+tar xf ~/doctl-1.104.0-linux-amd64.tar.gz
+sudo mv ~/doctl /usr/local/bin
+```
+
+> **Note:** Check for the latest version at [doctl releases](https://github.com/digitalocean/doctl/releases)
+
+#### Windows
+```bash
+# Using Chocolatey
+choco install doctl
+
+# Or download from https://github.com/digitalocean/doctl/releases
+```
+
+### Authentication Setup
+
+1. Create a DigitalOcean API token:
+   - Log in to your DigitalOcean account
+   - Navigate to API → Tokens/Keys
+   - Click "Generate New Token"
+   - Give it a name and select read/write access
+   - Copy the generated token
+
+2. Authenticate doctl:
+```bash
+doctl auth init
+```
+Enter your API token when prompted.
+
+3. Verify authentication:
+```bash
+doctl account get
+```
+
+### Managing Infrastructure
+
+#### List Droplets
+```bash
+doctl compute droplet list
+```
+
+#### Create a Droplet
+```bash
+doctl compute droplet create potentia-ludi-app \
+  --image ubuntu-22-04-x64 \
+  --size s-1vcpu-1gb \
+  --region nyc3 \
+  --ssh-keys YOUR_SSH_KEY_ID
+```
+
+#### Deploy Using Helper Script
+The repository includes a deployment helper script for automated infrastructure setup:
+
+```bash
+# Make the script executable (first time only)
+chmod +x scripts/deploy.sh
+
+# View available options
+./scripts/deploy.sh --help
+
+# Run the deployment script (requires SSH key ID)
+./scripts/deploy.sh --ssh-key-id YOUR_SSH_KEY_ID
+
+# With custom configuration
+./scripts/deploy.sh --droplet-name my-app --region nyc3 --size s-2vcpu-4gb --ssh-key-id YOUR_SSH_KEY_ID
+```
+
+Get your SSH key ID: `doctl compute ssh-key list`
+
+See `scripts/deploy.sh` for detailed usage and configuration options.
+
+## Usage
+
+<!-- CHUNK: Usage - Current Features Workflow (max 800 chars) -->
+## Current Features Workflow
+1. **Connect Your Wallet**: Click "Connect Wallet" to link your Web3 wallet
+2. **Enable Features**: Toggle gas optimization and auto-swap features as needed
+3. **Play Games**: Open any supported Web3 game, and it will be auto-detected
+4. **Record Sessions**: Click "Record" on any detected game to capture your gameplay
+5. **Track Rewards**: Monitor your cross-chain rewards in real-time
+6. **View Clips**: Access your recorded clips with embedded stats overlays
+<!-- END CHUNK -->
+
+<!-- CHUNK: Usage - Conversational Interface (max 800 chars) -->
+## Conversational Features Usage (Coming Soon)
+**Text Command Examples**:
+- "Show my balance on Polygon" - Query balances on specific chains
+- "Swap 100 USDC for ETH" - Execute token swaps with natural language
+- "What are my NFTs worth?" - Get NFT portfolio valuation
+- "Bridge 10 MATIC to Arbitrum" - Cross-chain asset transfers
+
+**Voice Interaction**:
+- Speak commands hands-free while gaming
+- Voice input automatically converted to actions
+- Real-time audio feedback on transaction status
+
+**Smart Safety Features**:
+- AI reviews transactions before execution
+- Risk assessment on potentially dangerous operations
+- Automatic confirmation prompts for high-value transactions
+- Context-aware clarification questions
+<!-- END CHUNK -->
+
+## Architecture
+
+## Current Architecture
+**Core Services**:
+- **gameDetection.ts**: Monitors URLs and blockchain transactions to detect Web3 games
+- **gasOptimization.ts**: Tracks gas prices and optimizes transaction parameters
+- **tokenSwap.ts**: Handles automatic token swapping with DEX aggregation
+- **rewardTracking.ts**: Monitors and tracks rewards across multiple chains
+- **clipGenerator.ts**: Records gameplay and generates clips with stats overlays
+
+**State Management**:
+- **gamingWalletStore.ts**: Zustand store managing wallet state, games, rewards, and clips
+
+**Components**:
+- **App.tsx**: Main application container
+- **WalletDashboard.tsx**: Wallet connection and feature toggles
+- **DetectedGames.tsx**: Shows auto-detected games with recording controls
+- **RewardsPanel.tsx**: Displays cross-chain rewards with claim functionality
+- **ClipsGallery.tsx**: Gallery of recorded clips with stats
+
+## 🔧 Workflow Modules Architecture (Planned)
+<!-- CHUNK: Workflow Modules - Intent & Execution System (max 800 chars) -->
+**Workflow Modules** - Modular intent handlers for Web3 operations:
+- `balances.get`: Query token and NFT balances across chains
+- `trade.swap`: Execute token swaps with DEX aggregation
+- `bridge.transfer`: Cross-chain asset bridging
+- `nft.transfer`: NFT transfers and marketplace interactions
+- `portfolio.analyze`: Portfolio valuation and analytics
+
+**Processing Pipeline**:
+1. Natural Language Processing (OpenAI Responses API integration)
+2. Intent Resolution Layer (parser, validator, risk scorer)
+3. Workflow Module Routing (intent → action mapping)
+4. Execution Layer (RPC gateway, transaction builder, simulator)
+5. Data Layer (PostgreSQL for state, Redis for caching)
+6. Safety Policies (SIWE authentication, risk assessment)
+
+See [ARCHITECTURE.md](./ARCHITECTURE.md) for complete specifications.
+<!-- END CHUNK -->
+
+## Multi-Chain Wallet & Bridge Integration
+
+Potentia Ludi integrates Circle BridgeKit for enterprise-grade multi-chain wallet management and cross-chain bridging:
+
+### Features
+- 🌐 **16+ Supported Chains**: Ethereum, Base, Arbitrum, Polygon, Optimism, Avalanche, BSC, Solana, and testnets
+- 🔄 **Cross-Chain Transfers**: USDC bridging via CCTP (Cross-Chain Transfer Protocol)
+- ☀️ **Native Solana Support**: Automatic ATA creation, burn + mint functionality
+- 🛡️ **Enhanced Safety**: Prevents fund loss on unsupported routes with clear error messages
+- ⚡ **Fast Transfers**: As fast as 1 minute for Solana transfers
+
+For complete integration guide, see [Circle BridgeKit Documentation](./docs/CIRCLE_BRIDGEKIT.md).
+
+## Supported Chains
+
+### Mainnet
+- Ethereum (Chain ID: 1)
+- Base (Chain ID: 8453)
+- Arbitrum (Chain ID: 42161)
+- Polygon (Chain ID: 137)
+- Optimism (Chain ID: 10)
+- Avalanche (Chain ID: 43114)
+- BSC (Chain ID: 56)
+- Solana (Chain ID: 1399811149)
+
+### Testnets
+- Sepolia (Chain ID: 11155111)
+- Base Sepolia (Chain ID: 84532)
+- Arbitrum Sepolia (Chain ID: 421614)
+- Polygon Amoy (Chain ID: 80002)
+- Optimism Sepolia (Chain ID: 11155420)
+- Solana Devnet (Chain ID: 1399811150)
+
+## Supported Games
+
+- Axie Infinity (Ronin)
+- Gods Unchained (IMX)
+- The Sandbox (Ethereum)
+- Decentraland (Polygon)
+- Custom game support
 
 5. Database
 
@@ -52,12 +379,108 @@ psql -d potentia_ludi -f database/schema.sql
 ```bash
 npm run api:dev
 ```
+## Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+- `npm run lint` - Run ESLint
+- `npm test` - Run unit tests
+
+## API Endpoints
+
+### Webhook Endpoints
+
+The application includes webhook endpoints for receiving and processing game events from external systems:
+
+- **`POST /api/webhooks/game-event-transfer`** - Receives game event transfers with HMAC signature verification
+- **`POST /api/webhooks/test`** - Test endpoint for simulating webhook requests
+
+**Key Features:**
+- ✅ HMAC-SHA256 signature verification for security
+- ✅ Rate limiting (100 req/min for main endpoint, 10 req/min for test)
+- ✅ Comprehensive emoji-coded logging (🔗📊✅❌💾)
+- ✅ Database event logging via telemetry system
+- ✅ Input validation and error handling
+
+For complete webhook documentation, setup instructions, and security best practices, see [docs/WEBHOOK_ENDPOINTS.md](./docs/WEBHOOK_ENDPOINTS.md).
+
+### Vercel API Integration
+
+The project is deployed on Vercel with automated CI/CD through GitHub Actions. For developers who need to interact with the Vercel API programmatically:
+
+- **[Vercel API Integration Guide](./docs/VERCEL_API_GUIDE.md)** - Comprehensive guide covering:
+  - Creating and managing Access Tokens
+  - Authentication patterns
+  - Pagination and rate limiting
+  - Team resource access
+  - Complete code examples
 
 - Health: http://localhost:3001/health
 - SIWE endpoints: /api/siwe/*
 - Intent endpoints: /api/intents/*
 
 7. Run tests
+Contributions are welcome! This project is evolving to include conversational AI features alongside the existing gaming wallet capabilities.
+
+## How to Contribute
+
+1. **Fork and Clone**: Fork this repository and clone your fork locally
+2. **Create a Branch**: `git checkout -b feature/your-feature-name`
+3. **Make Changes**: Follow the code style and architecture patterns
+4. **Test**: Ensure your changes work and don't break existing features
+5. **Submit PR**: Open a pull request with a clear description
+
+For detailed contributing guidelines, see [CONTRIBUTING.md](./CONTRIBUTING.md).
+
+**Need help with Git workflows?** Check out our [Git Workflows Guide](./GIT_WORKFLOWS.md) for practical examples of cherry-picking, resolving conflicts, and safely rewriting history.
+
+## Areas for Contribution
+
+**Current Features** (Vite + React):
+- Improve game detection algorithms
+- Add support for new gaming platforms
+- Enhance clip generation with more stats
+- Optimize gas prediction algorithms
+
+**Conversational Features** (Next.js + AI):
+- Implement NL → Intent pipeline components
+- Add new workflow modules (e.g., `nft.transfer`, `portfolio.analyze`)
+- Improve intent recognition accuracy
+- Enhance safety validation rules
+- Build UI components for conversational interface
+
+## Extension Points
+
+The architecture is designed for modularity. See [ARCHITECTURE.md](./ARCHITECTURE.md) for:
+- **Adding New Workflows**: Guide for implementing custom intent handlers
+- **Integrating New APIs**: How to add DEX aggregators, bridge providers, etc.
+- **Extending Intent Recognition**: Adding new command types and entities
+- **Custom Safety Rules**: Implementing domain-specific validation
+
+## Development Setup
+
+See the detailed contributor guidelines in [ARCHITECTURE.md](./ARCHITECTURE.md#contributor-guidelines) for:
+- Local environment setup
+- Code organization patterns
+- Testing strategies
+- Security best practices
+
+## Security & Compliance
+
+### GitHub Enterprise Security Features
+
+For organizations using GitHub Enterprise, we provide comprehensive guidance for configuring advanced security features:
+
+- **IP Allow Lists**: Restrict repository access to trusted IP ranges
+- **Audit Log Streaming**: Real-time audit log streaming to SIEM (Splunk, Azure, AWS)
+- **Repository Rulesets**: Enforce commit signing, branch protection, and naming conventions
+
+See [GitHub Enterprise Security Guide](./docs/GITHUB_ENTERPRISE_SECURITY.md) for detailed configuration instructions.
+
+### Security Advisories
+
+For information about current security vulnerabilities and mitigation strategies, see [SECURITY_ADVISORY.md](./docs/SECURITY_ADVISORY.md).
 
 ```bash
 npm test

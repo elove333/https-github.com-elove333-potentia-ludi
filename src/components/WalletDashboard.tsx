@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useGamingWalletStore } from '../store/gamingWalletStore';
+import NetworkStatus from './NetworkStatus';
 
 const WalletDashboard: React.FC = () => {
   const {
@@ -57,6 +58,8 @@ const WalletDashboard: React.FC = () => {
   return (
     <div style={styles.container}>
       <h2 style={styles.heading}>💼 Wallet</h2>
+      
+      <NetworkStatus />
       
       <div style={styles.walletInfo}>
         <div style={styles.infoRow}>

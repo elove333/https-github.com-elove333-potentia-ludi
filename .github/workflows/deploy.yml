@@ -1,0 +1,48 @@
+name: Deploy to Vercel
+
+on:
+  push:
+    branches:
+      - 'main'
+  repository_dispatch:
+    types:
+      - vercel.deployment.success
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # Only run if Vercel token is available
+    if: ${{ secrets.VERCEL_TOKEN }}
+    permissions:
+      contents: read
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install Vercel CLI
+        run: npm install -g vercel
+      - name: Pull Environment Variables
+        run: vercel pull --yes --environment=preview --token=$VERCEL_TOKEN
+      - name: Build Project
+        run: vercel build --token=$VERCEL_TOKEN
+      - name: Deploy to Vercel
+        run: vercel deploy --prebuilt --token=$VERCEL_TOKEN
+        if: github.ref != 'refs/heads/main'
+      - name: Pull Production Environment Variables
+        if: github.ref == 'refs/heads/main'
+        run: vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+      - name: Deploy to Production
+        run: vercel deploy --prod --prebuilt --token=$VERCEL_TOKEN
+        if: github.ref == 'refs/heads/main'
+      - name: Trigger End-to-End Tests
+        if: github.event.action == 'vercel.deployment.success'
+        run: |
+          echo 'Triggering end-to-end tests...';
+          # Insert the command to run Playwright or test suite here

@@ -10,4 +10,15 @@
     "REDIS_URL": "@redis-url",
     "ALCHEMY_API_KEY": "@alchemy-api-key"
   }
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "framework": null,
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
 }
