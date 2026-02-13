@@ -65,6 +65,9 @@
     "@paulmillr/qr": "npm:qr@^0.5.4",
     "@walletconnect/sign-client": "^2.23.5",
     "@walletconnect/universal-provider": "^2.23.5",
-    "@walletconnect/ethereum-provider": "^2.23.5"
+    "@walletconnect/ethereum-provider": "^2.23.5",
+    "rimraf": "^6.0.0",
+    "glob": "^13.0.0",
+    "inflight": "npm:lru-cache@^11.0.0"
   }
 }
