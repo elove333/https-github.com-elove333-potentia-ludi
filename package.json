@@ -8,7 +8,9 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint src app",
-    "test": "vitest"
+    "test": "vitest",
+    "validate:json": "node scripts/validate-json.js",
+    "prebuild": "npm run validate:json"
   },
   "keywords": [
     "web3",
