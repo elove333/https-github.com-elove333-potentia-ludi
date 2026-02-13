@@ -159,4 +159,4 @@ export default function Home() {
 }
 const switchChain: (chainId: number) => void = (chainId) => {
     setSelectedChainId(chainId);
-};
+}
