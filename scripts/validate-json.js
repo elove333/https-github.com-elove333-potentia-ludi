@@ -22,7 +22,6 @@ console.log('Validating JSON files...\n');
 
 jsonFiles.forEach(file => {
   const filePath = path.join(process.cwd(), file);
-  let content;
   
   try {
     if (!fs.existsSync(filePath)) {
@@ -30,20 +29,26 @@ jsonFiles.forEach(file => {
       return;
     }
     
-    content = fs.readFileSync(filePath, 'utf8');
+    const content = fs.readFileSync(filePath, 'utf8');
     JSON.parse(content);
     console.log(`✓ ${file}: Valid JSON`);
   } catch (error) {
     hasErrors = true;
     console.error(`✗ ${file}: ${error.message}`);
     
-    if (error instanceof SyntaxError && content) {
-      // Try to provide more context about the error
+    // Only try to show context for SyntaxError from JSON.parse
+    if (error instanceof SyntaxError) {
       const errorPosition = error.message.match(/position (\d+)/);
       if (errorPosition) {
-        const pos = parseInt(errorPosition[1], 10);
-        const context = content.substring(Math.max(0, pos - 50), Math.min(content.length, pos + 50));
-        console.error(`   Context: ...${context}...`);
+        try {
+          // Re-read file to show error context
+          const content = fs.readFileSync(filePath, 'utf8');
+          const pos = parseInt(errorPosition[1], 10);
+          const context = content.substring(Math.max(0, pos - 50), Math.min(content.length, pos + 50));
+          console.error(`   Context: ...${context}...`);
+        } catch (readError) {
+          // Ignore errors when trying to show context
+        }
       }
     }
   }
