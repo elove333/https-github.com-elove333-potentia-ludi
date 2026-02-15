@@ -13,7 +13,9 @@
     "api:build": "tsc -p tsconfig.api.json",
     "db:setup": "psql -d potentia_ludi -f database/schema.sql"
     "lint": "eslint src app",
-    "test": "vitest"
+    "test": "vitest",
+    "validate:json": "node scripts/validate-json.js",
+    "prebuild": "npm run validate:json"
   },
   "keywords": [
     "web3",
@@ -54,7 +56,7 @@
     "@types/pg": "^8.10.0",
     "@types/cookie-parser": "^1.4.10",
     "@types/express": "^5.0.6",
-    "@types/node": "^25.0.9",
+    "@types/node": "^25.2.3",
     "@types/pg": "^8.16.0",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
