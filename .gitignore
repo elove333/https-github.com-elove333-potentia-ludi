@@ -9,6 +9,8 @@ coverage/
 # Production
 build/
 dist/
+.next/
+out/
 
 # Misc
 .DS_Store
@@ -32,6 +34,7 @@ yarn-error.log*
 # Temporary files
 tmp/
 temp/
+ 
 *.tmp
 
 # Google App Engine generated folder

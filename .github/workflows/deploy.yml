@@ -12,7 +12,6 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     # Only run if Vercel token is available
-    if: ${{ secrets.VERCEL_TOKEN }}
     permissions:
       contents: read
     env:
