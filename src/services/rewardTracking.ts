@@ -52,7 +52,7 @@ class RewardTrackingService extends PeriodicMonitor {
     if (Math.random() > 0.5) {
       const reward: ChainReward = {
         chainId,
-        chainName: chainNames[chainId] || `Chain ${chainId}`,
+        chainName: CHAIN_NAMES[chainId] || `Chain ${chainId}`,
         tokenAddress: '0x1234567890123456789012345678901234567890',
         tokenSymbol: 'GAME',
         amount: (Math.random() * 100).toFixed(2),
