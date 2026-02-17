@@ -1,0 +1,42 @@
+# Pre-commit hooks configuration
+# See https://pre-commit.com for more information
+# See the Git Tools guide (GIT_TOOLS.md) for setup instructions
+
+repos:
+  # General file checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: '.*\.(md|markdown)$'
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+      - id: mixed-line-ending
+        args: ['--fix=lf']
+      - id: check-merge-conflict
+      - id: detect-private-key
+
+  # JavaScript/TypeScript linting
+  - repo: https://github.com/pre-commit/mirrors-eslint
+    rev: v8.56.0
+    hooks:
+      - id: eslint
+        files: \.[jt]sx?$
+        types: [file]
+        additional_dependencies:
+          - eslint@8.56.0
+          - '@typescript-eslint/parser@6.19.0'
+          - '@typescript-eslint/eslint-plugin@6.19.0'
+
+# Installation:
+# 1. Install pre-commit: pip install pre-commit or brew install pre-commit
+# 2. Install hooks: pre-commit install
+# 3. (Optional) Run on all files: pre-commit run --all-files
+#
+# Usage:
+# - Hooks run automatically on git commit
+# - Skip hooks: SKIP=eslint git commit -m "message"
+# - Update hooks: pre-commit autoupdate

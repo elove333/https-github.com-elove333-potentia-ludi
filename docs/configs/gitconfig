@@ -1,0 +1,172 @@
+# Enhanced Git Configuration
+# Copy useful sections to your ~/.gitconfig
+# See the Git Tools guide (GIT_TOOLS.md) for tool-specific configurations
+
+[user]
+    # Set your name and email
+    name = Your Name
+    email = your.email@example.com
+
+[core]
+    # Use delta as the pager for better diffs (install: brew install git-delta)
+    pager = delta
+    
+    # Set your preferred editor
+    editor = vim
+    
+    # Automatically convert line endings
+    autocrlf = input
+
+[interactive]
+    # Use delta for interactive commands
+    diffFilter = delta --color-only
+
+[delta]
+    # Delta configuration for beautiful diffs
+    navigate = true
+    side-by-side = true
+    line-numbers = true
+    syntax-theme = Dracula
+    features = decorations
+
+[delta "decorations"]
+    commit-decoration-style = bold yellow box ul
+    file-style = bold yellow ul
+    file-decoration-style = none
+    hunk-header-decoration-style = cyan box ul
+
+[merge]
+    # Show common ancestor in conflicts
+    conflictstyle = diff3
+    
+    # Set merge tool (options: vimdiff, meld, kdiff3, etc.)
+    tool = vimdiff
+
+[diff]
+    # Detect moved lines in diffs
+    colorMoved = default
+    
+    # Use better diff algorithm
+    algorithm = histogram
+
+[pull]
+    # Use rebase instead of merge when pulling
+    # Change to false if you prefer merge
+    rebase = false
+
+[push]
+    # Push current branch to remote with same name
+    default = current
+    
+    # Automatically set up remote tracking
+    autoSetupRemote = true
+
+[init]
+    # Use 'main' as default branch name
+    defaultBranch = main
+
+[fetch]
+    # Automatically prune deleted remote branches
+    prune = true
+
+[rebase]
+    # Automatically stash and unstash when rebasing
+    autoStash = true
+    
+    # Use autosquash by default
+    autoSquash = false
+
+# Git Aliases - Shortcuts for common commands
+[alias]
+    # Status shortcuts
+    st = status
+    s = status -sb
+    
+    # Checkout shortcuts
+    co = checkout
+    cob = checkout -b
+    
+    # Branch shortcuts
+    br = branch
+    bra = branch -a
+    brd = branch -d
+    
+    # Commit shortcuts
+    ci = commit
+    cm = commit -m
+    ca = commit --amend
+    can = commit --amend --no-edit
+    
+    # Diff shortcuts
+    df = diff
+    dc = diff --cached
+    ds = diff --stat
+    
+    # Log shortcuts
+    lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+    ll = log --pretty=format:'%C(yellow)%h%Cred%d %Creset%s%Cblue [%cn]' --decorate --numstat
+    last = log -1 HEAD
+    l = log --oneline -n 20
+    
+    # Stash shortcuts
+    sl = stash list
+    sa = stash apply
+    ss = stash save
+    sp = stash pop
+    
+    # Other useful shortcuts
+    unstage = reset HEAD --
+    undo = reset --soft HEAD~1
+    amend = commit --amend --no-edit
+    visual = !lazygit
+    please = push --force-with-lease
+    
+    # Show contributors
+    contributors = shortlog --summary --numbered --email
+    
+    # List aliases
+    aliases = config --get-regexp alias
+    
+    # Clean up branches
+    cleanup = !git branch --merged | grep -v '\\*\\|main\\|master\\|develop' | xargs -n 1 git branch -d
+    
+    # Show current branch name
+    current = rev-parse --abbrev-ref HEAD
+    
+    # Sync with upstream (for forks)
+    sync = !git fetch upstream && git checkout main && git merge upstream/main
+
+[color]
+    # Enable colored output
+    ui = auto
+
+[color "branch"]
+    current = yellow reverse
+    local = yellow
+    remote = green
+
+[color "diff"]
+    meta = yellow bold
+    frag = magenta bold
+    old = red bold
+    new = green bold
+    whitespace = red reverse
+
+[color "status"]
+    added = green
+    changed = yellow
+    untracked = cyan
+
+# Git LFS Configuration (if using git-lfs)
+[filter "lfs"]
+    clean = git-lfs clean -- %f
+    smudge = git-lfs smudge -- %f
+    process = git-lfs filter-process
+    required = true
+
+# Conditional includes based on directory
+# Useful for different git configs for work vs personal projects
+# [includeIf "gitdir:~/work/"]
+#     path = ~/.gitconfig-work
+# [includeIf "gitdir:~/personal/"]
+#     path = ~/.gitconfig-personal

@@ -46,7 +46,7 @@ Thank you for your interest in contributing to the Conversational Web3 Wallet Hu
 
 ## Git Workflows & Best Practices
 
-When contributing to this project, you may need to work with common Git operations like cherry-picking commits, resolving conflicts, or safely rewriting commit history. We've created a comprehensive guide to help you:
+When contributing to this project, you may need to work with common Git operations like cherry-picking commits, resolving conflicts, or safely rewriting commit history. We've created comprehensive guides to help you:
 
 **📖 [Git Workflows Guide](./GIT_WORKFLOWS.md)** - Complete reference with practical examples
 
@@ -57,6 +57,17 @@ This guide covers:
 - **Handling stash conflicts** when applying stashed changes
 - **Safety tips and recovery strategies** using `git reflog`
 
+**🛠️ [Git Tools & TUIs Guide](./GIT_TOOLS.md)** - Essential tools to enhance your Git workflow
+
+Discover 25+ powerful Git tools including:
+- **TUI Git Clients**: lazygit, tig, forgit, gitu, gitui for visual Git operations
+- **Diff Tools**: delta, difftastic, diff-so-fancy for better code reviews
+- **Hook Managers**: pre-commit, lefthook for automated code quality
+- **History Management**: git-absorb, git-filter-repo, git-branchless
+- **Security Tools**: git-secrets to prevent committing credentials
+- **Collaboration**: mob.sh for pair programming, Commitizen for conventional commits
+- And many more!
+
 ### Quick Git Tips for Contributors
 
 - **Always create a backup branch** before any destructive operations
@@ -65,7 +76,26 @@ This guide covers:
 - **Check `git status` and `git diff`** immediately when conflicts occur
 - **Use `git reflog`** to recover from mistakes
 
-See the [Git Workflows Guide](./GIT_WORKFLOWS.md) for detailed step-by-step instructions and conflict resolution examples.
+### Recommended Tool Setup
+
+We recommend installing at least these tools to improve your development experience:
+
+```bash
+# Visual Git interface
+brew install lazygit  # or your package manager
+
+# Better diffs
+brew install git-delta
+
+# Git hooks framework
+pip install pre-commit
+pre-commit install
+
+# Better shell prompt
+brew install starship
+```
+
+See the [Git Tools Guide](./GIT_TOOLS.md) for complete installation instructions and usage examples.
 
 ## Code Organization
 
