@@ -1515,7 +1515,7 @@ symbol = "🌱 "
 ahead = "⇡${count}"
 diverged = "⇕⇡${ahead_count}⇣${behind_count}"
 behind = "⇣${count}"
-staged = '[++\($count\)](green)'  # \( \) is Starship's variable interpolation syntax
+staged = '[++\($count\)](green)'  # \( \) is Starship's variable syntax
 
 [nodejs]
 symbol = "⬢ "

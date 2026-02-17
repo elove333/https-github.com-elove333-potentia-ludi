@@ -74,7 +74,11 @@ case $setup_choice in
                 install_tool "delta" "brew install git-delta"
                 ;;
             apt)
-                install_tool "delta" "wget https://github.com/dandavison/delta/releases/download/${DELTA_VERSION}/git-delta_${DELTA_VERSION}_amd64.deb && sudo dpkg -i git-delta_${DELTA_VERSION}_amd64.deb && rm git-delta_${DELTA_VERSION}_amd64.deb"
+                # Install delta
+                DELTA_URL="https://github.com/dandavison/delta/releases/download/${DELTA_VERSION}"
+                DELTA_DEB="git-delta_${DELTA_VERSION}_amd64.deb"
+                install_tool "delta" "wget ${DELTA_URL}/${DELTA_DEB} && sudo dpkg -i ${DELTA_DEB} && rm ${DELTA_DEB}"
+                
                 echo -e "${YELLOW}⚠${NC} lazygit: Please install manually from https://github.com/jesseduffield/lazygit"
                 ;;
             *)
