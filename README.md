@@ -413,9 +413,7 @@ Contributions are welcome! This project is evolving to include conversational AI
 
 For detailed contributing guidelines, see [CONTRIBUTING.md](./CONTRIBUTING.md).
 
-**Need help with Git?**
-- 📖 [Git Workflows Guide](./GIT_WORKFLOWS.md) - Practical examples of cherry-picking, resolving conflicts, and safely rewriting history
-- 🛠️ [Git Tools & TUIs Guide](./GIT_TOOLS.md) - Terminal UIs, diff tools, hook managers, and 25+ essential Git tools to enhance your workflow
+**Need help with Git workflows?** Check out our [Git Workflows Guide](./GIT_WORKFLOWS.md) for practical examples of cherry-picking, resolving conflicts, and safely rewriting history.
 
 ## Areas for Contribution
 
