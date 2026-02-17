@@ -68,6 +68,6 @@
     "@walletconnect/ethereum-provider": "^2.23.5",
     "rimraf": "^6.0.0",
     "glob": "^13.0.0",
-    "inflight": "npm:lru-cache@^11.0.0"
+    "inflight": "^1.0.6"
   }
 }
