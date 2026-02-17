@@ -4,6 +4,9 @@
 
 set -e
 
+# Version variables for easier maintenance
+DELTA_VERSION="0.16.5"
+
 echo "🛠️  Git Tools Setup for Potentia Ludi"
 echo "======================================"
 echo ""
@@ -71,7 +74,7 @@ case $setup_choice in
                 install_tool "delta" "brew install git-delta"
                 ;;
             apt)
-                install_tool "delta" "wget https://github.com/dandavison/delta/releases/download/0.16.5/git-delta_0.16.5_amd64.deb && sudo dpkg -i git-delta_0.16.5_amd64.deb && rm git-delta_0.16.5_amd64.deb"
+                install_tool "delta" "wget https://github.com/dandavison/delta/releases/download/${DELTA_VERSION}/git-delta_${DELTA_VERSION}_amd64.deb && sudo dpkg -i git-delta_${DELTA_VERSION}_amd64.deb && rm git-delta_${DELTA_VERSION}_amd64.deb"
                 echo -e "${YELLOW}⚠${NC} lazygit: Please install manually from https://github.com/jesseduffield/lazygit"
                 ;;
             *)

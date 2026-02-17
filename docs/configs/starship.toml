@@ -28,7 +28,7 @@ conflicted = "🏳"
 deleted = "🗑"
 renamed = "📛"
 modified = "📝"
-staged = '[++\($count\)](green)'
+staged = '[++\($count\)](green)'  # \( \) is Starship's variable syntax
 untracked = "🤷"
 stashed = "📦"
 

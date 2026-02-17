@@ -289,7 +289,7 @@ brew install gitui
 
 **Ubuntu/Debian:**
 ```bash
-# Download latest release
+# Download latest release (check https://github.com/extrawurst/gitui/releases for newest version)
 wget https://github.com/extrawurst/gitui/releases/download/v0.25.1/gitui-linux-x86_64.tar.gz
 tar xf gitui-linux-x86_64.tar.gz
 sudo mv gitui /usr/local/bin/
@@ -1356,7 +1356,7 @@ brew install git-town
 
 **Manual:**
 ```bash
-# Download from releases
+# Download from releases (check https://github.com/git-town/git-town/releases for latest version)
 wget https://github.com/git-town/git-town/releases/download/v9.0.1/git-town_9.0.1_linux_amd64.tar.gz
 tar xf git-town_9.0.1_linux_amd64.tar.gz
 sudo mv git-town /usr/local/bin/
@@ -1515,7 +1515,7 @@ symbol = "🌱 "
 ahead = "⇡${count}"
 diverged = "⇕⇡${ahead_count}⇣${behind_count}"
 behind = "⇣${count}"
-staged = '[++\($count\)](green)'
+staged = '[++\($count\)](green)'  # \( \) is Starship's variable interpolation syntax
 
 [nodejs]
 symbol = "⬢ "
