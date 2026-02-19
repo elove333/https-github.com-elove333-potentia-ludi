@@ -1,4 +1,4 @@
-# Potentia Ludi - Implementation Summary
+# Potentia Lud - Readme.Md
 
 <!-- PARENT_CHUNK: Overview and Core Services (1500 tokens) -->
 ## Overview
