@@ -11,7 +11,7 @@
     "test": "vitest",
     "api:dev": "ts-node api/server.ts",
     "api:build": "tsc -p tsconfig.api.json",
-    "db:setup": "psql -d potentia_ludi -f database/schema.sql"
+    "db:setup": "psql -d potentia_ludi -f database/schema.sql",
     "lint": "eslint src app",
     "test": "vitest",
     "validate:json": "node scripts/validate-json.js",
