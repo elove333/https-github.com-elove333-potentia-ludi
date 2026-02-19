@@ -36,7 +36,7 @@ import { rateLimit, success, error } from '../../client';
 const router = Router();
 
 // Generate nonce for SIWE authentication
-router.post('/', rateLimit(10, 60000), async (req, res) => {
+router.post('/', rateLimit(10, 60000), async (_, res) => {
   try {
     const nonce = generateNonce();
 
