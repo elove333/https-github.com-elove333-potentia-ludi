@@ -1,10 +1,10 @@
-import { ChainReward } from '../types';
+import { Chain_Reward } from '../types';
 import { telemetryService } from './telemetry';
 import { SUPPORTED_CHAIN_IDS, CHAIN_NAMES } from '../constants/chains';
 import { PeriodicMonitor } from '../utils/monitoring';
 
-class RewardTrackingService extends PeriodicMonitor {
-  private trackedRewards: Map<string, ChainReward[]> = new Map();
+class Reward_Tracking_Service extends Periodic_Monitor {
+  private trackedRewards: Map<string, Chain_Reward[]> = new Map();
   private currentWalletAddress: string | null = null;
 
   /**
