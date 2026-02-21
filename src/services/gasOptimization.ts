@@ -28,7 +28,7 @@ class GasOptimizationService {
    * Start monitoring gas prices across chains
    */
   private startGasMonitoring() {
-    if (this.isMonitoring) return;
+    if (this.isMonitoring && this.updateInterval) return;
     
     this.isMonitoring = true;
     // Update gas prices every 15 seconds when monitoring is active
