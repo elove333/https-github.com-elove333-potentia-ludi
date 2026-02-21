@@ -32,11 +32,19 @@ const KNOWN_WEB3_GAMES = [
 class GameDetectionService {
   private detectedGames: Map<string, Web3Game> = new Map();
   private observers: Array<(game: Web3Game) => void> = [];
+  private initialized: boolean = false;
+  private urlCheckInterval: ReturnType<typeof setInterval> | null = null;
+  private popstateHandler: (() => void) | null = null;
 
   /**
-   * Initialize the game detection service
+   * Initialize the game detection service.
+   * Guards against multiple initializations to prevent duplicate listeners/timers.
    */
   init() {
+    if (this.initialized) {
+      return;
+    }
+    this.initialized = true;
     this.startUrlMonitoring();
     this.startContractMonitoring();
   }
@@ -53,13 +61,31 @@ class GameDetectionService {
         this.checkUrlForGame(currentUrl);
       };
 
+      this.popstateHandler = checkUrl;
+
       // Check on load and navigation
       checkUrl();
-      window.addEventListener('popstate', checkUrl);
-      
+      window.addEventListener('popstate', this.popstateHandler);
+
       // Check periodically for dynamic apps
-      setInterval(checkUrl, 5000);
+      this.urlCheckInterval = setInterval(checkUrl, 5000);
     }
+  }
+
+  /**
+   * Clean up listeners and timers, and reset initialization state.
+   * Call this before re-initializing or when shutting down.
+   */
+  cleanup() {
+    if (typeof window !== 'undefined' && this.popstateHandler) {
+      window.removeEventListener('popstate', this.popstateHandler);
+      this.popstateHandler = null;
+    }
+    if (this.urlCheckInterval !== null) {
+      clearInterval(this.urlCheckInterval);
+      this.urlCheckInterval = null;
+    }
+    this.initialized = false;
   }
 
   /**
@@ -146,3 +172,6 @@ class GameDetectionService {
 }
 
 export const gameDetectionService = new GameDetectionService();
+
+// Export class for custom configurations or testing
+export { GameDetectionService };
