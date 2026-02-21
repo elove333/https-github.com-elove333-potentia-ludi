@@ -19,6 +19,9 @@ export interface GasOptimization {
 }
 
 export interface TokenSwap {
+  id: string;
+  pair: string;
+  timestamp: number;
   fromToken: string;
   toToken: string;
   amount: string;

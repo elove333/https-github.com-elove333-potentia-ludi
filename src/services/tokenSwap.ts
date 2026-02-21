@@ -7,8 +7,134 @@ interface SwapRoute {
   estimatedOutput: string;
 }
 
+export interface TokenSwapServiceConfig {
+  swapTTLMs?: number;       // TTL for completed/failed swaps (default: 24 hours)
+  maxPerPair?: number;      // Max swaps to retain per pair (default: 50)
+  enableAutoCleanup?: boolean; // Enable periodic TTL cleanup (default: true)
+  cleanupInterval?: number; // Cleanup interval in ms (default: 5 minutes)
+}
+
+const DEFAULT_SWAP_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+const DEFAULT_MAX_PER_PAIR = 50;
+const DEFAULT_CLEANUP_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
+
 class TokenSwapService {
-  private swapHistory: TokenSwap[] = [];
+  private swapHistory: Map<string, TokenSwap[]> = new Map();
+  private swapByIdMap: Map<string, TokenSwap> = new Map();
+  private latestSwapPerPairMap: Map<string, TokenSwap> = new Map();
+  private swapCounter: number = 0;
+  private swapTTLMs: number;
+  private maxPerPair: number;
+  private enableAutoCleanup: boolean;
+  private cleanupIntervalMs: number;
+  private cleanupTimer: ReturnType<typeof setInterval> | null = null;
+
+  constructor(config: TokenSwapServiceConfig = {}) {
+    this.swapTTLMs = config.swapTTLMs ?? DEFAULT_SWAP_TTL_MS;
+    this.maxPerPair = config.maxPerPair ?? DEFAULT_MAX_PER_PAIR;
+    this.enableAutoCleanup = config.enableAutoCleanup ?? true;
+    this.cleanupIntervalMs = config.cleanupInterval ?? DEFAULT_CLEANUP_INTERVAL_MS;
+
+    if (this.enableAutoCleanup) {
+      this.startAutoCleanup();
+    }
+  }
+
+  /**
+   * Add a swap entry, enforcing per-pair capacity limits and updating lookup maps.
+   * Oldest swaps beyond maxPerPair are evicted from all structures.
+   */
+  private addOrEvictSwap(swap: TokenSwap): void {
+    this.swapByIdMap.set(swap.id, swap);
+
+    const pairSwaps = this.swapHistory.get(swap.pair) ?? [];
+    pairSwaps.push(swap);
+
+    // Sort descending by timestamp; use the monotonic counter embedded in the ID
+    // as a tiebreaker so that swaps created in the same millisecond are ordered
+    // correctly (higher counter = more recent).
+    // ID format: "swap-{timestamp}-{counter}" — counter is the last segment.
+    const getSeq = (swap: TokenSwap): number => {
+      const parts = swap.id.split('-');
+      return parseInt(parts[parts.length - 1], 10) || 0;
+    };
+    pairSwaps.sort((a, b) => {
+      const timeDiff = b.timestamp - a.timestamp;
+      return timeDiff !== 0 ? timeDiff : getSeq(b) - getSeq(a);
+    });
+    const kept = pairSwaps.slice(0, this.maxPerPair);
+    this.swapHistory.set(swap.pair, kept);
+
+    // Update the latest-swap map with the most recent entry for this pair
+    this.latestSwapPerPairMap.set(swap.pair, kept[0]);
+
+    // Remove evicted swaps from the ID map
+    const evicted = pairSwaps.slice(this.maxPerPair);
+    for (const evictedSwap of evicted) {
+      this.swapByIdMap.delete(evictedSwap.id);
+    }
+  }
+
+  /**
+   * Remove completed/failed swaps older than the configured TTL.
+   * Returns the number of entries removed.
+   */
+  pruneExpiredSwaps(): number {
+    const now = Date.now();
+    let removed = 0;
+
+    for (const id of Array.from(this.swapByIdMap.keys())) {
+      const swap = this.swapByIdMap.get(id);
+      if (swap && swap.status !== 'pending' && now - swap.timestamp > this.swapTTLMs) {
+        this.swapByIdMap.delete(id);
+        removed++;
+
+        // Evict from pair history
+        const pairSwaps = this.swapHistory.get(swap.pair);
+        if (pairSwaps) {
+          const updated = pairSwaps.filter((s) => s.id !== id);
+          if (updated.length > 0) {
+            this.swapHistory.set(swap.pair, updated);
+          } else {
+            this.swapHistory.delete(swap.pair);
+          }
+        }
+
+        // Evict from latest-per-pair map if this was the latest entry
+        const latest = this.latestSwapPerPairMap.get(swap.pair);
+        if (latest?.id === id) {
+          this.latestSwapPerPairMap.delete(swap.pair);
+        }
+      }
+    }
+
+    return removed;
+  }
+
+  /**
+   * Start periodic TTL-based cleanup
+   */
+  private startAutoCleanup(): void {
+    if (this.cleanupTimer) {
+      return;
+    }
+    this.cleanupTimer = setInterval(() => {
+      const removed = this.pruneExpiredSwaps();
+      if (removed > 0 && process.env.NODE_ENV === 'development') {
+        console.log(`TokenSwapService: Pruned ${removed} expired swap(s)`);
+      }
+    }, this.cleanupIntervalMs);
+  }
+
+  /**
+   * Stop periodic TTL-based cleanup
+   */
+  stopAutoCleanup(): void {
+    if (this.cleanupTimer) {
+      clearInterval(this.cleanupTimer);
+      this.cleanupTimer = null;
+    }
+  }
 
   /**
    * Get the best swap route across multiple DEXs
@@ -57,7 +183,13 @@ class TokenSwapService {
     
     const route = await this.getBestRoute(chainId, fromToken, toToken, amount);
 
+    this.swapCounter++;
+    const pair = `${fromToken}-${toToken}`;
+    const now = Date.now();
     const swap: TokenSwap = {
+      id: `swap-${now}-${this.swapCounter}`,
+      pair,
+      timestamp: now,
       fromToken,
       toToken,
       amount,
@@ -67,7 +199,7 @@ class TokenSwapService {
       status: 'pending',
     };
 
-    this.swapHistory.push(swap);
+    this.addOrEvictSwap(swap);
 
     // In production, this would execute the actual swap
     // For demo, simulate completion after delay
@@ -121,20 +253,64 @@ class TokenSwapService {
   }
 
   /**
-   * Get swap history
+   * Get all swap history as a flat array (most recent first per pair)
    */
   getSwapHistory(): TokenSwap[] {
-    return this.swapHistory;
+    const all: TokenSwap[] = [];
+    for (const swaps of this.swapHistory.values()) {
+      all.push(...swaps);
+    }
+    return all;
   }
 
   /**
-   * Get swap status
+   * Get the latest swap for a given token pair, or undefined if none exists
    */
   getSwapStatus(fromToken: string, toToken: string): TokenSwap | undefined {
-    return this.swapHistory.find(
-      (swap) => swap.fromToken === fromToken && swap.toToken === toToken
-    );
+    const pair = `${fromToken}-${toToken}`;
+    return this.latestSwapPerPairMap.get(pair);
+  }
+
+  /**
+   * Get swap by ID
+   */
+  getSwapById(id: string): TokenSwap | undefined {
+    return this.swapByIdMap.get(id);
+  }
+
+  /**
+   * Get service configuration
+   */
+  getConfig(): {
+    swapTTLMs: number;
+    maxPerPair: number;
+    enableAutoCleanup: boolean;
+    cleanupIntervalMs: number;
+    totalSwapCount: number;
+    pairCount: number;
+  } {
+    return {
+      swapTTLMs: this.swapTTLMs,
+      maxPerPair: this.maxPerPair,
+      enableAutoCleanup: this.enableAutoCleanup,
+      cleanupIntervalMs: this.cleanupIntervalMs,
+      totalSwapCount: this.swapByIdMap.size,
+      pairCount: this.swapHistory.size,
+    };
+  }
+
+  /**
+   * Clean up all resources (call when shutting down or in tests)
+   */
+  cleanup(): void {
+    this.stopAutoCleanup();
+    this.swapHistory.clear();
+    this.swapByIdMap.clear();
+    this.latestSwapPerPairMap.clear();
   }
 }
 
 export const tokenSwapService = new TokenSwapService();
+
+// Export class for custom configurations or testing
+export { TokenSwapService };
