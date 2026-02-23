@@ -60,11 +60,6 @@
     "globals": "^17.3.0",
     "pg": "^8.17.1",
     "siwe": "^3.0.0",
-    "typescript": "^5.0.0",
-    "vite": "^7.3.1",
-    "vitest": "^4.0.18"
-  },
-  "overrides": {
     "@paulmillr/qr": "npm:qr@^0.5.4",
     "@walletconnect/sign-client": "^2.23.5",
     "@walletconnect/universal-provider": "^2.23.5",
