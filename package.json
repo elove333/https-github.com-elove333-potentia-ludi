@@ -7,14 +7,11 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "lint": "eslint src app",
-    "test": "vitest",
     "api:dev": "ts-node api/server.ts",
     "api:build": "tsc -p tsconfig.api.json",
     "db:setup": "psql -d potentia_ludi -f database/schema.sql",
     "validate:json": "node scripts/validate-json.js",
-    "prebuild": "npm run validate:json"
-  },
+    "prebuild": "npm run validate:json,
   "keywords": [
     "web3",
     "gaming",
