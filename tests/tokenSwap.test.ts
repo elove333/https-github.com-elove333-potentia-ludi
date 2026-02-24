@@ -9,20 +9,6 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { TokenSwapService } from '../src/services/tokenSwap';
 import { TokenSwap } from '../src/types';
 
-// Helper to build a minimal TokenSwap without calling executeSwap
-function makeSwap(overrides: Partial<TokenSwap> & { id: string; pair: string; timestamp: number }): TokenSwap {
-  return {
-    fromToken: 'TokenA',
-    toToken: 'TokenB',
-    amount: '100',
-    estimatedOutput: '99.8',
-    route: ['TokenA', 'TokenB'],
-    slippage: 0.5,
-    status: 'pending',
-    ...overrides,
-  };
-}
-
 describe('TokenSwapService', () => {
   let service: TokenSwapService;
 
@@ -204,6 +190,25 @@ describe('TokenSwapService', () => {
       service.pruneExpiredSwaps();
 
       expect(service.getSwapStatus('ETH', 'USDC')).toBeUndefined();
+    });
+
+    it('should update latestSwapPerPairMap to next most-recent when the latest swap expires', async () => {
+      const old = await service.executeSwap(1, 'ETH', 'USDC', '1.0');
+      const recent = await service.executeSwap(1, 'ETH', 'USDC', '2.0');
+
+      // Expire the most-recent (latest) swap
+      recent.status = 'completed';
+      recent.timestamp = Date.now() - 2000;
+      // Keep old swap fresh and completed within TTL
+      old.status = 'completed';
+      old.timestamp = Date.now();
+
+      service.pruneExpiredSwaps();
+
+      // recent was evicted; latestSwapPerPairMap should now point at the remaining swap
+      const status = service.getSwapStatus('ETH', 'USDC');
+      expect(status).toBeDefined();
+      expect(status?.id).toBe(old.id);
     });
 
     it('should return count of removed swaps', async () => {

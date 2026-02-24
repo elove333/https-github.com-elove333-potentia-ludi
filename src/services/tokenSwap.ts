@@ -100,10 +100,16 @@ class TokenSwapService {
           }
         }
 
-        // Evict from latest-per-pair map if this was the latest entry
+        // Evict from latest-per-pair map if this was the latest entry,
+        // otherwise keep it pointing at the newest remaining swap.
         const latest = this.latestSwapPerPairMap.get(swap.pair);
         if (latest?.id === id) {
-          this.latestSwapPerPairMap.delete(swap.pair);
+          const remaining = this.swapHistory.get(swap.pair);
+          if (remaining && remaining.length > 0) {
+            this.latestSwapPerPairMap.set(swap.pair, remaining[0]);
+          } else {
+            this.latestSwapPerPairMap.delete(swap.pair);
+          }
         }
       }
     }
