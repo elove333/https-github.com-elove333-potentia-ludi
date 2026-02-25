@@ -23,7 +23,7 @@ class TokenSwapService {
    * Generate a unique ID for a swap
    */
   private generateSwapId(): string {
-    return `swap-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    return `swap-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
   }
 
   /**
