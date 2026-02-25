@@ -203,7 +203,7 @@ Missing cleanup for timers and intervals could cause memory leaks.
 | Clip polling frequency | Every 5s | Every 10s | 50% reduction |
 | Gas monitoring (idle) | Continuous | Conditional | 100% when idle |
 | Swap status lookup | O(n) | O(1) | n times faster |
-| Game domain lookup | O(n*m) | O(1) | n*m times faster |
+| Game domain lookup | O(n*m) | O(n*m) | Same asymptotic, lower constant factors |
 | React re-renders | Frequent | Memoized | ~70% reduction |
 
 ## Code Quality Improvements
