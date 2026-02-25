@@ -79,21 +79,27 @@ class GameDetectionService {
    * Check if a URL matches any known Web3 games
    */
   private checkUrlForGame(url: string) {
-    // Use O(1) domain lookup instead of nested loops
-    for (const [domain, gameConfig] of this.domainToGameMap.entries()) {
-      if (url.includes(domain)) {
-        const game: Web3Game = {
-          id: gameConfig.name.toLowerCase().replace(/\s+/g, '-'),
-          name: gameConfig.name,
-          url: url,
-          chainId: gameConfig.chainId,
-          contractAddresses: gameConfig.contractPatterns,
-          detected: true,
-          lastActive: new Date(),
-        };
-        this.addDetectedGame(game);
+    try {
+      const hostname = new URL(url).hostname;
+      const gameConfig = this.domainToGameMap.get(hostname);
+
+      if (!gameConfig) {
         return;
       }
+
+      const game: Web3Game = {
+        id: gameConfig.name.toLowerCase().replace(/\s+/g, '-'),
+        name: gameConfig.name,
+        url,
+        chainId: gameConfig.chainId,
+        contractAddresses: gameConfig.contractPatterns,
+        detected: true,
+        lastActive: new Date(),
+      };
+      this.addDetectedGame(game);
+    } catch {
+      // If the URL is invalid or cannot be parsed, skip detection
+      return;
     }
   }
 
