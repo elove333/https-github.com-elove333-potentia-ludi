@@ -111,7 +111,8 @@ getSwapKey(fromToken: string, toToken: string): string {
 }
 
 getSwapStatus(fromToken: string, toToken: string): TokenSwap | undefined {
-  return this.swapStatusMap.get(this.getSwapKey(fromToken, toToken));
+  const swapId = this.latestSwapPerPairMap.get(this.getSwapKey(fromToken, toToken));
+  return swapId ? this.swapByIdMap.get(swapId) : undefined;
 }
 ```
 
