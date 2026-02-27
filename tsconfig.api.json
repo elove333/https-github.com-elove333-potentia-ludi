@@ -5,16 +5,6 @@
     "target": "ES2020",
     "lib": ["ES2020"],
     "outDir": "./dist/api",
-    "rootDir": "./api",
-    "moduleResolution": "node",
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "strict": true,
-  "compilerOptions": {
-    "target": "ES2020",
-    "module": "commonjs",
-    "lib": ["ES2020"],
-    "outDir": "./dist/api",
     "rootDir": ".",
     "strict": true,
     "esModuleInterop": true,
@@ -27,8 +17,6 @@
     "sourceMap": true,
     "types": ["node"]
   },
-  "include": ["api/**/*"],
-  "exclude": ["node_modules", "dist"]
   "include": [
     "api/**/*",
     "tests/**/*"

@@ -69,3 +69,6 @@ android/build/
 *.dex
 local.properties
 .gradle/
+
+# Generated secrets and temporary paths
+path/to/
