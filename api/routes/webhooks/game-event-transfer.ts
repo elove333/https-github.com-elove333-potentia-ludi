@@ -45,9 +45,6 @@ router.post('/', async (req: Request, res: Response) => {
     console.log('🔗 Webhook ID:', webhookData.webhookId);
     console.log('🔗 Event type:', webhookData.type);
 
-    // Validate webhook structure
-    if (!webhookData.event || !webhookData.event.activity) {
-      console.log('❌ Invalid webhook structure');
       return res.status(400).json({ error: 'Invalid webhook structure' });
     }
 
