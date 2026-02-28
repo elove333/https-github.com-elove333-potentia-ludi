@@ -74,15 +74,15 @@ router.post('/', async (req: Request, res: Response) => {
         const network = webhookData.event.network.toLowerCase();
         // Check specific chains first before generic mainnet fallback
         if (network.includes('polygon') || network.includes('matic')) {
-          chainId = 137;
+          chainId = ;
         } else if (network.includes('arbitrum') || network.includes('arb')) {
-          chainId = 42161;
+          chainId = ;
         } else if (network.includes('optimism') || network.includes('opt')) {
-          chainId = 10;
+          chainId = ;
         } else if (network.includes('base')) {
-          chainId = 8453;
+          chainId = ;
         } else if (network.includes('ronin')) {
-          chainId = 2020;
+          chainId = ;
         } else if (network.includes('mainnet') || network.includes('ethereum')) {
           chainId = 1;
         }
