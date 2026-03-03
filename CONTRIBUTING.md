@@ -594,16 +594,50 @@ it('should complete swap workflow', async () => {
    - Update README.md if adding features
    - Update ARCHITECTURE.md for significant changes
 
-3. **Write Clear Commits**
+3. **Write Clear Commits** (Conventional Commits format required)
+
+   All commit messages must follow the [Conventional Commits](https://www.conventionalcommits.org/) specification. This is enforced automatically by CI via commitlint.
+
+   **Format:**
    ```
-   feat: Add NFT transfer workflow
-   
+   <type>: <short description>
+
+   [optional body]
+
+   [optional footer]
+   ```
+
+   **Allowed types:**
+   | Type | When to use |
+   |------|-------------|
+   | `feat` | New feature |
+   | `fix` | Bug fix |
+   | `docs` | Documentation changes only |
+   | `style` | Formatting, missing semicolons, etc. (no code change) |
+   | `refactor` | Code refactoring (no feature or bug fix) |
+   | `perf` | Performance improvement |
+   | `test` | Adding or updating tests |
+   | `build` | Build system or dependency changes |
+   | `ci` | CI/CD configuration changes |
+   | `chore` | Other changes (e.g., tooling, scripts) |
+   | `revert` | Reverting a previous commit |
+
+   **Examples:**
+   ```
+   feat: add NFT transfer workflow
+
    - Implement NFT transfer validation
    - Add ownership checks
    - Integrate with OpenSea API
    - Add tests for edge cases
-   
+
    Closes #123
+   ```
+   ```
+   ci: create deploy.yml for Vercel deployment automation
+   ```
+   ```
+   fix: handle nil user agent in request handler
    ```
 
 4. **Create Pull Request**
