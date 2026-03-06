@@ -1,6 +1,6 @@
 // Tests for Intent Parser
 import { describe, it, expect } from 'vitest';
-import { IntentParser, validateIntent } from '../api/services/intentParser';
+import { IntentParser, validateStructuredIntent } from '../api/services/intentParser';
 
 describe('IntentParser', () => {
   const testAddress = '0x742d35Cc6634C0532925a3b8D7De2665B81b5fE4';
@@ -80,7 +80,7 @@ describe('IntentParser', () => {
   describe('Validation', () => {
     it('should validate valid swap intent', () => {
       const intent = IntentParser.parse('swap 100 USDC to ETH', testAddress);
-      const validation = validateIntent(intent);
+      const validation = validateStructuredIntent(intent);
       expect(validation.valid).toBe(true);
       expect(validation.errors).toHaveLength(0);
     });
@@ -91,7 +91,7 @@ describe('IntentParser', () => {
         takerAddress: 'invalid',
         chainId: 1,
       };
-      const validation = validateIntent(intent);
+      const validation = validateStructuredIntent(intent);
       expect(validation.valid).toBe(false);
       expect(validation.errors).toContain('Invalid taker address');
     });
@@ -104,7 +104,7 @@ describe('IntentParser', () => {
         from: { token: 'USDC', amount: '0', chain: 'ethereum' },
         to: { token: 'ETH', chain: 'ethereum' },
       };
-      const validation = validateIntent(intent);
+      const validation = validateStructuredIntent(intent);
       expect(validation.valid).toBe(false);
       expect(validation.errors).toContain('Invalid swap amount');
     });
@@ -117,11 +117,14 @@ describe('IntentParser', () => {
         from: { token: 'USDC', amount: '100', chain: 'ethereum' },
         to: { chain: 'ethereum' },
       };
-      const validation = validateIntent(intent);
+      const validation = validateStructuredIntent(intent);
       expect(validation.valid).toBe(false);
       expect(validation.errors).toContain('Cannot bridge to the same chain');
+    });
+  });
+});
+
 // Intent Parser Tests
-import { describe, it, expect } from 'vitest';
 import { parseIntent, validateIntent, getIntentDescription } from '../api/services/intentParser';
 
 describe('Intent Parser', () => {
@@ -138,7 +141,7 @@ describe('Intent Parser', () => {
     });
 
     it('should parse transfer intent', async () => {
-      const result = await parseIntent('send 50 USDC to 0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb');
+      const result = await parseIntent('send 50 USDC to 0x742d35Cc6634C0532925a3b8D7De2665B81b5fE4');
       
       expect(result).toBeDefined();
       expect(result?.action).toBe('transfer.send');
