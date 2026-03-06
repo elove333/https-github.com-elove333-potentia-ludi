@@ -9,6 +9,22 @@ interface NetworkStatusState {
   lastChecked: Date;
 }
 
+const HEALTH_COLOR: Record<NetworkHealth, string> = {
+  excellent: '#00ff88',
+  good: '#00d9ff',
+  fair: '#ffa500',
+  poor: '#ff6b6b',
+  offline: '#666',
+};
+
+const HEALTH_LABEL: Record<NetworkHealth, string> = {
+  excellent: 'Excellent',
+  good: 'Good',
+  fair: 'Fair',
+  poor: 'Poor',
+  offline: 'Offline',
+};
+
 const NetworkStatus: React.FC = () => {
   const { wallet } = useGamingWalletStore();
   const [status, setStatus] = useState<NetworkStatusState>({
@@ -19,89 +35,43 @@ const NetworkStatus: React.FC = () => {
 
   useEffect(() => {
     if (!wallet?.isConnected) {
-      setStatus({
-        health: 'offline',
-        latency: 0,
-        lastChecked: new Date(),
-      });
+      setStatus({ health: 'offline', latency: 0, lastChecked: new Date() });
       return;
     }
 
-    // Simulate network health check
     const checkNetworkHealth = async () => {
       const start = Date.now();
-      
+
       // In production, this would make actual RPC calls
-      // For demo, simulate network latency
       await new Promise((resolve) => setTimeout(resolve, Math.random() * 100 + 50));
-      
+
       const latency = Date.now() - start;
       let health: NetworkHealth;
-      
+
       if (latency < 100) health = 'excellent';
       else if (latency < 200) health = 'good';
       else if (latency < 500) health = 'fair';
       else health = 'poor';
-      
-      setStatus({
-        health,
-        latency,
-        lastChecked: new Date(),
-      });
+
+      setStatus({ health, latency, lastChecked: new Date() });
     };
 
     checkNetworkHealth();
-    const interval = setInterval(checkNetworkHealth, 10000); // Check every 10 seconds
+    const interval = setInterval(checkNetworkHealth, 10000);
 
     return () => clearInterval(interval);
   }, [wallet?.isConnected]);
 
-  const getHealthColor = (health: NetworkHealth): string => {
-    switch (health) {
-      case 'excellent':
-        return '#00ff88';
-      case 'good':
-        return '#00d9ff';
-      case 'fair':
-        return '#ffa500';
-      case 'poor':
-        return '#ff6b6b';
-      case 'offline':
-        return '#666';
-      default:
-        return '#666';
-    }
-  };
-
-  const getHealthLabel = (health: NetworkHealth): string => {
-    switch (health) {
-      case 'excellent':
-        return 'Excellent';
-      case 'good':
-        return 'Good';
-      case 'fair':
-        return 'Fair';
-      case 'poor':
-        return 'Poor';
-      case 'offline':
-        return 'Offline';
-      default:
-        return 'Unknown';
-    }
-  };
+  const color = HEALTH_COLOR[status.health];
 
   return (
     <div style={styles.container}>
       <div style={styles.indicator}>
         <div
           className="pulse-animation"
-          style={{
-            ...styles.dot,
-            backgroundColor: getHealthColor(status.health),
-            boxShadow: `0 0 8px ${getHealthColor(status.health)}`,
-          }}
+          style={{ ...styles.dot, backgroundColor: color, boxShadow: `0 0 8px ${color}` }}
         />
-        <span style={styles.label}>Network: {getHealthLabel(status.health)}</span>
+        <span style={styles.label}>Network: {HEALTH_LABEL[status.health]}</span>
       </div>
       {wallet?.isConnected && status.latency > 0 && (
         <span style={styles.latency}>{status.latency}ms</span>
